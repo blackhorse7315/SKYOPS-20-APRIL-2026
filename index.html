@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkyOps Navigation Pro V.00</title>
     
+    <!-- PWA / Installability Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-">
+    <link id="manifest-link" rel="manifest" href="">
+
     <!-- ========================================== -->
     <!--         GLOBAL CSS & LIBRARIES             -->
     <!-- ========================================== -->
@@ -1000,10 +1007,36 @@
                 splash.classList.remove('fade-in'); splash.classList.add('fade-out');
                 setTimeout(() => { initApp(); }, 1000);
             }, 3000);
+
+            // --- PWA SETUP ---
+            setupPWA();
         };
+
+        function setupPWA() {
+            const manifestData = {
+                "name": "SkyOps Navigation Pro",
+                "short_name": "SkyOps",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#0f172a",
+                "theme_color": "#0f172a",
+                "icons": [ { "src": "https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-", "sizes": "192x192 512x512", "type": "image/png", "purpose": "any" } ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
+
+            if ('serviceWorker' in navigator) {
+                const swCode = `self.addEventListener('install', (e) => { self.skipWaiting(); }); self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); }); self.addEventListener('fetch', (e) => { });`;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(console.warn);
+            }
+        }
 
         // --- APP INIT ---
         async function initApp() {
+            if (GOOGLE_SCRIPT_URL === '') {
+                alert('PERINGATAN: URL Google Sheet belum diatur! Aplikasi murni menggunakan Cloud Data. Masukkan URL Script di source code agar data dapat tampil.');
+            }
             showView('loginScreen');
             await loadUsers();
             await loadWaypoints(); 
@@ -1018,21 +1051,12 @@
             if (GOOGLE_SCRIPT_URL !== '') {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=users'); usersData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Users", error); loadLocalUsers(); }
-            } else { loadLocalUsers(); }
+                } catch (error) { console.error("Error G-Sheet Users", error); usersData = []; }
+            } else { usersData = []; }
             renderUserTable();
         }
 
-        function loadLocalUsers() {
-            const localData = localStorage.getItem('skyops_users');
-            if(localData) { usersData = JSON.parse(localData); } else {
-                const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
-                usersData = [{ id: Date.now().toString(), name: 'Demo Pilot', role: 'user', username: 'pilot', password: '123', expired: nextMonth.toISOString().split('T')[0] }]; saveToLocal();
-            }
-        }
-
-        function saveToLocal() { 
-            localStorage.setItem('skyops_users', JSON.stringify(usersData)); 
+        function saveUsers() { 
             if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=users', { method: 'POST', body: JSON.stringify(usersData) }).catch(e => console.warn(e));
         }
 
@@ -1078,13 +1102,13 @@
             e.preventDefault(); const id = document.getElementById('userId').value;
             const userData = { id: id || Date.now().toString(), name: document.getElementById('uName').value, role: document.getElementById('uRole').value, username: document.getElementById('uUsername').value, password: document.getElementById('uPassword').value, expired: document.getElementById('uExpired').value };
             if(id) { const idx = usersData.findIndex(u => u.id === id); if(idx !== -1) usersData[idx] = userData; } else { usersData.push(userData); }
-            saveToLocal(); renderUserTable(); closeUserModal();
+            saveUsers(); renderUserTable(); closeUserModal();
         }
         function editUser(id) {
             const user = usersData.find(u => u.id === id);
             if(user) { document.getElementById('userId').value = user.id; document.getElementById('uName').value = user.name; document.getElementById('uRole').value = user.role; document.getElementById('uUsername').value = user.username; document.getElementById('uPassword').value = user.password; document.getElementById('uExpired').value = user.expired; document.getElementById('modalTitle').textContent = 'Edit User'; document.getElementById('userModal').classList.remove('hidden'); }
         }
-        function deleteUser(id) { if(confirm("Are you sure?")) { usersData = usersData.filter(u => u.id !== id); saveToLocal(); renderUserTable(); } }
+        function deleteUser(id) { if(confirm("Are you sure?")) { usersData = usersData.filter(u => u.id !== id); saveUsers(); renderUserTable(); } }
 
         function setupMainApp(user) {
             document.getElementById('displayUserName').textContent = user.name;
@@ -1233,20 +1257,12 @@
             if (GOOGLE_SCRIPT_URL !== '') {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=waypoints'); waypointsData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Waypoints", error); loadLocalWaypoints(); }
-            } else { loadLocalWaypoints(); }
+                } catch (error) { console.error("Error G-Sheet Waypoints", error); waypointsData = []; }
+            } else { waypointsData = []; }
             renderWaypoints();
         }
 
-        function loadLocalWaypoints() {
-            const localWP = localStorage.getItem('skyops_waypoints');
-            if (localWP) { waypointsData = JSON.parse(localWP); } else {
-                waypointsData = [ { id: '170001', name: 'WIMM', type: 'airport', lat: 3.637222, lon: 98.878889, elev: 23 }, { id: '170002', name: 'MDN', type: 'vfr', lat: 3.5638, lon: 98.6695, elev: 110 }, { id: '170003', name: 'MEDAN HELI', type: 'heliport', lat: 3.5952, lon: 98.6722, elev: 85 } ]; saveWaypoints();
-            } 
-        }
-
         function saveWaypoints() { 
-            localStorage.setItem('skyops_waypoints', JSON.stringify(waypointsData)); 
             if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=waypoints', { method: 'POST', body: JSON.stringify(waypointsData) }).catch(e => console.warn(e));
         }
 
@@ -1366,20 +1382,12 @@
             if (GOOGLE_SCRIPT_URL !== '') {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=aircrafts'); aircraftsData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Aircrafts", error); loadLocalAircrafts(); }
-            } else { loadLocalAircrafts(); }
+                } catch (error) { console.error("Error G-Sheet Aircrafts", error); aircraftsData = []; }
+            } else { aircraftsData = []; }
             renderAircrafts();
         }
 
-        function loadLocalAircrafts() {
-            const localAC = localStorage.getItem('skyops_aircrafts');
-            if (localAC) { aircraftsData = JSON.parse(localAC); } else {
-                aircraftsData = [ { id: 'ac_1', reg: 'PK-TWA', type: 'Gulfstream IV SP', model: 'Fixed Wing', speed: 450, fuel: 3500, fuelUnit: 'lbs' }, { id: 'ac_2', reg: 'PK-HLY', type: 'Bell 412 EP', model: 'Helicopter', speed: 140, fuel: 250, fuelUnit: 'liter' } ]; saveAircrafts();
-            } 
-        }
-
         function saveAircrafts() { 
-            localStorage.setItem('skyops_aircrafts', JSON.stringify(aircraftsData)); 
             if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=aircrafts', { method: 'POST', body: JSON.stringify(aircraftsData) }).catch(e => console.warn(e));
         }
 
@@ -1429,18 +1437,12 @@
             if (GOOGLE_SCRIPT_URL !== '') {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=routes'); routesData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Routes", error); loadLocalRoutes(); }
-            } else { loadLocalRoutes(); }
+                } catch (error) { console.error("Error G-Sheet Routes", error); routesData = []; }
+            } else { routesData = []; }
             renderRouteList();
         }
 
-        function loadLocalRoutes() {
-            const localRt = localStorage.getItem('skyops_routes');
-            if (localRt) { routesData = JSON.parse(localRt); } else { routesData = []; }
-        }
-
         function saveRoutes() { 
-            localStorage.setItem('skyops_routes', JSON.stringify(routesData)); 
             if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=routes', { method: 'POST', body: JSON.stringify(routesData) }).catch(e => console.warn(e));
         }
 
