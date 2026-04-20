@@ -340,7 +340,7 @@
             <!-- ========================================== -->
             <div id="tab-map" class="tab-content absolute inset-0 fade-in h-full w-full">
                 <div id="mapTransformWrapper" class="absolute inset-0 z-0 bg-[#0f172a] overflow-hidden">
-                    <div id="realMap" class="absolute w-[150%] h-[150%] -left-[25%] -top-[25%] cursor-crosshair" style="transition: transform 0.1s linear;"></div>
+                    <div id="realMap" class="w-full h-full cursor-crosshair" style="transition: transform 0.1s linear;"></div>
                 </div>
 
                 <!-- Floating Status Bar (Top Left) -->
@@ -1257,11 +1257,8 @@
             const latlngs = rt.waypoints.map(wp => [wp.lat, wp.lon]);
             const bounds = L.latLngBounds(latlngs);
             
-            // Hitung kompensasi padding karena ukuran Map di-set 150% di belakang layar
-            const padX = (window.innerWidth * 0.25) + 50;
-            const padY = (window.innerHeight * 0.25) + 50;
-            
-            map.flyToBounds(bounds, { paddingTopLeft: [padX, padY], paddingBottomRight: [padX, padY], duration: 1.5 });
+            // Peta akan otomatis melakukan zoom out / in menyesuaikan rute ke ukuran normal
+            map.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
         }
 
         function drawActiveRoute() {
