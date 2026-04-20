@@ -1288,6 +1288,7 @@
             const data = await fetchFromSheet('waypoints');
             if (data !== null) { waypointsData = data; }
             renderWaypoints();
+            updateMapWaypoints(); // Memperbarui marker/ikon di peta setelah sync
         }
 
         function saveWaypoints() { postToSheet('waypoints', waypointsData); }
@@ -1458,6 +1459,15 @@
             const data = await fetchFromSheet('routes');
             if (data !== null) { routesData = data; }
             renderRouteList();
+            
+            // Perbarui juga garis rute aktif di peta jika ada perubahan/penghapusan dari cloud saat sync
+            if (activeMapRouteId) {
+                if (!routesData.find(r => r.id === activeMapRouteId)) {
+                    clearActiveMapRoute();
+                } else {
+                    drawActiveRoute();
+                }
+            }
         }
 
         function saveRoutes() { postToSheet('routes', routesData); }
