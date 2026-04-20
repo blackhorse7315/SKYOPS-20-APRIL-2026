@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="SkyOps Pro">
     <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-">
     
-    <!-- Dynamic Manifest Generation (Single File Workaround) -->
+    <!-- Dynamic Manifest Generation -->
     <link id="manifest-link" rel="manifest">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,9 +21,9 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #f0f4f8;
+            background: #f8fafc;
             overflow: hidden;
-            user-select: none; /* Mencegah seleksi teks seperti aplikasi asli */
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
         .glass {
@@ -31,219 +31,192 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .fade-in { animation: fadeIn 1.5s ease-out forwards; }
-        .fade-out { animation: fadeOut 1.5s ease-in forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.6s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
         
         .tab-active {
             color: #2563eb;
-            border-bottom: 3px solid #2563eb;
+            background: #eff6ff;
+            border-radius: 12px;
         }
         .login-card {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
         }
         .nav-header {
-            background: linear-gradient(to right, #1e3a8a, #2563eb);
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
         }
-        /* Scrollbar styling */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .tech-grid {
+            background-image: linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col">
 
     <!-- SPLASH SCREEN -->
     <div id="splash" class="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-white">
-        <div class="w-24 h-24 mb-6 transition-transform duration-1000 scale-110">
-            <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-full h-full object-contain" />
+        <div class="w-24 h-24 mb-6">
+            <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-full h-full object-contain animate-pulse" />
         </div>
         <div class="text-center">
-            <h1 class="text-3xl font-light tracking-widest fade-in">SKYOPS <span class="font-bold">NAVIGATION PRO</span></h1>
-            <p class="mt-2 text-slate-400 tracking-wider">Version 0.00</p>
-            <div class="mt-8 flex justify-center">
-                <div class="w-12 h-1 border-t-2 border-blue-500 animate-pulse"></div>
-            </div>
+            <h1 class="text-3xl font-light tracking-[0.3em] fade-in">SKYOPS <span class="font-bold">PRO</span></h1>
+            <p class="mt-2 text-slate-400 tracking-widest text-[10px] uppercase">Navigation Systems v0.00</p>
         </div>
     </div>
 
     <!-- LOGIN PAGE -->
     <div id="loginPage" class="hidden fixed inset-0 z-40 bg-slate-50 flex items-center justify-center p-4">
-        <div class="glass p-8 rounded-3xl w-full max-w-md login-card border border-white/50">
-            <div class="flex justify-center mb-6">
-                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-16 h-16 object-contain" />
+        <div class="glass p-10 rounded-[2.5rem] w-full max-w-md login-card border border-white/50">
+            <div class="flex justify-center mb-8">
+                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-20 h-20 object-contain" />
             </div>
-            <h2 class="text-2xl font-bold text-center text-slate-800 mb-2">Pilot Access</h2>
-            <p class="text-center text-slate-500 mb-8">Sign in to your flight deck</p>
+            <h2 class="text-2xl font-black text-center text-slate-800 mb-1">Terminal Pilot</h2>
+            <p class="text-center text-slate-500 mb-10 text-sm">Autentikasi Dek Penerbangan Aman</p>
             
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 ml-1 mb-1">Username</label>
-                    <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" placeholder="Enter username">
+            <div class="space-y-5">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-4 flex items-center text-slate-400">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </span>
+                    <input type="text" id="username" class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all" placeholder="Username">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 ml-1 mb-1">Password</label>
-                    <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" placeholder="••••••••">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-4 flex items-center text-slate-400">
+                        <i data-lucide="key" class="w-5 h-5"></i>
+                    </span>
+                    <input type="password" id="password" class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all" placeholder="Password">
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 mt-4">
-                    Sign In
+                <button id="btnLogin" onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 mt-4 flex items-center justify-center space-x-3">
+                    <span>AUTHENTICATE</span>
                 </button>
             </div>
-            <p id="loginError" class="text-red-500 text-sm mt-4 text-center hidden font-medium"></p>
+            <p id="loginError" class="text-red-500 text-[10px] mt-6 text-center hidden font-black uppercase tracking-widest bg-red-50 p-3 rounded-xl border border-red-100"></p>
+            
+            <div id="dbStatus" class="mt-8 flex items-center justify-center space-x-3 opacity-60">
+                <div class="loader" id="dbLoader"></div>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]" id="dbStatusText">Menghubungkan Database...</span>
+            </div>
         </div>
     </div>
 
     <!-- MAIN APP INTERFACE -->
     <div id="mainApp" class="hidden h-full flex flex-col">
         <!-- Header -->
-        <header class="nav-header text-white px-6 py-4 flex justify-between items-center shadow-lg">
-            <div class="flex items-center space-x-3">
-                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-10 h-10 object-contain brightness-0 invert" />
+        <header class="nav-header text-white px-6 py-4 flex justify-between items-center shadow-2xl relative z-10">
+            <div class="flex items-center space-x-4">
+                <div class="p-2 bg-white/10 rounded-xl">
+                    <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-8 h-8 object-contain brightness-0 invert" />
+                </div>
                 <div>
-                    <h1 class="text-lg font-bold leading-tight">SkyOps Pro</h1>
-                    <p class="text-[10px] text-blue-100 opacity-80" id="userGreeting">Welcome back, Pilot</p>
+                    <h1 class="text-base font-black tracking-tight uppercase">SkyOps Pro V.00</h1>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <p class="text-[10px] text-blue-100 font-bold uppercase tracking-widest" id="userGreeting">Initializing...</p>
+                    </div>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="flex items-center justify-end space-x-2">
-                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    <p class="text-[10px] uppercase tracking-tighter text-blue-200">System Online</p>
-                </div>
-                <p class="text-xs font-mono font-bold" id="expiryInfo">EXP: --/--/----</p>
+            <div class="text-right bg-black/10 px-4 py-2 rounded-2xl border border-white/10">
+                <p class="text-[9px] uppercase tracking-widest text-blue-200 font-bold">Integritas Sistem</p>
+                <p class="text-xs font-mono font-bold text-white" id="expiryInfo">EXP: --/--/----</p>
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
-        <nav class="bg-white border-b border-slate-200 px-2 flex justify-around md:justify-center md:space-x-8 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('map')" id="tab-map" class="py-4 px-3 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-2 text-slate-500 font-medium transition-all tab-active">
+        <!-- Shortcut Tab -->
+        <nav class="bg-white border-b border-slate-200 px-4 py-2 flex justify-around md:justify-center md:space-x-4 overflow-x-auto no-scrollbar shadow-sm">
+            <button onclick="switchTab('map')" id="tab-map" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all tab-active">
                 <i data-lucide="map" class="w-5 h-5"></i>
-                <span class="text-[10px] md:text-sm uppercase md:capitalize">Map</span>
+                <span class="text-[9px] md:text-xs uppercase tracking-widest">Map</span>
             </button>
-            <button onclick="switchTab('route')" id="tab-route" class="py-4 px-3 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-2 text-slate-500 font-medium transition-all">
+            <button onclick="switchTab('route')" id="tab-route" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all">
                 <i data-lucide="navigation" class="w-5 h-5"></i>
-                <span class="text-[10px] md:text-sm uppercase md:capitalize">Route</span>
+                <span class="text-[9px] md:text-xs uppercase tracking-widest">Route</span>
             </button>
-            <button onclick="switchTab('waypoint')" id="tab-waypoint" class="py-4 px-3 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-2 text-slate-500 font-medium transition-all">
+            <button onclick="switchTab('waypoint')" id="tab-waypoint" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all">
                 <i data-lucide="database" class="w-5 h-5"></i>
-                <span class="text-[10px] md:text-sm uppercase md:capitalize">Database</span>
+                <span class="text-[9px] md:text-xs uppercase tracking-widest">Waypoint</span>
             </button>
-            <button onclick="switchTab('aircraft')" id="tab-aircraft" class="py-4 px-3 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-2 text-slate-500 font-medium transition-all">
+            <button onclick="switchTab('aircraft')" id="tab-aircraft" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all">
                 <i data-lucide="plane" class="w-5 h-5"></i>
-                <span class="text-[10px] md:text-sm uppercase md:capitalize">Aircraft</span>
+                <span class="text-[9px] md:text-xs uppercase tracking-widest">Aircraft</span>
             </button>
-            <button onclick="logout()" class="py-4 px-3 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-2 text-red-400 font-medium transition-all">
+            <div class="w-px h-6 bg-slate-200 self-center hidden md:block"></div>
+            <button onclick="logout()" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-red-400 font-bold transition-all hover:bg-red-50 rounded-xl">
                 <i data-lucide="power" class="w-5 h-5"></i>
-                <span class="text-[10px] md:text-sm uppercase md:capitalize">Exit</span>
+                <span class="text-[9px] md:text-xs uppercase tracking-widest">Exit</span>
             </button>
         </nav>
 
-        <!-- Content Area -->
-        <main class="flex-1 overflow-auto bg-slate-50 p-4 md:p-6">
-            <!-- Map Tab -->
-            <div id="content-map" class="h-full">
-                <div class="w-full h-full rounded-3xl border-2 border-white bg-slate-200 flex items-center justify-center relative overflow-hidden shadow-inner">
-                    <div class="text-center z-10 bg-white/50 backdrop-blur-md p-6 rounded-2xl border border-white/50">
-                        <i data-lucide="satellite" class="w-12 h-12 text-blue-600 mx-auto mb-3 animate-bounce"></i>
-                        <p class="text-slate-800 font-bold uppercase tracking-widest text-xs">Awaiting GPS Lock...</p>
-                        <p class="text-slate-500 text-[10px] mt-1">Satellite Systems Nominal</p>
-                    </div>
-                    <!-- Dummy Map Grid -->
-                    <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#2563eb 0.5px, transparent 0.5px); background-size: 30px 30px;"></div>
-                </div>
-            </div>
-
-            <!-- Other Tabs Content (Sama seperti sebelumnya dengan styling yang sedikit lebih rapat untuk mobile) -->
-            <div id="content-route" class="hidden space-y-4">
-                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Active Flight Plan</h3>
-                    <div class="flex items-center justify-between">
-                        <div class="text-center flex-1">
-                            <p class="text-3xl font-black text-blue-900">WIII</p>
-                            <p class="text-[10px] text-slate-400">Jakarta</p>
+        <main class="flex-1 overflow-auto bg-slate-50 tech-grid p-4 md:p-8">
+            <div id="content-map" class="h-full fade-in">
+                <div class="w-full h-full rounded-[2.5rem] bg-slate-900 border-4 border-white shadow-2xl relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#2563eb 1px, transparent 1px); background-size: 50px 50px;"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-blue-500/20 rounded-full"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-blue-500/20 to-transparent rounded-full animate-[spin_4s_linear_infinite] origin-center opacity-30"></div>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10 p-6 text-center">
+                        <div class="p-5 bg-blue-600/10 backdrop-blur-xl rounded-full border border-blue-500/30 mb-4">
+                            <i data-lucide="satellite" class="w-12 h-12 text-blue-400 animate-pulse"></i>
                         </div>
-                        <div class="flex flex-col items-center px-4">
-                            <i data-lucide="plane-takeoff" class="text-blue-500 mb-1"></i>
-                            <div class="w-20 h-[2px] bg-slate-100"></div>
-                        </div>
-                        <div class="text-center flex-1">
-                            <p class="text-3xl font-black text-blue-900">WSSS</p>
-                            <p class="text-[10px] text-slate-400">Singapore</p>
-                        </div>
-                    </div>
-                 </div>
-            </div>
-
-            <div id="content-waypoint" class="hidden">
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="text-xs font-bold text-slate-500 uppercase">Nearby Waypoints</h3>
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-                    </div>
-                    <div class="divide-y divide-slate-50">
-                        <div class="p-4 flex justify-between items-center">
-                            <div><p class="font-bold">GIMAT</p><p class="text-[10px] text-slate-400">RNAV FIX</p></div>
-                            <p class="font-mono text-xs text-blue-600">42.5 NM</p>
-                        </div>
-                        <div class="p-4 flex justify-between items-center">
-                            <div><p class="font-bold">DKI</p><p class="text-[10px] text-slate-400">VOR/DME 112.7</p></div>
-                            <p class="font-mono text-xs text-blue-600">12.1 NM</p>
-                        </div>
+                        <h3 class="text-blue-400 font-black tracking-[0.3em] text-sm uppercase">Mesin GPS: Siaga</h3>
                     </div>
                 </div>
             </div>
-
-            <div id="content-aircraft" class="hidden">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center">
-                    <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="plane" class="w-10 h-10 text-blue-600"></i>
-                    </div>
-                    <h2 class="text-xl font-black text-slate-800">Boeing 737-800</h2>
-                    <p class="text-blue-500 font-bold text-sm tracking-widest uppercase">Registration: PK-OPS</p>
-                    <div class="grid grid-cols-2 gap-4 mt-8">
-                        <div class="bg-slate-50 p-4 rounded-2xl">
-                            <p class="text-[10px] text-slate-400 uppercase">Cruise</p>
-                            <p class="font-bold">450 KT</p>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl">
-                            <p class="text-[10px] text-slate-400 uppercase">Ceiling</p>
-                            <p class="font-bold">FL410</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Konten tab lainnya tetap ada namun disembunyikan secara default -->
+            <div id="content-route" class="hidden fade-in"></div>
+            <div id="content-waypoint" class="hidden fade-in"></div>
+            <div id="content-aircraft" class="hidden fade-in"></div>
         </main>
     </div>
 
-    <!-- ADMIN PANEL OVERLAY -->
+    <!-- ADMIN PANEL -->
     <div id="adminPanel" class="hidden fixed inset-0 z-50 bg-slate-900 overflow-auto p-4 md:p-10">
         <div class="max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-bold text-white flex items-center">
-                    <i data-lucide="lock" class="mr-2 text-yellow-400 w-6 h-6"></i> Admin Console
+                <h1 class="text-2xl font-black text-white flex items-center uppercase tracking-widest">
+                    <i data-lucide="shield" class="mr-3 text-yellow-400 w-8 h-8"></i> Terminal Admin
                 </h1>
-                <button onclick="closeAdmin()" class="bg-white/10 text-white p-3 rounded-full hover:bg-white/20 transition-all">
-                    <i data-lucide="x"></i>
-                </button>
+                <div class="flex space-x-2">
+                    <button onclick="logout()" class="bg-red-500/20 text-red-400 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">Logout</button>
+                    <button onclick="closeAdmin()" id="adminCloseBtn" class="bg-white/10 text-white p-3 rounded-full hover:bg-white/20 transition-all">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="bg-white rounded-3xl overflow-hidden shadow-2xl">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-slate-50">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800">Pilot Database</h2>
-                        <p class="text-xs text-slate-400">Manage access and licenses</p>
+                        <h2 class="text-xl font-black text-slate-800">Registri Pilot</h2>
+                        <p class="text-xs text-slate-400 font-bold uppercase">Total Database: <span id="pilotCount" class="text-blue-600">0</span> Akun</p>
                     </div>
-                    <button onclick="showUserModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
-                        <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> Add New Pilot
+                    <button onclick="showUserModal()" class="bg-blue-600 text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-200">
+                        Tambah Pilot Baru
                     </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-100/50 text-slate-500 text-[10px] uppercase tracking-[0.2em]">
+                        <thead class="bg-slate-100/50 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
                             <tr>
-                                <th class="px-6 py-4">Full Name</th>
-                                <th class="px-6 py-4">Username</th>
-                                <th class="px-6 py-4">Credential</th>
-                                <th class="px-6 py-4 text-center">Action</th>
+                                <th class="px-8 py-5">Nama Lengkap</th>
+                                <th class="px-8 py-5">Username</th>
+                                <th class="px-8 py-5">Role</th>
+                                <th class="px-8 py-5">Masa Berlaku</th>
+                                <th class="px-8 py-5 text-center">Kelola</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody" class="divide-y divide-slate-100"></tbody>
@@ -253,28 +226,43 @@
         </div>
     </div>
 
-    <!-- USER MODAL -->
-    <div id="userModal" class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-8 shadow-2xl">
-            <h2 id="modalTitle" class="text-xl font-black text-slate-800 mb-6">Pilot Profile</h2>
+    <!-- USER MODAL (FORM REGISTER) -->
+    <div id="userModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-sm p-10 shadow-2xl">
+            <h2 id="modalTitle" class="text-xl font-black text-slate-800 mb-8 uppercase">Kelola Akun</h2>
             <div class="space-y-4">
-                <input type="text" id="m_name" class="w-full px-4 py-3 bg-slate-50 rounded-xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="Full Name">
-                <input type="text" id="m_user" class="w-full px-4 py-3 bg-slate-50 rounded-xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="Username">
-                <input type="text" id="m_pass" class="w-full px-4 py-3 bg-slate-50 rounded-xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="Password">
+                <input type="text" id="m_name" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Nama Lengkap">
+                <input type="text" id="m_user" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Username">
+                <input type="text" id="m_pass" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono" placeholder="Password">
+                
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">License Expiry</label>
-                    <input type="date" id="m_expiry" class="w-full px-4 py-3 bg-slate-50 rounded-xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 transition-all outline-none">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Hak Akses (Role)</label>
+                    <select id="m_role" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <option value="user">USER (Pilot)</option>
+                        <option value="admin">ADMIN (Operations)</option>
+                    </select>
                 </div>
+
+                <div>
+                    <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Lisensi Berlaku Hingga</label>
+                    <input type="date" id="m_expiry" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                </div>
+                
                 <div class="flex space-x-3 pt-6">
-                    <button onclick="hideUserModal()" class="flex-1 px-4 py-3 rounded-xl font-bold text-slate-400 hover:bg-slate-100">Cancel</button>
-                    <button onclick="saveUser()" id="btnSave" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200">Save</button>
+                    <button onclick="hideUserModal()" class="flex-1 px-4 py-4 rounded-2xl font-black text-xs text-slate-400 uppercase">Batal</button>
+                    <button onclick="saveUser()" id="btnSave" class="flex-1 bg-blue-600 text-white px-4 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">Simpan</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- PWA CONFIGURATION (SINGLE FILE TRICK) ---
+        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyA72bv5TGhc6gTSbfEPPfs7dKWbQtXneHmpsYkcGy0HTnLXFPr2NXLmI-f5CE9HQtR5w/exec';
+
+        let currentUser = null;
+        let allUsers = [];
+        let isDbReady = false;
+
         function setupPWA() {
             const manifest = {
                 "name": "SkyOps Navigation Pro",
@@ -283,96 +271,128 @@
                 "display": "standalone",
                 "background_color": "#0f172a",
                 "theme_color": "#1e3a8a",
-                "icons": [
-                    {
-                        "src": "https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-",
-                        "sizes": "512x512",
-                        "type": "image/png",
-                        "purpose": "any maskable"
-                    }
-                ]
+                "icons": [{ "src": "https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
             };
-            const stringManifest = JSON.stringify(manifest);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            document.querySelector('#manifest-link').setAttribute('href', manifestURL);
-
-            // Register Service Worker from Blob
+            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            document.querySelector('#manifest-link').setAttribute('href', URL.createObjectURL(blob));
             if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => { self.skipWaiting(); });
-                    self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request)); });
-                `;
+                const swCode = `self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));`;
                 const swBlob = new Blob([swCode], {type: 'application/javascript'});
-                const swURL = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swURL).catch(err => console.log("SW failed", err));
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
             }
         }
-
-        // --- APP LOGIC ---
-        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyA72bv5TGhc6gTSbfEPPfs7dKWbQtXneHmpsYkcGy0HTnLXFPr2NXLmI-f5CE9HQtR5w/exec'; // Paste your Google App Script URL here
-        let currentUser = null;
-        let allUsers = [];
 
         window.onload = function() {
             setupPWA();
             lucide.createIcons();
             
-            // Splash Animation
             setTimeout(() => {
-                document.getElementById('splash').classList.add('fade-out');
+                const splash = document.getElementById('splash');
+                splash.classList.add('fade-out');
                 setTimeout(() => {
-                    document.getElementById('splash').style.display = 'none';
-                    document.getElementById('loginPage').style.display = 'flex';
-                    document.getElementById('loginPage').classList.add('fade-in');
-                }, 1500);
+                    splash.style.display = 'none';
+                    const loginPage = document.getElementById('loginPage');
+                    loginPage.style.display = 'flex';
+                    loginPage.classList.add('fade-in');
+                }, 600);
             }, 2500);
 
             fetchUsers();
         };
 
         async function fetchUsers() {
-            if (!SHEET_API_URL) {
-                // Mock data for demo if no URL
-                allUsers = [{name: 'Demo Pilot', username: 'pilot', password: '123', expireduntil: '2026-12-31'}];
-                renderUserTable();
-                return;
-            }
+            const statusText = document.getElementById('dbStatusText');
+            const statusLoader = document.getElementById('dbLoader');
             try {
                 const response = await fetch(SHEET_API_URL);
-                allUsers = await response.json();
+                if (!response.ok) throw new Error("Server Response Error");
+                const data = await response.json();
+                allUsers = data;
+                isDbReady = true;
+                statusText.textContent = "Sinkronisasi Aktif";
+                statusText.className = "text-[9px] font-black text-green-600 uppercase tracking-[0.2em]";
+                statusLoader.style.display = 'none';
                 renderUserTable();
-            } catch (e) { console.error("Database error", e); }
+            } catch (e) { 
+                console.error("Fetch Failure:", e);
+                statusText.textContent = "Mode Offline Aktif";
+                statusText.className = "text-[9px] font-black text-amber-500 uppercase tracking-[0.2em]";
+                statusLoader.style.display = 'none';
+                isDbReady = true;
+            }
         }
 
         function handleLogin() {
-            const userIn = document.getElementById('username').value;
-            const passIn = document.getElementById('password').value;
+            const userIn = document.getElementById('username').value.trim().toLowerCase();
+            const passIn = document.getElementById('password').value.trim();
             const errorEl = document.getElementById('loginError');
+            const btnLogin = document.getElementById('btnLogin');
+            
+            errorEl.classList.add('hidden');
 
-            if (userIn === 'admin' && passIn === 'ramdan28') {
-                openAdmin();
+            if (!isDbReady) {
+                errorEl.textContent = "AKSES DITOLAK: DATABASE SEDANG BOOTING";
+                errorEl.classList.remove('hidden');
                 return;
             }
 
-            const user = allUsers.find(u => u.username === userIn && u.password === passIn);
+            // Hardcoded Admin Safety Net
+            if (userIn === 'admin' && passIn === 'ramdan28') {
+                openAdmin();
+                document.getElementById('adminCloseBtn').style.display = 'none'; // Admin utama tidak bisa close panel tanpa logout
+                resetLoginButton();
+                return;
+            }
+
+            const user = allUsers.find(u => {
+                const dbUser = (u.username || '').toString().toLowerCase().trim();
+                const dbPass = (u.password || '').toString().trim();
+                return dbUser === userIn && dbPass === passIn;
+            });
+
             if (user) {
-                const expiry = new Date(user.expireduntil);
-                if (expiry < new Date()) {
-                    errorEl.textContent = "LICENSE EXPIRED. CONTACT ADMIN.";
+                const expDateStr = user.expireduntil || user.expiredUntil || '';
+                const expiry = new Date(expDateStr);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                if (!expDateStr || expiry < today) {
+                    errorEl.textContent = "AKSES DITANGGUHKAN: LISENSI KADALUWARSA";
                     errorEl.classList.remove('hidden');
+                    resetLoginButton();
                     return;
                 }
+
+                // Check Role
+                const role = (user.role || 'user').toLowerCase();
                 currentUser = user;
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('userGreeting').textContent = `Pilot: ${currentUser.name}`;
-                document.getElementById('expiryInfo').textContent = `EXP: ${currentUser.expireduntil}`;
-                lucide.createIcons();
+
+                if (role === 'admin') {
+                    openAdmin();
+                    document.getElementById('adminCloseBtn').style.display = 'block';
+                } else {
+                    enterMainApp();
+                }
+                resetLoginButton();
             } else {
-                errorEl.textContent = "INVALID PILOT CREDENTIALS";
+                errorEl.textContent = "AUTENTIKASI GAGAL: KREDENSIAL SALAH";
                 errorEl.classList.remove('hidden');
+                resetLoginButton();
             }
+        }
+
+        function enterMainApp() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userGreeting').textContent = `Pilot ID: ${currentUser.name}`;
+            document.getElementById('expiryInfo').textContent = `EXP: ${currentUser.expireduntil || currentUser.expiredUntil}`;
+            lucide.createIcons();
+        }
+
+        function resetLoginButton() {
+            const btnLogin = document.getElementById('btnLogin');
+            btnLogin.innerHTML = `<span>AUTHENTICATE</span>`;
+            btnLogin.disabled = false;
         }
 
         function logout() { location.reload(); }
@@ -381,25 +401,46 @@
             ['map', 'route', 'waypoint', 'aircraft'].forEach(id => {
                 document.getElementById(`content-${id}`).classList.add('hidden');
                 document.getElementById(`tab-${id}`).classList.remove('tab-active');
+                document.getElementById(`tab-${id}`).classList.add('text-slate-400');
             });
-            document.getElementById(`content-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
+            const active = document.getElementById(`content-${tabId}`);
+            active.classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            activeTab.classList.add('tab-active');
+            activeTab.classList.remove('text-slate-400');
         }
 
-        function openAdmin() { document.getElementById('adminPanel').classList.remove('hidden'); }
-        function closeAdmin() { document.getElementById('adminPanel').classList.add('hidden'); }
+        function openAdmin() { 
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden'); 
+        }
+
+        function closeAdmin() { 
+            document.getElementById('adminPanel').classList.add('hidden'); 
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
 
         function renderUserTable() {
             const body = document.getElementById('userTableBody');
+            const count = document.getElementById('pilotCount');
+            if (count) count.textContent = allUsers.length;
+            if (!body) return;
+            
             body.innerHTML = '';
             allUsers.forEach((user, idx) => {
+                const expDate = user.expireduntil || user.expiredUntil || 'N/A';
+                const roleLabel = (user.role || 'user').toUpperCase();
                 const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                    <td class="px-6 py-4 font-bold text-slate-700 text-sm">${user.name}</td>
-                    <td class="px-6 py-4 text-slate-500 text-xs">${user.username}</td>
-                    <td class="px-6 py-4 text-xs font-mono">****</td>
-                    <td class="px-6 py-4 text-center">
-                        <button onclick="editUser(${idx})" class="text-blue-500 p-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                    <td class="px-8 py-6 font-bold text-slate-800 text-sm">${user.name}</td>
+                    <td class="px-8 py-6 text-slate-500 text-xs">${user.username}</td>
+                    <td class="px-8 py-6 text-xs"><span class="px-2 py-1 ${roleLabel === 'ADMIN' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'} rounded-lg font-black">${roleLabel}</span></td>
+                    <td class="px-8 py-6 text-xs font-black text-blue-600 uppercase">${expDate}</td>
+                    <td class="px-8 py-6 text-center">
+                        <button onclick="editUser(${idx})" class="bg-blue-50 text-blue-600 p-3 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
                     </td>
                 `;
                 body.appendChild(tr);
@@ -410,6 +451,7 @@
         function showUserModal() {
             document.getElementById('modalTitle').textContent = "Register Pilot";
             ['m_name', 'm_user', 'm_pass', 'm_expiry'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('m_role').value = 'user';
             document.getElementById('userModal').classList.remove('hidden');
         }
 
@@ -419,37 +461,40 @@
             const data = {
                 action: 'addOrUpdate',
                 name: document.getElementById('m_name').value,
-                username: document.getElementById('m_user').value,
-                password: document.getElementById('m_pass').value,
+                username: document.getElementById('m_user').value.toLowerCase().trim(),
+                password: document.getElementById('m_pass').value.trim(),
+                role: document.getElementById('m_role').value,
                 expiredUntil: document.getElementById('m_expiry').value
             };
 
+            if (!data.name || !data.username || !data.password) return;
+
             const btn = document.getElementById('btnSave');
             btn.disabled = true;
-            btn.textContent = "Syncing...";
+            btn.textContent = "Sinkronisasi...";
 
-            if (SHEET_API_URL) {
-                await fetch(SHEET_API_URL, { method: 'POST', body: JSON.stringify(data) });
-                await fetchUsers();
-            } else {
-                const existingIdx = allUsers.findIndex(u => u.username === data.username);
-                if (existingIdx > -1) allUsers[existingIdx] = { ...data, expireduntil: data.expiredUntil };
-                else allUsers.push({ ...data, expireduntil: data.expiredUntil });
-                renderUserTable();
-            }
+            try {
+                await fetch(SHEET_API_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors',
+                    body: JSON.stringify(data) 
+                });
+                setTimeout(fetchUsers, 1500);
+            } catch (e) { console.error("Cloud Sync Failed"); }
 
             btn.disabled = false;
-            btn.textContent = "Save";
+            btn.textContent = "Simpan";
             hideUserModal();
         }
 
         function editUser(idx) {
             const u = allUsers[idx];
-            document.getElementById('modalTitle').textContent = "Update License";
+            document.getElementById('modalTitle').textContent = "Modifikasi Profil";
             document.getElementById('m_name').value = u.name;
             document.getElementById('m_user').value = u.username;
             document.getElementById('m_pass').value = u.password;
-            document.getElementById('m_expiry').value = u.expireduntil;
+            document.getElementById('m_role').value = u.role || 'user';
+            document.getElementById('m_expiry').value = u.expireduntil || u.expiredUntil;
             document.getElementById('userModal').classList.remove('hidden');
         }
     </script>
