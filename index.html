@@ -116,6 +116,12 @@
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
         ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.8); }
+
+        /* PRINT STYLES */
+        @media print {
+            body { background: white !important; }
+            @page { size: A4; margin: 1cm; }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-500 selection:text-white relative">
@@ -123,7 +129,7 @@
     <!-- ========================================== -->
     <!--         BAGIAN 1: SPLASH SCREEN            -->
     <!-- ========================================== -->
-    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f172a] transition-opacity duration-1000">
+    <div id="splashScreen" class="print:hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f172a] transition-opacity duration-1000">
         <div class="w-48 h-48 mb-8 fade-in">
             <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
         </div>
@@ -138,7 +144,7 @@
     <!-- ========================================== -->
     <!--         BAGIAN 2: LOGIN SCREEN             -->
     <!-- ========================================== -->
-    <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+    <div id="loginScreen" class="print:hidden hidden min-h-screen flex items-center justify-center p-4">
         <div class="glass-panel p-8 rounded-3xl w-full max-w-md relative overflow-hidden">
             <div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
             
@@ -175,7 +181,7 @@
     <!-- ========================================== -->
     <!--         BAGIAN 3: ADMIN DASHBOARD          -->
     <!-- ========================================== -->
-    <div id="adminScreen" class="hidden min-h-screen flex flex-col">
+    <div id="adminScreen" class="print:hidden hidden min-h-screen flex flex-col">
         <header class="glass-panel sticky top-0 z-40 border-b border-slate-700/50 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-10 h-10 object-contain" />
@@ -238,7 +244,7 @@
     </div>
 
     <!-- Add/Edit User Modal -->
-    <div id="userModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div id="userModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div class="glass-panel w-full max-w-md p-6 rounded-2xl relative">
             <h3 id="modalTitle" class="text-xl font-bold mb-4">Add New User</h3>
             <form id="userForm" onsubmit="saveUser(event)" class="space-y-4">
@@ -278,7 +284,7 @@
     <!-- ========================================== -->
     <!--         BAGIAN 4: MAIN APP CONTAINER       -->
     <!-- ========================================== -->
-    <div id="mainScreen" class="hidden h-screen flex flex-col bg-[#0b1121]">
+    <div id="mainScreen" class="print:hidden hidden h-screen flex flex-col bg-[#0b1121]">
         <header class="glass-panel px-6 py-3 flex justify-between items-center shadow-md z-30 relative">
             <div class="flex items-center gap-4">
                 <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-12 h-12 object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
@@ -292,7 +298,6 @@
                     <p class="text-sm font-medium text-white" id="displayUserName">Pilot</p>
                     <p class="text-xs text-slate-400">Active Session</p>
                 </div>
-                <!-- User Sync Button -->
                 <button onclick="syncWithGoogleSheet()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/50 transition flex items-center justify-center text-slate-300" title="Sync Data dari Cloud">
                     <i class="fas fa-sync-alt"></i>
                 </button>
@@ -348,7 +353,6 @@
                         
                         <!-- Map Wrapper untuk Scale & Rotation Track-Up -->
                         <div id="mapTransformWrapper">
-                            <!-- Real Leaflet Map Container -->
                             <div id="realMap" class="cursor-crosshair"></div>
                         </div>
 
@@ -373,7 +377,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Panel Kontrol Mode -->
                             <div class="mt-2 flex items-center justify-center gap-4 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur">
                                 <span id="flightModeLabel" class="text-xs font-bold text-magenta-400 uppercase tracking-widest"><i class="fas fa-play-circle mr-1"></i> SIMULATION</span>
                                 <div id="simSpeedControl" class="flex items-center gap-2 border-l border-slate-600 pl-4">
@@ -438,7 +441,6 @@
                                 </tr>
                             </thead>
                             <tbody id="routeTableBody" class="divide-y divide-slate-700/50 bg-slate-900/40">
-                                <!-- Populated by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -446,7 +448,7 @@
             </div>
 
             <!-- BAGIAN 6.1: ROUTE FORM MODAL -->
-            <div id="routeFormModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div id="routeFormModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-5xl h-[90vh] flex flex-col rounded-2xl relative shadow-2xl overflow-hidden">
                     <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
                         <h3 id="routeModalTitle" class="text-xl font-bold"><i class="fas fa-clipboard-list text-blue-400 mr-2"></i>Create Operational Flight Plan</h3>
@@ -465,7 +467,6 @@
                                 <label class="text-xs text-slate-400 mb-1 block">Aircraft Profile</label>
                                 <select id="rtAircraft" onchange="handleRouteAircraftChange()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
                                     <option value="">-- Select Aircraft --</option>
-                                    <!-- Populated by JS -->
                                 </select>
                             </div>
                             <div>
@@ -492,7 +493,6 @@
                             </div>
                         </div>
 
-                        <!-- OFP Table -->
                         <div class="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-900/60">
                             <table class="w-full text-left text-sm whitespace-nowrap">
                                 <thead class="bg-slate-800/80 text-slate-300 border-b border-slate-700">
@@ -542,7 +542,6 @@
                             </div>
                         </div>
 
-                        <!-- Summary -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
                                 <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Total Distance</p>
@@ -572,7 +571,7 @@
             </div>
 
             <!-- BAGIAN 6.2: WAYPOINT SELECTOR MODAL (UNTUK ROUTE) -->
-            <div id="routeWpSelectModal" class="fixed inset-0 z-[10010] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div id="routeWpSelectModal" class="print:hidden fixed inset-0 z-[10010] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-md h-[70vh] flex flex-col rounded-2xl relative shadow-2xl">
                     <div class="p-4 border-b border-slate-700 flex justify-between items-center">
                         <h3 class="text-lg font-bold"><i class="fas fa-search text-emerald-400 mr-2"></i>Select Waypoint</h3>
@@ -584,13 +583,12 @@
                             <input type="text" id="searchRouteWp" onkeyup="renderRouteWpSelectorList()" placeholder="Search ID or Name..." class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white outline-none focus:border-emerald-500">
                         </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-2" id="routeWpSelectList">
-                    </div>
+                    <div class="flex-1 overflow-y-auto p-2" id="routeWpSelectList"></div>
                 </div>
             </div>
 
             <!-- BAGIAN 6.3: ROUTE DETAIL MODAL -->
-            <div id="routeDetailModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div id="routeDetailModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-lg p-0 rounded-2xl relative shadow-2xl overflow-hidden flex flex-col">
                     <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-900/80 to-slate-900 z-0"></div>
                     <i class="fas fa-route text-8xl text-blue-400/10 absolute -right-4 -top-4 z-0 transform -rotate-12"></i>
@@ -632,6 +630,10 @@
                             
                             <button id="btnDetViewMap" class="col-span-2 bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-xl text-sm transition font-medium flex items-center justify-center mt-2 border border-slate-600">
                                 <i class="fas fa-map-marked-alt mr-2"></i> View Route on Map
+                            </button>
+
+                            <button id="btnDetPrint" class="col-span-2 bg-slate-200 hover:bg-slate-300 text-slate-900 py-2.5 rounded-xl text-sm transition font-bold flex items-center justify-center mt-2 border border-slate-300">
+                                <i class="fas fa-file-pdf mr-2 text-red-600"></i> Print OFP (PDF / A4)
                             </button>
 
                             <button id="btnDetEdit" class="bg-slate-800 hover:bg-blue-600/50 border border-slate-700 text-slate-300 hover:text-white py-2 rounded-xl text-xs transition font-medium flex justify-center items-center"><i class="fas fa-edit mr-2"></i> Edit</button>
@@ -683,7 +685,7 @@
             </div>
 
             <!-- BAGIAN 7.1: WAYPOINT MODAL -->
-            <div id="waypointModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div id="waypointModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-lg p-6 rounded-2xl relative shadow-2xl">
                     <button onclick="closeWaypointModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                     <h3 id="wpModalTitle" class="text-xl font-bold mb-5 border-b border-slate-700 pb-3"><i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>Add New Waypoint</h3>
@@ -767,7 +769,7 @@
             </div>
 
             <!-- BAGIAN 7.2: PARSE WAYPOINT MODAL -->
-            <div id="parseWaypointModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div id="parseWaypointModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-2xl p-6 rounded-2xl relative shadow-2xl">
                     <button onclick="closeParseModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                     <h3 class="text-xl font-bold mb-3 border-b border-slate-700 pb-3"><i class="fas fa-file-import text-emerald-400 mr-2"></i>Parse Bulk Waypoints</h3>
@@ -809,7 +811,7 @@
             </div>
 
             <!-- BAGIAN 8.1: AIRCRAFT FORM MODAL -->
-            <div id="aircraftFormModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div id="aircraftFormModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-lg p-6 rounded-2xl relative shadow-2xl">
                     <button onclick="closeAircraftForm()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                     <h3 id="acModalTitle" class="text-xl font-bold mb-5 border-b border-slate-700 pb-3"><i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile</h3>
@@ -873,7 +875,7 @@
             </div>
 
             <!-- BAGIAN 8.2: AIRCRAFT DETAILS MODAL -->
-            <div id="aircraftDetailModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div id="aircraftDetailModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-md p-6 rounded-3xl relative shadow-2xl overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-900/60 to-slate-900 z-0"></div>
                     <i id="detailIconBg" class="fas fa-plane text-8xl text-blue-400/10 absolute -right-6 -top-2 z-0 transform -rotate-45"></i>
@@ -910,6 +912,9 @@
 
         </main>
     </div>
+
+    <!-- AREA CETAK OFP (Hanya Tampil Saat Dicetak / Ctrl+P) -->
+    <div id="printArea" class="hidden print:block bg-white text-black p-8 min-h-screen absolute inset-0 z-[99999]"></div>
 
     <!-- ========================================== -->
     <!--         BAGIAN 9: JAVASCRIPT LOGIC         -->
@@ -954,11 +959,9 @@
         // ==========================================
         // --- GOOGLE SHEETS API HELPERS          ---
         // ==========================================
-        // Fungsi terpusat ini memastikan data selalu ditarik baru (tanpa cache)
         async function fetchFromSheet(sheetName) {
             if (!GOOGLE_SCRIPT_URL) return null;
             try {
-                // &t=Date.now() memaksa browser mengabaikan cache dan menarik data terbaru
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?sheet=${sheetName}&t=${Date.now()}`);
                 if (!res.ok) throw new Error("Gagal merespon dari server.");
                 const text = await res.text();
@@ -972,13 +975,8 @@
         async function postToSheet(sheetName, data) {
             if (!GOOGLE_SCRIPT_URL) return;
             try {
-                await fetch(`${GOOGLE_SCRIPT_URL}?sheet=${sheetName}`, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-            } catch (err) {
-                console.error(`Error Posting ${sheetName}:`, err);
-            }
+                await fetch(`${GOOGLE_SCRIPT_URL}?sheet=${sheetName}`, { method: 'POST', body: JSON.stringify(data) });
+            } catch (err) { console.error(`Error Posting ${sheetName}:`, err); }
         }
 
         // ==========================================
@@ -1068,15 +1066,15 @@
         // --- APP INIT ---
         async function initApp() {
             if (GOOGLE_SCRIPT_URL === '') {
-                alert('PERINGATAN: URL Google Sheet belum diatur! Aplikasi murni menggunakan Cloud Data. Masukkan URL Script di source code agar data dapat tampil.');
+                console.warn('PERINGATAN: URL Google Sheet belum diatur! Aplikasi murni menggunakan Cloud Data. Masukkan URL Script di source code agar data dapat tampil.');
             }
             showView('loginScreen');
             await loadUsers();
             await loadWaypoints(); 
             await loadAircrafts();
             await loadRoutes(); 
-            document.getElementById('editAdminUser').value = localStorage.getItem('adminUser');
-            document.getElementById('editAdminPass').value = localStorage.getItem('adminPass');
+            document.getElementById('editAdminUser').value = localStorage.getItem('adminUser') || 'admin';
+            document.getElementById('editAdminPass').value = localStorage.getItem('adminPass') || 'ramdan28';
         }
 
         // --- DATA MANAGEMENT & AUTH ---
@@ -1091,14 +1089,10 @@
         async function syncWithGoogleSheet() {
             if (GOOGLE_SCRIPT_URL === '') { alert('URL Google Script belum diatur.'); return; }
             
-            // Putar icon sync saat loading
             const icons = document.querySelectorAll('.fa-sync-alt');
             icons.forEach(i => i.classList.add('fa-spin'));
             
-            await loadUsers();
-            await loadWaypoints(); 
-            await loadAircrafts();
-            await loadRoutes(); 
+            await loadUsers(); await loadWaypoints(); await loadAircrafts(); await loadRoutes(); 
             
             icons.forEach(i => i.classList.remove('fa-spin'));
             alert('Semua data berhasil ditarik dan diperbarui dari Google Sheets!');
@@ -1304,7 +1298,7 @@
             const data = await fetchFromSheet('waypoints');
             if (data !== null) { waypointsData = data; }
             renderWaypoints();
-            updateMapWaypoints(); // Memperbarui marker/ikon di peta setelah sync
+            updateMapWaypoints(); 
         }
 
         function saveWaypoints() { postToSheet('waypoints', waypointsData); }
@@ -1332,8 +1326,6 @@
             }
 
             let wpsToRender = waypointsData;
-            
-            // Logic filter Waypoints jika Peta sedang dalam mode melihat Rute/Simulasi
             if (activeMapRouteId) {
                 const showAll = document.getElementById('toggleAllWps') ? document.getElementById('toggleAllWps').checked : false;
                 if (!showAll) {
@@ -1495,13 +1487,8 @@
             if (data !== null) { routesData = data; }
             renderRouteList();
             
-            // Perbarui juga garis rute aktif di peta jika ada perubahan/penghapusan dari cloud saat sync
             if (activeMapRouteId) {
-                if (!routesData.find(r => r.id === activeMapRouteId)) {
-                    clearActiveMapRoute();
-                } else {
-                    drawActiveRoute();
-                }
+                if (!routesData.find(r => r.id === activeMapRouteId)) { clearActiveMapRoute(); } else { drawActiveRoute(); }
             }
         }
 
@@ -1531,7 +1518,17 @@
                 } totalFuel = totalDecHours * rt.fuelCons;
             }
             document.getElementById('detRtFuel').textContent = Math.round(totalFuel) + (ac ? ' ' + ac.fuelUnit : '');
-            document.getElementById('btnDetEdit').onclick = () => { closeRouteDetailModal(); editRoute(id); }; document.getElementById('btnDetDuplicate').onclick = () => duplicateRoute(id); document.getElementById('btnDetInvert').onclick = () => invertRoute(id); document.getElementById('btnDetDelete').onclick = () => { closeRouteDetailModal(); deleteRoute(id); }; document.getElementById('btnDetViewMap').onclick = () => viewRouteOnMap(id);
+            
+            // Re-bind Action Buttons
+            document.getElementById('btnDetEdit').onclick = () => { closeRouteDetailModal(); editRoute(id); }; 
+            document.getElementById('btnDetDuplicate').onclick = () => duplicateRoute(id); 
+            document.getElementById('btnDetInvert').onclick = () => invertRoute(id); 
+            document.getElementById('btnDetDelete').onclick = () => { closeRouteDetailModal(); deleteRoute(id); }; 
+            document.getElementById('btnDetViewMap').onclick = () => viewRouteOnMap(id);
+            document.getElementById('btnDetPrint').onclick = () => printRouteOFP(id);
+            document.getElementById('btnDetSimulate').onclick = () => { if(rt.id) startSimulateRoute(rt.id); };
+            document.getElementById('btnDetNavigate').onclick = () => { if(rt.id) startNavigateRoute(rt.id); };
+
             document.getElementById('routeDetailModal').classList.remove('hidden');
         }
 
@@ -1614,6 +1611,102 @@
 
         function editRoute(id) { openRouteForm(id); }
         function deleteRoute(id) { if(confirm("Hapus rute ini dari database?")) { routesData = routesData.filter(r => r.id !== id); saveRoutes(); renderRouteList(); } }
+
+        // --- PRINT ROUTE OFP (NEW FEATURE) ---
+        function printRouteOFP(id) {
+            const rt = routesData.find(r => r.id === id);
+            if (!rt) return;
+            const ac = aircraftsData.find(a => a.id === rt.aircraftId);
+
+            let wpHtml = '';
+            let totalDist = 0; let totalDecHours = 0; let totalFuel = 0;
+            const speed = rt.speed || 0;
+            const fuelCons = rt.fuelCons || 0;
+            const etdVal = rt.etd || "00:00";
+
+            rt.waypoints.forEach((wp, i) => {
+                let dist = 0, brng = 0, decHrs = 0, fuelBurn = 0, etaHrs = 0;
+                if (i > 0) {
+                    const prevWp = rt.waypoints[i-1];
+                    dist = calcDistanceNM(prevWp.lat, prevWp.lon, wp.lat, wp.lon);
+                    brng = calcBearingDeg(prevWp.lat, prevWp.lon, wp.lat, wp.lon);
+                    if (speed > 0) decHrs = dist / speed;
+                    fuelBurn = decHrs * fuelCons;
+                    totalDist += dist; totalDecHours += decHrs; totalFuel += fuelBurn;
+                    etaHrs = totalDecHours; 
+                }
+
+                let distStr = i === 0 ? '-' : formatDecimal(dist);
+                let brngStr = i === 0 ? '-' : Math.round(brng).toString().padStart(3, '0') + '°';
+                let eetStr = i === 0 ? '-' : formatTimeHM(decHrs);
+                let etaStr = i === 0 ? etdVal : addDecimalHoursToHHMM(etdVal, etaHrs);
+                let fuelStr = i === 0 ? '-' : formatDecimal(fuelBurn);
+
+                wpHtml += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 8px; text-align: center;">${i+1}</td>
+                        <td style="padding: 8px;"><strong>${wp.name}</strong><br><span style="font-size: 10px; color: #6b7280;">Elev: ${wp.elev}ft</span></td>
+                        <td style="padding: 8px; font-size: 12px;">${decToDMSStr(wp.lat, true)}<br>${decToDMSStr(wp.lon, false)}</td>
+                        <td style="padding: 8px; text-align: center;">${brngStr}</td>
+                        <td style="padding: 8px; text-align: center;">${distStr}</td>
+                        <td style="padding: 8px; text-align: center;">${eetStr}</td>
+                        <td style="padding: 8px; text-align: center;">${etaStr}</td>
+                        <td style="padding: 8px; text-align: center;">${fuelStr}</td>
+                    </tr>
+                `;
+            });
+
+            const printHtml = `
+                <div style="max-width: 800px; margin: 0 auto; color: #000;">
+                    <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 16px; margin-bottom: 24px;">
+                        <h1 style="font-size: 24px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 2px;">SkyOps Navigation Pro</h1>
+                        <h2 style="font-size: 16px; font-weight: normal; color: #4b5563; margin: 4px 0 0 0;">OPERATIONAL FLIGHT PLAN (OFP)</h2>
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-bottom: 24px; font-size: 14px;">
+                        <div style="width: 30%; margin-bottom: 12px;"><span style="font-weight: bold; color: #6b7280; display: block; font-size: 10px;">ROUTE NAME</span><span style="font-weight: bold; font-size: 16px;">${rt.name}</span></div>
+                        <div style="width: 40%; margin-bottom: 12px;"><span style="font-weight: bold; color: #6b7280; display: block; font-size: 10px;">AIRCRAFT</span><span style="font-weight: bold; font-size: 16px;">${ac ? ac.reg : rt.aircraftReg} <span style="font-size: 12px; font-weight: normal;">(${ac ? ac.type : ''})</span></span></div>
+                        <div style="width: 30%; margin-bottom: 12px;"><span style="font-weight: bold; color: #6b7280; display: block; font-size: 10px;">ETD (LOCAL)</span><span style="font-weight: bold; font-size: 16px;">${rt.etd || '00:00'}</span></div>
+                        <div style="width: 30%;"><span style="font-weight: bold; color: #6b7280; display: block; font-size: 10px;">CRUISING SPEED</span><span style="font-weight: bold; font-size: 16px;">${rt.speed} kts</span></div>
+                        <div style="width: 40%;"><span style="font-weight: bold; color: #6b7280; display: block; font-size: 10px;">FUEL CONSUMPTION</span><span style="font-weight: bold; font-size: 16px;">${rt.fuelCons} ${ac ? ac.fuelUnit : ''}/hr</span></div>
+                        <div style="width: 30%;"><span style="font-weight: bold; color: #6b7280; display: block; font-size: 10px;">FUEL ONBOARD</span><span style="font-weight: bold; font-size: 16px;">${rt.fuelOnboard || 0} ${ac ? ac.fuelUnit : ''}</span></div>
+                    </div>
+
+                    <table style="width: 100%; text-align: left; font-size: 12px; margin-bottom: 24px; border-top: 1px solid #000; border-bottom: 1px solid #000; border-collapse: collapse;">
+                        <thead style="background-color: #f3f4f6; border-bottom: 1px solid #000;">
+                            <tr>
+                                <th style="padding: 8px; text-align: center;">#</th>
+                                <th style="padding: 8px;">Waypoint</th>
+                                <th style="padding: 8px;">Coordinates</th>
+                                <th style="padding: 8px; text-align: center;">Heading</th>
+                                <th style="padding: 8px; text-align: center;">Dist (NM)</th>
+                                <th style="padding: 8px; text-align: center;">EET</th>
+                                <th style="padding: 8px; text-align: center;">ETA</th>
+                                <th style="padding: 8px; text-align: center;">Fuel Burn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${wpHtml}
+                        </tbody>
+                    </table>
+
+                    <div style="display: flex; justify-content: space-between; background-color: #f3f4f6; padding: 16px; border: 1px solid #000; font-weight: bold; text-align: center;">
+                        <div><span style="display: block; font-size: 10px; color: #6b7280; text-transform: uppercase;">Total Distance</span>${Math.round(totalDist)} NM</div>
+                        <div><span style="display: block; font-size: 10px; color: #6b7280; text-transform: uppercase;">Total EET</span>${formatTimeHM(totalDecHours)}</div>
+                        <div><span style="display: block; font-size: 10px; color: #6b7280; text-transform: uppercase;">Fuel Required</span>${Math.round(totalFuel)} ${ac ? ac.fuelUnit : ''}</div>
+                        <div><span style="display: block; font-size: 10px; color: #6b7280; text-transform: uppercase;">Fuel Remaining</span>${Math.round((rt.fuelOnboard || 0) - totalFuel)} ${ac ? ac.fuelUnit : ''}</div>
+                    </div>
+
+                    <div style="margin-top: 40px; text-align: center; font-size: 10px; color: #9ca3af;">
+                        Generated by SkyOps Navigation Pro V.00 on ${new Date().toLocaleString('id-ID')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('printArea').innerHTML = printHtml;
+            // Timeout singkat memastikan DOM sempat merender PDF layer
+            setTimeout(() => { window.print(); }, 100);
+        }
 
         // ==========================================
         // --- SIMULATION & NAVIGATION LOGIC      ---
@@ -1712,16 +1805,6 @@
             if (spdKts > 5) { const now = new Date(); const hrsRemaining = totalRemainingDist / spdKts; now.setMinutes(now.getMinutes() + (hrsRemaining * 60)); etaDestStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`; }
             updateHUD(hdg, spdKts, distToTarget, etaDestStr);
         }
-
-        // ==========================================
-        // --- BINDING EVENTS ---
-        // ==========================================
-        document.getElementById('btnDetSimulate').onclick = () => {
-            const rtId = document.getElementById('detailId').value || activeMapRouteId; if(rtId) startSimulateRoute(rtId);
-        };
-        document.getElementById('btnDetNavigate').onclick = () => {
-            const rtId = document.getElementById('detailId').value || activeMapRouteId; if(rtId) startNavigateRoute(rtId);
-        };
 
     </script>
 </body>
