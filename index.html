@@ -65,6 +65,18 @@
             100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
 
+        /* Active Route Midpoint Drag Marker */
+        .midpoint-marker {
+            background-color: #ffffff;
+            border: 3px solid #d946ef; /* Magenta-500 */
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 0 8px rgba(0,0,0,0.8);
+            transition: transform 0.2s;
+        }
+        .midpoint-marker:hover { transform: scale(1.3); }
+        .midpoint-marker:active { cursor: grabbing; transform: scale(1.1); }
+
         /* Customizing Leaflet Map controls */
         .leaflet-container { font-family: 'Inter', sans-serif; background: #0f172a; }
         .leaflet-top, .leaflet-bottom { z-index: 400 !important; }
@@ -307,6 +319,22 @@
                     </div>
                     
                     <div class="flex-1 rounded-2xl border border-slate-700/50 bg-slate-900 relative overflow-hidden z-10">
+                        <!-- Map Overlay (For Active Route Indicator) -->
+                        <div id="activeRouteOverlay" class="absolute top-4 left-4 z-[1000] hidden">
+                            <div class="bg-black/70 backdrop-blur border border-magenta-500/50 rounded-xl p-3 shadow-lg flex flex-col gap-2">
+                                <div class="flex justify-between items-center gap-4">
+                                    <div>
+                                        <p class="text-[10px] text-magenta-400 uppercase tracking-widest font-bold mb-1"><i class="fas fa-route mr-1"></i> ACTIVE FLIGHT PLAN</p>
+                                        <h3 id="activeRouteOverlayName" class="text-sm font-bold text-white uppercase">WIMM-WIII</h3>
+                                    </div>
+                                    <button onclick="clearActiveMapRoute()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-red-500/20 hover:text-red-400 border border-slate-600 transition flex items-center justify-center text-slate-300">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-slate-400 italic">Drag titik putih pada garis magenta untuk modifikasi rute (Rubber-band).</p>
+                            </div>
+                        </div>
+
                         <!-- Real Leaflet Map Container -->
                         <div id="realMap" class="absolute inset-0 z-0 cursor-crosshair"></div>
                         
@@ -495,6 +523,55 @@
                     </div>
                     <div class="flex-1 overflow-y-auto p-2" id="routeWpSelectList">
                         <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- BAGIAN 6.3: ROUTE DETAIL MODAL -->
+            <div id="routeDetailModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div class="glass-panel w-full max-w-lg p-0 rounded-2xl relative shadow-2xl overflow-hidden flex flex-col">
+                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-900/80 to-slate-900 z-0"></div>
+                    <i class="fas fa-route text-8xl text-blue-400/10 absolute -right-4 -top-4 z-0 transform -rotate-12"></i>
+                    
+                    <button onclick="closeRouteDetailModal()" class="absolute top-4 right-4 text-slate-300 hover:text-white z-10 bg-black/20 rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md"><i class="fas fa-times"></i></button>
+                    
+                    <div class="relative z-10 p-6 pt-10 flex flex-col">
+                        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-[10px] font-bold tracking-widest mb-3 w-max">ACTIVE PLAN</span>
+                        <h2 id="detRtName" class="text-3xl font-bold text-white tracking-widest mb-1">WIMM-WIII</h2>
+                        <p class="text-cyan-400 font-medium text-sm flex items-center"><i class="fas fa-plane mr-2 text-xs"></i> <span id="detRtAircraft">PK-TWA (Gulfstream IV SP)</span></p>
+                    </div>
+
+                    <div class="relative z-10 p-6 pt-0 space-y-4">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 flex flex-col gap-3">
+                            <div class="flex justify-between items-center pb-3 border-b border-slate-700/50">
+                                <span class="text-xs text-slate-400 uppercase">Routing</span>
+                                <span id="detRtOriginDest" class="font-bold text-white text-sm">WIMM <i class="fas fa-arrow-right text-blue-400 mx-2 text-xs"></i> WIII</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase">Total Dist</p>
+                                    <p class="text-sm font-semibold text-white"><span id="detRtDist">0</span> <span class="text-[10px] text-slate-400">NM</span></p>
+                                </div>
+                                <div class="border-l border-r border-slate-700/50">
+                                    <p class="text-[10px] text-slate-500 uppercase">Total EET</p>
+                                    <p id="detRtEET" class="text-sm font-semibold text-orange-300">00:00</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase">Fuel Req</p>
+                                    <p class="text-sm font-semibold text-emerald-400"><span id="detRtFuel">0</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button id="btnDetViewMap" class="col-span-2 bg-gradient-to-r from-magenta-600 to-purple-500 hover:from-magenta-500 hover:to-purple-400 text-white py-3 rounded-xl text-sm font-bold transition shadow-lg shadow-purple-500/30 flex items-center justify-center">
+                                <i class="fas fa-map-marked-alt mr-2"></i> View Route on Map
+                            </button>
+                            <button id="btnDetEdit" class="bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-sm transition font-medium flex justify-center items-center"><i class="fas fa-edit mr-2"></i> Edit</button>
+                            <button id="btnDetDuplicate" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white py-2.5 rounded-xl text-sm transition font-medium flex justify-center items-center"><i class="fas fa-copy mr-2"></i> Duplicate</button>
+                            <button id="btnDetInvert" class="bg-orange-600/80 hover:bg-orange-500 text-white py-2.5 rounded-xl text-sm transition font-medium flex justify-center items-center"><i class="fas fa-exchange-alt mr-2"></i> Invert Route</button>
+                            <button id="btnDetDelete" class="bg-red-600/20 hover:bg-red-600/40 border border-red-500/30 text-red-400 py-2.5 rounded-xl text-sm transition font-medium flex justify-center items-center"><i class="fas fa-trash mr-2"></i> Delete</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -787,7 +864,7 @@
     <!-- ========================================== -->
     <script>
         // --- KONFIGURASI GOOGLE SHEETS ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhduNJN27_m9Y_Ku2FMOnI3d1rgZuMr0Bt2tOI3WlV_H4nj1U3MjQp9fpKfHsoffENvQ/exec'; 
+        const GOOGLE_SCRIPT_URL = ''; 
         
         // --- GLOBAL STATE ---
         let usersData = [];
@@ -800,6 +877,12 @@
         
         let routesData = []; // Data State untuk Routes
         let currentRouteWps = []; // Temporary penyimpan waypoint saat membuat route
+        
+        // State Map Active Route Overlay & Dragging
+        let activeMapRouteId = null;
+        let activeRouteLayerGroup = null;
+        let pendingRouteInsert = null;
+        let activeRoutePolyline = null;
         
         if(!localStorage.getItem('adminUser')) {
             localStorage.setItem('adminUser', 'admin');
@@ -1021,9 +1104,11 @@
             // Register click event on the map
             map.on('click', handleMapClick);
 
-            // Inisialisasi layer waypoint ke Peta Realtime
+            // Inisialisasi layer global
             waypointLayerGroup = L.layerGroup().addTo(map);
-            updateMapWaypoints(); // Load data
+            activeRouteLayerGroup = L.layerGroup().addTo(map);
+            
+            updateMapWaypoints(); // Load data global waypoint
         }
 
         // --- MAP CLICK HANDLER (NEW FEATURE) ---
@@ -1117,24 +1202,18 @@
             } else { alert('Geolocation tidak didukung oleh browser ini.'); }
         }
 
-        // Fungsi Global Placeholder untuk Route
+        // Fungsi Placeholder dari Global Waypoint (Jika route overlay belum hidup)
         function addToRoute(id) {
             const wp = waypointsData.find(w => w.id === id);
-            
-            // Jika dalam mode buka Route tab
             switchTab('route');
-            if (document.getElementById('routeFormModal').classList.contains('hidden')) {
-                openRouteForm();
-            }
-            
+            if (document.getElementById('routeFormModal').classList.contains('hidden')) { openRouteForm(); }
             addWpToRoute(wp.id);
             map.closePopup();
         }
 
-        // Update seluruh titik waypoint di Peta & Tambahkan Popup
+        // Update seluruh titik waypoint global di Peta & Tambahkan Popup
         function updateMapWaypoints() {
             if (!map || !waypointLayerGroup) return;
-            
             waypointLayerGroup.clearLayers();
             
             // Injeksi CSS Custom untuk Tooltip (Label) dan Popup (Info)
@@ -1163,23 +1242,16 @@
 
                 const customIcon = L.divIcon({
                     html: iconHtml,
-                    className: '', // Kosong agar tak tergabung css standard leaflet
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14],
-                    popupAnchor: [0, -14]
+                    className: '', 
+                    iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14]
                 });
 
                 const marker = L.marker([wp.lat, wp.lon], { icon: customIcon });
                 
-                // Binding Teks Hitam
                 marker.bindTooltip(wp.name.toUpperCase(), {
-                    permanent: true,
-                    direction: 'bottom',
-                    className: 'wp-black-label',
-                    offset: [0, 10]
+                    permanent: true, direction: 'bottom', className: 'wp-black-label', offset: [0, 10]
                 });
 
-                // HTML Kustom untuk Informasi Popup
                 const popupHtml = `
                     <div class="min-w-[180px]">
                         <div class="flex items-center gap-2 mb-2 border-b border-slate-600 pb-2">
@@ -1212,7 +1284,6 @@
             if (localWP) {
                 waypointsData = JSON.parse(localWP);
             } else {
-                // Mock Data Default
                 waypointsData = [
                     { id: '170001', name: 'WIMM', type: 'airport', lat: 3.637222, lon: 98.878889, elev: 23 },
                     { id: '170002', name: 'MDN', type: 'vfr', lat: 3.5638, lon: 98.6695, elev: 110 },
@@ -1227,7 +1298,6 @@
             localStorage.setItem('skyops_waypoints', JSON.stringify(waypointsData));
         }
 
-        // Helper: Convert Decimal ke Derajat Menit Detik (DMS)
         function decToDMSStr(dec, isLat) {
             const dir = dec < 0 ? (isLat ? 'S' : 'W') : (isLat ? 'N' : 'E');
             let abs = Math.abs(dec);
@@ -1238,27 +1308,19 @@
             return `${deg}° ${min}' ${sec}" ${dir}`;
         }
 
-        // Helper: Convert Form DMS input ke Decimal
         function getDecimalFromDMSForm(isLat) {
             const prefix = isLat ? 'lat' : 'lon';
             const degStr = document.getElementById(`${prefix}Deg`).value;
             const minStr = document.getElementById(`${prefix}Min`).value;
             const secStr = document.getElementById(`${prefix}Sec`).value;
-            
-            // Return NaN jika semua kolom kosong agar tidak menimpa data dengan angka 0
             if (degStr === '' && minStr === '' && secStr === '') return NaN;
-
-            let deg = parseFloat(degStr || 0);
-            let min = parseFloat(minStr || 0);
-            let sec = parseFloat(secStr || 0);
+            let deg = parseFloat(degStr || 0); let min = parseFloat(minStr || 0); let sec = parseFloat(secStr || 0);
             let dir = document.getElementById(`${prefix}Dir`).value;
-            
             let decimal = deg + (min / 60) + (sec / 3600);
             if (dir === 'S' || dir === 'W') decimal = decimal * -1;
             return decimal;
         }
 
-        // Helper: Ikon Custom Tipe Waypoint
         function getIconHTML(type) {
             switch(type) {
                 case 'vfr': return '<div class="w-7 h-7 bg-orange-500 rounded-sm mx-auto shadow-md" title="VFR"></div>';
@@ -1271,7 +1333,6 @@
         function renderWaypoints() {
             const tbody = document.getElementById('waypointTableBody');
             const search = document.getElementById('searchInputWaypoint') ? document.getElementById('searchInputWaypoint').value.toLowerCase() : '';
-            
             tbody.innerHTML = '';
             
             const filtered = waypointsData.filter(wp => wp.name.toLowerCase().includes(search));
@@ -1300,34 +1361,26 @@
             const isDec = document.querySelector('input[name="coordFormat"][value="decimal"]').checked;
             
             if (isDec) {
-                // Saat beralih ke Decimal, konversi dari DMS (jika ada isinya)
-                const lat = getDecimalFromDMSForm(true);
-                const lon = getDecimalFromDMSForm(false);
+                const lat = getDecimalFromDMSForm(true); const lon = getDecimalFromDMSForm(false);
                 if (!isNaN(lat)) document.getElementById('wpLatDec').value = lat.toFixed(6);
                 if (!isNaN(lon)) document.getElementById('wpLonDec').value = lon.toFixed(6);
                 
                 document.getElementById('coordDecimalGroup').style.display = 'grid';
                 document.getElementById('coordDMSGroup').style.display = 'none';
             } else {
-                // Saat beralih ke DMS, konversi nilai Decimal yang sudah ada ke DMS
-                const latDec = parseFloat(document.getElementById('wpLatDec').value);
-                const lonDec = parseFloat(document.getElementById('wpLonDec').value);
+                const latDec = parseFloat(document.getElementById('wpLatDec').value); const lonDec = parseFloat(document.getElementById('wpLonDec').value);
 
                 if (!isNaN(latDec)) {
                     document.getElementById('latDir').value = latDec >= 0 ? 'N' : 'S';
-                    let absLat = Math.abs(latDec);
-                    document.getElementById('latDeg').value = Math.floor(absLat);
-                    let minFloat = (absLat - Math.floor(absLat)) * 60;
-                    document.getElementById('latMin').value = Math.floor(minFloat);
+                    let absLat = Math.abs(latDec); document.getElementById('latDeg').value = Math.floor(absLat);
+                    let minFloat = (absLat - Math.floor(absLat)) * 60; document.getElementById('latMin').value = Math.floor(minFloat);
                     document.getElementById('latSec').value = ((minFloat - Math.floor(minFloat)) * 60).toFixed(2);
                 }
 
                 if (!isNaN(lonDec)) {
                     document.getElementById('lonDir').value = lonDec >= 0 ? 'E' : 'W';
-                    let absLon = Math.abs(lonDec);
-                    document.getElementById('lonDeg').value = Math.floor(absLon);
-                    let minFloat = (absLon - Math.floor(absLon)) * 60;
-                    document.getElementById('lonMin').value = Math.floor(minFloat);
+                    let absLon = Math.abs(lonDec); document.getElementById('lonDeg').value = Math.floor(absLon);
+                    let minFloat = (absLon - Math.floor(absLon)) * 60; document.getElementById('lonMin').value = Math.floor(minFloat);
                     document.getElementById('lonSec').value = ((minFloat - Math.floor(minFloat)) * 60).toFixed(2);
                 }
 
@@ -1340,96 +1393,64 @@
             document.getElementById('waypointForm').reset();
             document.getElementById('wpId').value = '';
             
-            // Bersihkan manual form agar konversi DMS tidak bentrok dengan data lama
             ['latDeg', 'latMin', 'latSec', 'lonDeg', 'lonMin', 'lonSec', 'wpLatDec', 'wpLonDec'].forEach(id => {
                 document.getElementById(id).value = '';
             });
-            document.getElementById('latDir').value = 'N';
-            document.getElementById('lonDir').value = 'E';
-
+            document.getElementById('latDir').value = 'N'; document.getElementById('lonDir').value = 'E';
             document.getElementById('wpModalTitle').innerHTML = '<i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>Add New Waypoint';
             document.getElementById('elevStatus').classList.add('hidden');
             
-            // Reset ke mode awal Decimal
             document.querySelector('input[name="coordFormat"][value="decimal"]').checked = true;
-            document.getElementById('coordDecimalGroup').style.display = 'grid';
-            document.getElementById('coordDMSGroup').style.display = 'none';
+            document.getElementById('coordDecimalGroup').style.display = 'grid'; document.getElementById('coordDMSGroup').style.display = 'none';
             
             document.getElementById('waypointModal').classList.remove('hidden');
         }
 
-        function closeWaypointModal() {
-            document.getElementById('waypointModal').classList.add('hidden');
-        }
+        function closeWaypointModal() { document.getElementById('waypointModal').classList.add('hidden'); }
 
-        // --- BULK PARSE WAYPOINTS ---
         function openParseModal() {
             document.getElementById('bulkWaypointData').value = '';
             document.getElementById('parseWaypointModal').classList.remove('hidden');
         }
-
-        function closeParseModal() {
-            document.getElementById('parseWaypointModal').classList.add('hidden');
-        }
+        function closeParseModal() { document.getElementById('parseWaypointModal').classList.add('hidden'); }
 
         async function processBulkWaypoints() {
             const text = document.getElementById('bulkWaypointData').value;
             if(!text.trim()) { alert("Silahkan masukkan data waypoint."); return; }
-
             const lines = text.split('\n');
             const regex = /([a-zA-Z0-9_-]+)\s+([NS])(\d{1,3})\s+(\d{1,2})'(\d{1,2}(?:\.\d+)?)"\s+([EW])(\d{1,3})\s+(\d{1,2})'(\d{1,2}(?:\.\d+)?)"\s+([a-zA-Z]+)/i;
             
-            let newWaypoints = [];
-            let lats = [];
-            let lons = [];
+            let newWaypoints = []; let lats = []; let lons = [];
 
             lines.forEach(line => {
                 const match = line.trim().match(regex);
                 if (match) {
                     const name = match[1];
                     const latDir = match[2].toUpperCase();
-                    let lat = parseFloat(match[3]) + (parseFloat(match[4])/60) + (parseFloat(match[5])/3600);
-                    if (latDir === 'S') lat = -lat;
-
+                    let lat = parseFloat(match[3]) + (parseFloat(match[4])/60) + (parseFloat(match[5])/3600); if (latDir === 'S') lat = -lat;
                     const lonDir = match[6].toUpperCase();
-                    let lon = parseFloat(match[7]) + (parseFloat(match[8])/60) + (parseFloat(match[9])/3600);
-                    if (lonDir === 'W') lon = -lon;
-
-                    let type = match[10].toLowerCase();
-                    if(!['vfr', 'airport', 'heliport'].includes(type)) type = 'vfr'; 
+                    let lon = parseFloat(match[7]) + (parseFloat(match[8])/60) + (parseFloat(match[9])/3600); if (lonDir === 'W') lon = -lon;
+                    let type = match[10].toLowerCase(); if(!['vfr', 'airport', 'heliport'].includes(type)) type = 'vfr'; 
 
                     newWaypoints.push({
                         id: 'wp_bulk_' + Date.now().toString() + Math.floor(Math.random()*10000),
-                        name: name.toUpperCase(),
-                        type: type,
-                        lat: lat,
-                        lon: lon,
-                        elev: 0 // Will sync next
+                        name: name.toUpperCase(), type: type, lat: lat, lon: lon, elev: 0 
                     });
-                    lats.push(lat.toFixed(6));
-                    lons.push(lon.toFixed(6));
+                    lats.push(lat.toFixed(6)); lons.push(lon.toFixed(6));
                 }
             });
 
-            if (newWaypoints.length === 0) {
-                alert("Tidak ada waypoint valid yang ditemukan. Pastikan format sesuai contoh.");
-                return;
-            }
+            if (newWaypoints.length === 0) { alert("Tidak ada waypoint valid yang ditemukan."); return; }
 
             const btn = document.getElementById('btnProcessBulk');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...'; btn.disabled = true;
 
-            // Auto Sync Elevation in batch (API open-meteo support batch lat,lon)
             try {
-                const chunkSize = 50; // Open-Meteo allows ~100 max per request safely
+                const chunkSize = 50; 
                 for (let i = 0; i < lats.length; i += chunkSize) {
-                    const chunkLats = lats.slice(i, i + chunkSize).join(',');
-                    const chunkLons = lons.slice(i, i + chunkSize).join(',');
-                    
+                    const chunkLats = lats.slice(i, i + chunkSize).join(','); const chunkLons = lons.slice(i, i + chunkSize).join(',');
                     const res = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${chunkLats}&longitude=${chunkLons}`);
                     const data = await res.json();
-                    
                     if (data.elevation && data.elevation.length > 0) {
                         for(let j = 0; j < data.elevation.length; j++) {
                             const elevMeters = data.elevation[j];
@@ -1437,67 +1458,44 @@
                         }
                     }
                 }
-            } catch(e) {
-                console.error("Gagal sync elevasi massal:", e);
-                alert("Beberapa elevasi mungkin gagal disinkronkan karena masalah jaringan.");
-            }
+            } catch(e) { console.error("Gagal sync elevasi massal:", e); alert("Gagal sync elevasi sebagian."); }
 
             waypointsData = [...waypointsData, ...newWaypoints];
-            saveWaypoints();
-            renderWaypoints();
-            updateMapWaypoints(); // Tautkan langsung ke Peta
+            saveWaypoints(); renderWaypoints(); updateMapWaypoints(); 
             closeParseModal();
-            
-            btn.innerHTML = 'Import & Auto Sync Elevasi';
-            btn.disabled = false;
+            btn.innerHTML = 'Import & Auto Sync Elevasi'; btn.disabled = false;
             alert(`${newWaypoints.length} Waypoint berhasil diimport dan disinkronkan!`);
         }
 
         async function syncElevation() {
-            const btn = document.getElementById('btnSyncElev');
-            const status = document.getElementById('elevStatus');
+            const btn = document.getElementById('btnSyncElev'); const status = document.getElementById('elevStatus');
             const isDec = document.querySelector('input[name="coordFormat"][value="decimal"]').checked;
             
             let lat, lon;
             if (isDec) {
-                lat = parseFloat(document.getElementById('wpLatDec').value);
-                lon = parseFloat(document.getElementById('wpLonDec').value);
+                lat = parseFloat(document.getElementById('wpLatDec').value); lon = parseFloat(document.getElementById('wpLonDec').value);
             } else {
-                lat = getDecimalFromDMSForm(true);
-                lon = getDecimalFromDMSForm(false);
+                lat = getDecimalFromDMSForm(true); lon = getDecimalFromDMSForm(false);
             }
 
-            if (isNaN(lat) || isNaN(lon)) {
-                alert("Harap isi koordinat Latitude & Longitude terlebih dahulu untuk Auto Sync.");
-                return;
-            }
+            if (isNaN(lat) || isNaN(lon)) { alert("Harap isi koordinat Latitude & Longitude."); return; }
 
             try {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Syncing...';
-                btn.disabled = true;
-                
-                // Gunakan API Open-Meteo untuk elevasi (Anti-Error, No Auth)
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Syncing...'; btn.disabled = true;
                 const res = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`);
                 const data = await res.json();
                 
                 if (data.elevation && data.elevation.length > 0) {
-                    const elevMeters = data.elevation[0];
-                    const elevFeet = Math.round(elevMeters * 3.28084); // Konversi Meter ke Kaki (Feet)
+                    const elevMeters = data.elevation[0]; const elevFeet = Math.round(elevMeters * 3.28084);
                     document.getElementById('wpElev').value = elevFeet;
-                    
                     status.textContent = `Sync Sukses: ${elevMeters} meter -> ${elevFeet} ft.`;
-                    status.classList.remove('hidden', 'text-red-400');
-                    status.classList.add('text-emerald-400');
-                } else {
-                    throw new Error("Data elevasi kosong.");
-                }
+                    status.classList.remove('hidden', 'text-red-400'); status.classList.add('text-emerald-400');
+                } else { throw new Error("Data elevasi kosong."); }
             } catch (err) {
                 status.textContent = "Gagal mengambil data elevasi. Cek koneksi Anda.";
-                status.classList.remove('hidden', 'text-emerald-400');
-                status.classList.add('text-red-400');
+                status.classList.remove('hidden', 'text-emerald-400'); status.classList.add('text-red-400');
             } finally {
-                btn.innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i>Sync Elevasi';
-                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i>Sync Elevasi'; btn.disabled = false;
             }
         }
 
@@ -1513,8 +1511,7 @@
                 id: id || 'wp_' + Date.now().toString(),
                 name: document.getElementById('wpName').value.toUpperCase(),
                 type: document.getElementById('wpType').value,
-                lat: lat,
-                lon: lon,
+                lat: lat, lon: lon,
                 elev: parseFloat(document.getElementById('wpElev').value || 0)
             };
 
@@ -1525,30 +1522,26 @@
                 waypointsData.push(newWp);
             }
 
-            saveWaypoints();
-            renderWaypoints();
-            updateMapWaypoints(); // Tautkan ke Peta
-            closeWaypointModal();
+            saveWaypoints(); renderWaypoints(); updateMapWaypoints(); closeWaypointModal();
+            
+            // INTEGRASI KE MAP ACTIVE ROUTE
+            if (pendingRouteInsert) {
+                addExistingWpToActiveRoute(newWp.id, pendingRouteInsert.insertIndex);
+                pendingRouteInsert = null; // Clear
+            }
         }
 
         function editWaypoint(id) {
             const wp = waypointsData.find(w => w.id === id);
             if (!wp) return;
 
-            document.getElementById('wpId').value = wp.id;
-            document.getElementById('wpName').value = wp.name;
-            document.getElementById('wpType').value = wp.type;
-            document.getElementById('wpElev').value = wp.elev;
+            document.getElementById('wpId').value = wp.id; document.getElementById('wpName').value = wp.name;
+            document.getElementById('wpType').value = wp.type; document.getElementById('wpElev').value = wp.elev;
             document.getElementById('elevStatus').classList.add('hidden');
             
-            // Reset state UI ke mode Decimal tanpa memicu fungsi konversi toggle
             document.querySelector('input[name="coordFormat"][value="decimal"]').checked = true;
-            document.getElementById('coordDecimalGroup').style.display = 'grid';
-            document.getElementById('coordDMSGroup').style.display = 'none';
-            
-            // Set Koordinat ke dalam input form Decimal
-            document.getElementById('wpLatDec').value = wp.lat;
-            document.getElementById('wpLonDec').value = wp.lon;
+            document.getElementById('coordDecimalGroup').style.display = 'grid'; document.getElementById('coordDMSGroup').style.display = 'none';
+            document.getElementById('wpLatDec').value = wp.lat; document.getElementById('wpLonDec').value = wp.lon;
 
             document.getElementById('wpModalTitle').innerHTML = '<i class="fas fa-edit text-blue-400 mr-2"></i>Edit Waypoint';
             document.getElementById('waypointModal').classList.remove('hidden');
@@ -1557,9 +1550,7 @@
         function deleteWaypoint(id) {
             if(confirm("Hapus Waypoint ini dari Database?")) {
                 waypointsData = waypointsData.filter(w => w.id !== id);
-                saveWaypoints();
-                renderWaypoints();
-                updateMapWaypoints(); // Sinkronisasikan Penghapusan ke Peta
+                saveWaypoints(); renderWaypoints(); updateMapWaypoints();
             }
         }
 
@@ -1572,7 +1563,6 @@
             if (localAC) {
                 aircraftsData = JSON.parse(localAC);
             } else {
-                // Mock Data Default
                 aircraftsData = [
                     { id: 'ac_1', reg: 'PK-TWA', type: 'Gulfstream IV SP', model: 'Fixed Wing', speed: 450, fuel: 3500, fuelUnit: 'lbs' },
                     { id: 'ac_2', reg: 'PK-HLY', type: 'Bell 412 EP', model: 'Helicopter', speed: 140, fuel: 250, fuelUnit: 'liter' }
@@ -1582,17 +1572,13 @@
             renderAircrafts();
         }
 
-        function saveAircrafts() {
-            localStorage.setItem('skyops_aircrafts', JSON.stringify(aircraftsData));
-        }
+        function saveAircrafts() { localStorage.setItem('skyops_aircrafts', JSON.stringify(aircraftsData)); }
 
         function renderAircrafts() {
-            const grid = document.getElementById('aircraftGrid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('aircraftGrid'); grid.innerHTML = '';
             
             if(aircraftsData.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No aircraft profiles found. Click "Add New Profile" to create one.</div>';
-                return;
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No aircraft profiles found.</div>'; return;
             }
 
             aircraftsData.forEach(ac => {
@@ -1616,14 +1602,8 @@
                         </div>
                     </div>
                     <div class="relative z-10 grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-700/50">
-                        <div>
-                            <p class="text-[10px] text-slate-400 uppercase">Speed</p>
-                            <p class="text-sm font-semibold text-white">${ac.speed} <span class="text-[10px] text-slate-500 font-normal">kts</span></p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-slate-400 uppercase">Fuel Cons.</p>
-                            <p class="text-sm font-semibold text-white">${ac.fuel} <span class="text-[10px] text-slate-500 font-normal">${ac.fuelUnit}/hr</span></p>
-                        </div>
+                        <div><p class="text-[10px] text-slate-400 uppercase">Speed</p><p class="text-sm font-semibold text-white">${ac.speed} <span class="text-[10px] text-slate-500 font-normal">kts</span></p></div>
+                        <div><p class="text-[10px] text-slate-400 uppercase">Fuel Cons.</p><p class="text-sm font-semibold text-white">${ac.fuel} <span class="text-[10px] text-slate-500 font-normal">${ac.fuelUnit}/hr</span></p></div>
                     </div>
                     <div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center backdrop-blur-[2px]">
                         <span class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg"><i class="fas fa-eye mr-2"></i>View Details</span>
@@ -1633,103 +1613,59 @@
             });
         }
 
-        // --- FORM MODAL LOGIC ---
         function openAircraftForm(id = null) {
             document.getElementById('aircraftForm').reset();
-            
             if (id) {
                 const ac = aircraftsData.find(a => a.id === id);
                 if(ac) {
-                    document.getElementById('acId').value = ac.id;
-                    document.getElementById('acReg').value = ac.reg;
-                    document.getElementById('acModel').value = ac.model;
-                    document.getElementById('acType').value = ac.type;
-                    document.getElementById('acSpeed').value = ac.speed;
-                    document.getElementById('acFuel').value = ac.fuel;
-                    document.getElementById('acFuelUnit').value = ac.fuelUnit;
-                    document.getElementById('acModalTitle').innerHTML = '<i class="fas fa-edit text-blue-400 mr-2"></i>Edit Aircraft Profile';
+                    document.getElementById('acId').value = ac.id; document.getElementById('acReg').value = ac.reg; document.getElementById('acModel').value = ac.model;
+                    document.getElementById('acType').value = ac.type; document.getElementById('acSpeed').value = ac.speed; document.getElementById('acFuel').value = ac.fuel;
+                    document.getElementById('acFuelUnit').value = ac.fuelUnit; document.getElementById('acModalTitle').innerHTML = '<i class="fas fa-edit text-blue-400 mr-2"></i>Edit Aircraft Profile';
                 }
             } else {
-                document.getElementById('acId').value = '';
-                document.getElementById('acModalTitle').innerHTML = '<i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile';
+                document.getElementById('acId').value = ''; document.getElementById('acModalTitle').innerHTML = '<i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile';
             }
-            
             document.getElementById('aircraftFormModal').classList.remove('hidden');
         }
 
-        function closeAircraftForm() {
-            document.getElementById('aircraftFormModal').classList.add('hidden');
-        }
+        function closeAircraftForm() { document.getElementById('aircraftFormModal').classList.add('hidden'); }
 
         function saveAircraft(e) {
             e.preventDefault();
             const id = document.getElementById('acId').value;
-            
             const newAC = {
-                id: id || 'ac_' + Date.now(),
-                reg: document.getElementById('acReg').value.toUpperCase(),
-                model: document.getElementById('acModel').value,
-                type: document.getElementById('acType').value,
-                speed: parseFloat(document.getElementById('acSpeed').value),
-                fuel: parseFloat(document.getElementById('acFuel').value),
-                fuelUnit: document.getElementById('acFuelUnit').value
+                id: id || 'ac_' + Date.now(), reg: document.getElementById('acReg').value.toUpperCase(), model: document.getElementById('acModel').value,
+                type: document.getElementById('acType').value, speed: parseFloat(document.getElementById('acSpeed').value),
+                fuel: parseFloat(document.getElementById('acFuel').value), fuelUnit: document.getElementById('acFuelUnit').value
             };
 
-            if (id) {
-                const idx = aircraftsData.findIndex(a => a.id === id);
-                if(idx !== -1) aircraftsData[idx] = newAC;
-            } else {
-                aircraftsData.push(newAC);
-            }
+            if (id) { const idx = aircraftsData.findIndex(a => a.id === id); if(idx !== -1) aircraftsData[idx] = newAC; } 
+            else { aircraftsData.push(newAC); }
 
-            saveAircrafts();
-            renderAircrafts();
-            closeAircraftForm();
-            
-            // Jika mengedit dari detail, tutup juga detail modalnya
-            closeAircraftDetail();
+            saveAircrafts(); renderAircrafts(); closeAircraftForm(); closeAircraftDetail();
         }
 
-        // --- DETAIL MODAL LOGIC ---
         function viewAircraft(id) {
             const ac = aircraftsData.find(a => a.id === id);
             if(!ac) return;
-
-            const isHeli = ac.model === 'Helicopter';
-            const iconClass = isHeli ? 'fa-helicopter' : 'fa-plane';
+            const isHeli = ac.model === 'Helicopter'; const iconClass = isHeli ? 'fa-helicopter' : 'fa-plane';
             
-            document.getElementById('detailId').value = ac.id;
-            document.getElementById('detailReg').textContent = ac.reg;
-            document.getElementById('detailType').textContent = ac.type;
-            document.getElementById('detailModel').textContent = ac.model.toUpperCase();
-            document.getElementById('detailSpeed').textContent = ac.speed;
-            document.getElementById('detailFuel').textContent = ac.fuel;
+            document.getElementById('detailId').value = ac.id; document.getElementById('detailReg').textContent = ac.reg;
+            document.getElementById('detailType').textContent = ac.type; document.getElementById('detailModel').textContent = ac.model.toUpperCase();
+            document.getElementById('detailSpeed').textContent = ac.speed; document.getElementById('detailFuel').textContent = ac.fuel;
             document.getElementById('detailFuelUnit').textContent = ac.fuelUnit + '/hr';
             
-            // Update Icons dynamically
             document.getElementById('detailIcon').innerHTML = `<i class="fas ${iconClass}"></i>`;
             document.getElementById('detailIconBg').className = `fas ${iconClass} text-8xl text-blue-400/10 absolute -right-6 -top-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}`;
-            
             document.getElementById('aircraftDetailModal').classList.remove('hidden');
         }
 
-        function closeAircraftDetail() {
-            document.getElementById('aircraftDetailModal').classList.add('hidden');
-        }
-
-        function editAircraftFromDetail() {
-            const id = document.getElementById('detailId').value;
-            closeAircraftDetail();
-            openAircraftForm(id);
-        }
-
+        function closeAircraftDetail() { document.getElementById('aircraftDetailModal').classList.add('hidden'); }
+        function editAircraftFromDetail() { const id = document.getElementById('detailId').value; closeAircraftDetail(); openAircraftForm(id); }
         function deleteAircraftFromDetail() {
             const id = document.getElementById('detailId').value;
             if(confirm("Hapus Profil Pesawat ini secara permanen?")) {
-                aircraftsData = aircraftsData.filter(a => a.id !== id);
-                saveAircrafts();
-                renderAircrafts();
-                closeAircraftDetail();
+                aircraftsData = aircraftsData.filter(a => a.id !== id); saveAircrafts(); renderAircrafts(); closeAircraftDetail();
             }
         }
 
@@ -1739,33 +1675,23 @@
 
         function loadRoutes() {
             const localRt = localStorage.getItem('skyops_routes');
-            if (localRt) {
-                routesData = JSON.parse(localRt);
-            } else {
-                routesData = [];
-            }
+            if (localRt) { routesData = JSON.parse(localRt); } else { routesData = []; }
             renderRouteList();
         }
 
-        function saveRoutes() {
-            localStorage.setItem('skyops_routes', JSON.stringify(routesData));
-        }
+        function saveRoutes() { localStorage.setItem('skyops_routes', JSON.stringify(routesData)); }
 
         function renderRouteList() {
-            const tbody = document.getElementById('routeTableBody');
-            tbody.innerHTML = '';
-            
+            const tbody = document.getElementById('routeTableBody'); tbody.innerHTML = '';
             routesData.forEach(rt => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/50 transition group';
-                
-                // Cari Origin dan Dest berdasarkan Wp Pertama dan Terakhir
+                tr.className = 'hover:bg-slate-800/50 transition group cursor-pointer';
+                tr.onclick = () => openRouteDetailModal(rt.id); // View Route Details
+
                 let originDest = '-';
                 if (rt.waypoints && rt.waypoints.length >= 2) {
                     originDest = `<span class="font-semibold text-emerald-400">${rt.waypoints[0].name}</span> <i class="fas fa-arrow-right text-slate-500 text-[10px] mx-1"></i> <span class="font-semibold text-blue-400">${rt.waypoints[rt.waypoints.length-1].name}</span>`;
-                } else if (rt.waypoints && rt.waypoints.length === 1) {
-                    originDest = rt.waypoints[0].name;
-                }
+                } else if (rt.waypoints && rt.waypoints.length === 1) { originDest = rt.waypoints[0].name; }
 
                 tr.innerHTML = `
                     <td class="px-6 py-3 font-bold text-white tracking-wide">${rt.name}</td>
@@ -1774,14 +1700,227 @@
                     <td class="px-6 py-3">${rt.totalDist} NM</td>
                     <td class="px-6 py-3 text-orange-300">${rt.totalEET}</td>
                     <td class="px-6 py-3 text-right opacity-50 group-hover:opacity-100 transition">
-                        <button onclick="editRoute('${rt.id}')" class="text-blue-400 hover:text-blue-300 mr-3 p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteRoute('${rt.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button>
+                        <button onclick="event.stopPropagation(); editRoute('${rt.id}')" class="text-blue-400 hover:text-blue-300 mr-3 p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button>
+                        <button onclick="event.stopPropagation(); deleteRoute('${rt.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
+        // --- ROUTE DETAIL MODAL ---
+        function openRouteDetailModal(id) {
+            const rt = routesData.find(r => r.id === id);
+            if(!rt) return;
+
+            document.getElementById('detRtName').textContent = rt.name;
+            const ac = aircraftsData.find(a => a.id === rt.aircraftId);
+            document.getElementById('detRtAircraft').textContent = ac ? `${ac.reg} (${ac.type})` : rt.aircraftReg;
+            
+            let originDest = '-';
+            if (rt.waypoints && rt.waypoints.length >= 2) {
+                originDest = `${rt.waypoints[0].name} <i class="fas fa-arrow-right text-blue-400 mx-2 text-xs"></i> ${rt.waypoints[rt.waypoints.length-1].name}`;
+            } else if (rt.waypoints && rt.waypoints.length === 1) { originDest = rt.waypoints[0].name; }
+            document.getElementById('detRtOriginDest').innerHTML = originDest;
+
+            document.getElementById('detRtDist').textContent = rt.totalDist;
+            document.getElementById('detRtEET').textContent = rt.totalEET;
+            
+            // Calculate Fuel Req accurately
+            let totalFuel = 0;
+            if (rt.speed > 0) {
+                let totalDecHours = 0;
+                for(let i=1; i<rt.waypoints.length; i++) {
+                    const dist = calcDistanceNM(rt.waypoints[i-1].lat, rt.waypoints[i-1].lon, rt.waypoints[i].lat, rt.waypoints[i].lon);
+                    totalDecHours += (dist / rt.speed);
+                }
+                totalFuel = totalDecHours * rt.fuelCons;
+            }
+            document.getElementById('detRtFuel').textContent = Math.round(totalFuel) + (ac ? ' ' + ac.fuelUnit : '');
+
+            // Re-bind Action Buttons
+            document.getElementById('btnDetEdit').onclick = () => { closeRouteDetailModal(); editRoute(id); };
+            document.getElementById('btnDetDuplicate').onclick = () => duplicateRoute(id);
+            document.getElementById('btnDetInvert').onclick = () => invertRoute(id);
+            document.getElementById('btnDetDelete').onclick = () => { closeRouteDetailModal(); deleteRoute(id); };
+            document.getElementById('btnDetViewMap').onclick = () => viewRouteOnMap(id);
+
+            document.getElementById('routeDetailModal').classList.remove('hidden');
+        }
+
+        function closeRouteDetailModal() { document.getElementById('routeDetailModal').classList.add('hidden'); }
+
+        function duplicateRoute(id) {
+            const rt = routesData.find(r => r.id === id);
+            if(!rt) return;
+            const clone = JSON.parse(JSON.stringify(rt));
+            clone.id = 'rt_' + Date.now();
+            clone.name += ' - COPY';
+            routesData.push(clone);
+            saveRoutes(); renderRouteList(); closeRouteDetailModal();
+        }
+
+        function invertRoute(id) {
+            const rt = routesData.find(r => r.id === id);
+            if(!rt) return;
+            
+            // Reverse Waypoints
+            rt.waypoints.reverse();
+            
+            // Reverse Name if format is XXXX-YYYY
+            const parts = rt.name.split('-');
+            if (parts.length === 2) rt.name = parts[1] + '-' + parts[0];
+            else rt.name = rt.name + ' (INVERTED)';
+
+            // Save and re-render
+            recalcRouteTotals(rt);
+            saveRoutes(); renderRouteList();
+            openRouteDetailModal(rt.id); // refresh modal view
+        }
+
+        // Helper to recalculate a specific route's totals
+        function recalcRouteTotals(rt) {
+            let totalDist = 0; let totalDecHours = 0;
+            for(let i=1; i<rt.waypoints.length; i++) {
+                const dist = calcDistanceNM(rt.waypoints[i-1].lat, rt.waypoints[i-1].lon, rt.waypoints[i].lat, rt.waypoints[i].lon);
+                totalDist += dist;
+                if(rt.speed > 0) totalDecHours += (dist / rt.speed);
+            }
+            rt.totalDist = Math.round(totalDist);
+            rt.totalEET = formatTimeHM(totalDecHours);
+        }
+
+        // --- MAP INTEGRATION (VIEW ON MAP & DRAG ROUTE) ---
+        function viewRouteOnMap(id) {
+            activeMapRouteId = id;
+            closeRouteDetailModal();
+            switchTab('map');
+            drawActiveRoute();
+        }
+
+        function clearActiveMapRoute() {
+            activeMapRouteId = null;
+            document.getElementById('activeRouteOverlay').classList.add('hidden');
+            if (activeRouteLayerGroup) activeRouteLayerGroup.clearLayers();
+        }
+
+        function drawActiveRoute() {
+            if (!activeRouteLayerGroup) return;
+            activeRouteLayerGroup.clearLayers();
+
+            const rt = routesData.find(r => r.id === activeMapRouteId);
+            if (!rt || !rt.waypoints || rt.waypoints.length === 0) return;
+
+            // Tampilkan UI Panel
+            document.getElementById('activeRouteOverlay').classList.remove('hidden');
+            document.getElementById('activeRouteOverlayName').textContent = rt.name;
+
+            // Gambar Garis Magenta
+            const latlngs = rt.waypoints.map(wp => [wp.lat, wp.lon]);
+            const polyline = L.polyline(latlngs, { color: '#d946ef', weight: 5, opacity: 0.9 }).addTo(activeRouteLayerGroup);
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+
+            // Gambar Titik Interaktif (Midpoints untuk Drag/Rubber-band)
+            for (let i = 0; i < rt.waypoints.length - 1; i++) {
+                const wp1 = rt.waypoints[i]; const wp2 = rt.waypoints[i+1];
+                const midLat = (wp1.lat + wp2.lat) / 2;
+                const midLon = (wp1.lon + wp2.lon) / 2;
+
+                const midIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: '<div class="midpoint-marker" style="width: 14px; height: 14px;"></div>',
+                    iconSize: [14, 14], iconAnchor: [7, 7]
+                });
+
+                const midMarker = L.marker([midLat, midLon], { icon: midIcon, draggable: true }).addTo(activeRouteLayerGroup);
+
+                // Saat di Drag: Modifikasi garis secara realtime
+                midMarker.on('drag', (e) => {
+                    const tempLatLngs = [...latlngs];
+                    tempLatLngs.splice(i+1, 0, e.latlng); // Sisipkan titik sementara
+                    polyline.setLatLngs(tempLatLngs);
+                });
+
+                // Saat dilepas: Eksekusi Drop Logic
+                midMarker.on('dragend', (e) => {
+                    const markerLatLng = e.target.getLatLng();
+                    handleTrackDrop(markerLatLng.lat, markerLatLng.lng, i+1);
+                    // Reset line visual in case they cancel the add
+                    polyline.setLatLngs(latlngs); 
+                });
+            }
+        }
+
+        async function handleTrackDrop(lat, lng, insertIndex) {
+            // Cari Waypoint Terdekat (Radius < 1.5 NM)
+            let nearbyWps = waypointsData.map(wp => {
+                return { wp: wp, dist: calcDistanceNM(lat, lng, wp.lat, wp.lon) };
+            });
+            nearbyWps = nearbyWps.filter(item => item.dist <= 1.5).sort((a,b) => a.dist - b.dist);
+
+            if (nearbyWps.length > 0) {
+                // Ada WP Terdekat -> Tampilkan Sugesti
+                let listHtml = '';
+                nearbyWps.forEach(item => {
+                    listHtml += `
+                        <div class="flex justify-between items-center bg-slate-800 p-2 rounded mb-2 border border-slate-700">
+                            <div>
+                                <span class="font-bold text-blue-400 text-sm">${item.wp.name}</span>
+                                <span class="text-[10px] text-slate-400 block">${item.dist.toFixed(2)} NM away</span>
+                            </div>
+                            <button onclick="addExistingWpToActiveRoute('${item.wp.id}', ${insertIndex})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded text-[10px] transition"><i class="fas fa-plus"></i> Route</button>
+                        </div>
+                    `;
+                });
+
+                const popupHtml = `
+                    <div class="min-w-[200px]">
+                        <h4 class="font-bold text-xs text-slate-300 mb-2 border-b border-slate-600 pb-1">Titik Ditemukan (Radius 1.5 NM)</h4>
+                        ${listHtml}
+                        <p class="text-[10px] text-slate-400 italic text-center mt-2">Atau klik area kosong map untuk buat WP baru.</p>
+                    </div>
+                `;
+                L.popup({ className: 'custom-popup' }).setLatLng([lat, lng]).setContent(popupHtml).openOn(map);
+            } else {
+                // Tidak ada WP Terdekat -> Fetch Elevasi & Tawarkan Buat WP Baru
+                const popup = L.popup({ className: 'custom-popup' }).setLatLng([lat, lng]).setContent('<div class="p-2 text-slate-300 text-xs"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data...</div>').openOn(map);
+                
+                try {
+                    const res = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lng}`);
+                    const data = await res.json();
+                    const elevFeet = Math.round((data.elevation && data.elevation.length > 0 ? data.elevation[0] : 0) * 3.28084);
+                    
+                    const popupHtml = `
+                        <div class="min-w-[180px]">
+                            <h4 class="font-bold text-sm text-magenta-400 m-0 mb-2 border-b border-slate-600 pb-1"><i class="fas fa-magic mr-1"></i> ADD NEW WAYPOINT</h4>
+                            <div class="text-xs text-slate-300 space-y-1 mb-3">
+                                <p class="m-0"><i class="fas fa-map-pin w-4 text-center mr-1"></i> ${decToDMSStr(lat, true)}</p>
+                                <p class="m-0"><i class="fas fa-map-pin w-4 text-center opacity-0 mr-1"></i> ${decToDMSStr(lng, false)}</p>
+                                <p class="m-0 mt-1"><i class="fas fa-mountain w-4 text-center mr-1"></i> ${elevFeet} ft</p>
+                            </div>
+                            <button onclick="pendingRouteInsert = { routeId: activeMapRouteId, insertIndex: ${insertIndex} }; addClickedToWaypoint(${lat}, ${lng}, ${elevFeet})" class="bg-magenta-600 hover:bg-magenta-500 text-white w-full px-2 py-2 rounded text-xs transition font-bold"><i class="fas fa-plus mr-1"></i> Create & Insert to Route</button>
+                        </div>
+                    `;
+                    popup.setContent(popupHtml);
+                } catch(e) {
+                    popup.setContent('<div class="p-2 text-red-400 text-xs">Gagal mengambil data elevasi.</div>');
+                }
+            }
+        }
+
+        function addExistingWpToActiveRoute(wpId, insertIndex) {
+            const rt = routesData.find(r => r.id === activeMapRouteId);
+            const wp = waypointsData.find(w => w.id === wpId);
+            if (rt && wp) {
+                rt.waypoints.splice(insertIndex, 0, wp);
+                recalcRouteTotals(rt);
+                saveRoutes();
+                drawActiveRoute(); // Redraw map
+                map.closePopup();
+            }
+        }
+
+        // --- FORM MODAL LOGIC (ROUTE) ---
         function openRouteForm(id = null) {
             populateRouteAircrafts();
             currentRouteWps = [];
@@ -1797,32 +1936,18 @@
                     document.getElementById('rtFuelCons').value = rt.fuelCons;
                     document.getElementById('rtFuelOnboard').value = rt.fuelOnboard || 0;
                     
-                    // Restore waypoints
                     currentRouteWps = rt.waypoints.map(savedWp => {
-                        // Sinkronkan data koordinat terbaru dari database jika berubah
-                        const dbWp = waypointsData.find(db => db.id === savedWp.id);
-                        return dbWp ? {...dbWp} : savedWp;
+                        const dbWp = waypointsData.find(db => db.id === savedWp.id); return dbWp ? {...dbWp} : savedWp;
                     });
                     
                     document.getElementById('routeModalTitle').innerHTML = '<i class="fas fa-edit text-blue-400 mr-2"></i>Edit Operational Flight Plan';
-                    
-                    // Set Unit Label
                     const ac = aircraftsData.find(a => a.id === rt.aircraftId);
-                    if(ac) {
-                        document.getElementById('rtFuelUnitLabel1').textContent = ac.fuelUnit;
-                        document.getElementById('rtFuelUnitLabel2').textContent = ac.fuelUnit;
-                    }
+                    if(ac) { document.getElementById('rtFuelUnitLabel1').textContent = ac.fuelUnit; document.getElementById('rtFuelUnitLabel2').textContent = ac.fuelUnit; }
                 }
             } else {
-                document.getElementById('rtId').value = '';
-                document.getElementById('rtName').value = '';
-                document.getElementById('rtAircraft').value = '';
-                document.getElementById('rtEtd').value = '';
-                document.getElementById('rtSpeed').value = '';
-                document.getElementById('rtFuelCons').value = '';
-                document.getElementById('rtFuelOnboard').value = '';
-                document.getElementById('rtFuelUnitLabel1').textContent = '-';
-                document.getElementById('rtFuelUnitLabel2').textContent = '-';
+                document.getElementById('rtId').value = ''; document.getElementById('rtName').value = ''; document.getElementById('rtAircraft').value = '';
+                document.getElementById('rtEtd').value = ''; document.getElementById('rtSpeed').value = ''; document.getElementById('rtFuelCons').value = '';
+                document.getElementById('rtFuelOnboard').value = ''; document.getElementById('rtFuelUnitLabel1').textContent = '-'; document.getElementById('rtFuelUnitLabel2').textContent = '-';
                 document.getElementById('routeModalTitle').innerHTML = '<i class="fas fa-clipboard-list text-blue-400 mr-2"></i>Create Operational Flight Plan';
             }
             
@@ -1830,118 +1955,77 @@
             document.getElementById('routeFormModal').classList.remove('hidden');
         }
 
-        function closeRouteForm() {
-            document.getElementById('routeFormModal').classList.add('hidden');
-        }
+        function closeRouteForm() { document.getElementById('routeFormModal').classList.add('hidden'); }
 
         function populateRouteAircrafts() {
-            const select = document.getElementById('rtAircraft');
-            const currentVal = select.value;
+            const select = document.getElementById('rtAircraft'); const currentVal = select.value;
             select.innerHTML = '<option value="">-- Select Aircraft --</option>';
-            aircraftsData.forEach(ac => {
-                select.innerHTML += `<option value="${ac.id}">${ac.reg} - ${ac.type}</option>`;
-            });
-            select.value = currentVal; // Restore jika ada isinya
+            aircraftsData.forEach(ac => { select.innerHTML += `<option value="${ac.id}">${ac.reg} - ${ac.type}</option>`; });
+            select.value = currentVal;
         }
 
         function handleRouteAircraftChange() {
-            const id = document.getElementById('rtAircraft').value;
-            const ac = aircraftsData.find(a => a.id === id);
+            const id = document.getElementById('rtAircraft').value; const ac = aircraftsData.find(a => a.id === id);
             if (ac) {
-                document.getElementById('rtSpeed').value = ac.speed;
-                document.getElementById('rtFuelCons').value = ac.fuel;
-                document.getElementById('rtFuelUnitLabel1').textContent = ac.fuelUnit;
-                document.getElementById('rtFuelUnitLabel2').textContent = ac.fuelUnit;
+                document.getElementById('rtSpeed').value = ac.speed; document.getElementById('rtFuelCons').value = ac.fuel;
+                document.getElementById('rtFuelUnitLabel1').textContent = ac.fuelUnit; document.getElementById('rtFuelUnitLabel2').textContent = ac.fuelUnit;
             } else {
-                document.getElementById('rtSpeed').value = '';
-                document.getElementById('rtFuelCons').value = '';
-                document.getElementById('rtFuelUnitLabel1').textContent = '-';
-                document.getElementById('rtFuelUnitLabel2').textContent = '-';
+                document.getElementById('rtSpeed').value = ''; document.getElementById('rtFuelCons').value = '';
+                document.getElementById('rtFuelUnitLabel1').textContent = '-'; document.getElementById('rtFuelUnitLabel2').textContent = '-';
             }
             renderOFPTable();
         }
 
-        // --- MATH HELPERS FOR OFP ---
-        // Haversine Distance in Nautical Miles (NM)
         function calcDistanceNM(lat1, lon1, lat2, lon2) {
-            const R = 3440.065; // Radius of Earth in NM
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const R = 3440.065; 
+            const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             return R * c;
         }
 
-        // Initial Bearing (Heading) in Degrees
         function calcBearingDeg(lat1, lon1, lat2, lon2) {
-            const lat1R = lat1 * Math.PI / 180;
-            const lat2R = lat2 * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-
+            const lat1R = lat1 * Math.PI / 180; const lat2R = lat2 * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
             const y = Math.sin(dLon) * Math.cos(lat2R);
             const x = Math.cos(lat1R) * Math.sin(lat2R) - Math.sin(lat1R) * Math.cos(lat2R) * Math.cos(dLon);
             let brng = Math.atan2(y, x) * 180 / Math.PI;
-            return (brng + 360) % 360; // Normalize 0-360
+            return (brng + 360) % 360;
         }
 
-        // Format decimal hours to HH:MM string (Untuk Durasi/EET)
         function formatTimeHM(decHours) {
             if (isNaN(decHours) || decHours === Infinity) return "00:00";
             const hrs = Math.floor(decHours);
             let mins = Math.round((decHours - hrs) * 60);
-            if (mins === 60) { hrs++; mins = 0; } // Handle rounding overflow
+            if (mins === 60) { hrs++; mins = 0; } 
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
         }
 
-        // Add Decimal Hours to specific HH:MM time (Untuk ETA)
         function addDecimalHoursToHHMM(timeStr, decHours) {
-            if (!timeStr) return formatTimeHM(decHours); // Fallback ke durasi jika ETD kosong
+            if (!timeStr) return formatTimeHM(decHours); 
             const parts = timeStr.split(':');
-            let h = parseInt(parts[0]) || 0;
-            let m = parseInt(parts[1]) || 0;
-            
+            let h = parseInt(parts[0]) || 0; let m = parseInt(parts[1]) || 0;
             let totalDec = h + (m / 60) + decHours;
-            
             let finalH = Math.floor(totalDec) % 24;
             let finalM = Math.round((totalDec - Math.floor(totalDec)) * 60);
-            
-            if (finalM === 60) { 
-                finalH = (finalH + 1) % 24; 
-                finalM = 0; 
-            }
-            
+            if (finalM === 60) { finalH = (finalH + 1) % 24; finalM = 0; }
             return `${finalH.toString().padStart(2, '0')}:${finalM.toString().padStart(2, '0')}`;
         }
 
-        function formatDecimal(val) {
-            return isNaN(val) ? 0 : val.toFixed(1);
-        }
+        function formatDecimal(val) { return isNaN(val) ? 0 : val.toFixed(1); }
 
-        // --- WAYPOINT SELECTOR FOR ROUTE ---
         function openRouteWpSelector() {
-            document.getElementById('searchRouteWp').value = '';
-            renderRouteWpSelectorList();
+            document.getElementById('searchRouteWp').value = ''; renderRouteWpSelectorList();
             document.getElementById('routeWpSelectModal').classList.remove('hidden');
             setTimeout(() => document.getElementById('searchRouteWp').focus(), 100);
         }
-
-        function closeRouteWpSelector() {
-            document.getElementById('routeWpSelectModal').classList.add('hidden');
-        }
+        function closeRouteWpSelector() { document.getElementById('routeWpSelectModal').classList.add('hidden'); }
 
         function renderRouteWpSelectorList() {
-            const listDiv = document.getElementById('routeWpSelectList');
-            const search = document.getElementById('searchRouteWp').value.toLowerCase();
+            const listDiv = document.getElementById('routeWpSelectList'); const search = document.getElementById('searchRouteWp').value.toLowerCase();
             listDiv.innerHTML = '';
-
             const filtered = waypointsData.filter(wp => wp.name.toLowerCase().includes(search) || wp.id.toLowerCase().includes(search));
 
-            if(filtered.length === 0) {
-                listDiv.innerHTML = '<div class="text-center p-4 text-slate-500">No waypoints found.</div>';
-                return;
-            }
+            if(filtered.length === 0) { listDiv.innerHTML = '<div class="text-center p-4 text-slate-500">No waypoints found.</div>'; return; }
 
             filtered.forEach(wp => {
                 const div = document.createElement('div');
@@ -1963,65 +2047,45 @@
 
         function addWpToRoute(wpId) {
             const wp = waypointsData.find(w => w.id === wpId);
-            if (wp) {
-                currentRouteWps.push({...wp}); // Copy object
-                renderOFPTable();
-                closeRouteWpSelector();
-            }
+            if (wp) { currentRouteWps.push({...wp}); renderOFPTable(); closeRouteWpSelector(); }
         }
 
-        function removeWpFromRoute(index) {
-            currentRouteWps.splice(index, 1);
-            renderOFPTable();
-        }
+        function removeWpFromRoute(index) { currentRouteWps.splice(index, 1); renderOFPTable(); }
 
-        // --- RENDER OFP TABLE & CALCULATION ---
         function renderOFPTable() {
-            const tbody = document.getElementById('ofpTableBody');
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('ofpTableBody'); tbody.innerHTML = '';
             
             const etdVal = document.getElementById('rtEtd').value || "00:00";
             const speed = parseFloat(document.getElementById('rtSpeed').value) || 0;
             const fuelCons = parseFloat(document.getElementById('rtFuelCons').value) || 0;
             const fuelOnboard = parseFloat(document.getElementById('rtFuelOnboard').value) || 0;
 
-            const col1Type = document.getElementById('ofpCol1').value;
-            const col2Type = document.getElementById('ofpCol2').value;
-            const col3Type = document.getElementById('ofpCol3').value;
+            const col1Type = document.getElementById('ofpCol1').value; const col2Type = document.getElementById('ofpCol2').value; const col3Type = document.getElementById('ofpCol3').value;
 
-            let totalDist = 0;
-            let totalDecHours = 0;
-            let totalFuel = 0;
+            let totalDist = 0; let totalDecHours = 0; let totalFuel = 0;
 
             currentRouteWps.forEach((wp, i) => {
-                let dist = 0, brng = 0, decHrs = 0, fuelBurn = 0;
-                let etaHrs = 0;
+                let dist = 0, brng = 0, decHrs = 0, fuelBurn = 0; let etaHrs = 0;
 
-                // Jika bukan baris pertama, hitung leg dari Wp[i-1] ke Wp[i]
                 if (i > 0) {
                     const prevWp = currentRouteWps[i-1];
                     dist = calcDistanceNM(prevWp.lat, prevWp.lon, wp.lat, wp.lon);
                     brng = calcBearingDeg(prevWp.lat, prevWp.lon, wp.lat, wp.lon);
-                    
                     if (speed > 0) decHrs = dist / speed;
                     fuelBurn = decHrs * fuelCons;
-
-                    totalDist += dist;
-                    totalDecHours += decHrs;
-                    totalFuel += fuelBurn;
-                    etaHrs = totalDecHours; // Accumulative ETA
+                    totalDist += dist; totalDecHours += decHrs; totalFuel += fuelBurn;
+                    etaHrs = totalDecHours; 
                 }
 
-                // Helper to render cell value based on type selected
                 const getColValueHTML = (type) => {
-                    if (i === 0 && type !== 'eta') return '-'; // Origin biasanya kosong
-                    if (i === 0 && type === 'eta') return document.getElementById('rtEtd').value || '00:00'; // Origin ETA = ETD
+                    if (i === 0 && type !== 'eta') return '-'; 
+                    if (i === 0 && type === 'eta') return document.getElementById('rtEtd').value || '00:00'; 
                     switch(type) {
                         case 'distance': return `${formatDecimal(dist)} <span class="text-[10px] text-slate-500">NM</span>`;
                         case 'heading':
                         case 'bearing': return `${Math.round(brng).toString().padStart(3, '0')}°`;
                         case 'eet': return formatTimeHM(decHrs);
-                        case 'eta': return addDecimalHoursToHHMM(etdVal, etaHrs); // Realtime ETA Calculation
+                        case 'eta': return addDecimalHoursToHHMM(etdVal, etaHrs); 
                         case 'fuel': return formatDecimal(fuelBurn);
                         default: return '-';
                     }
@@ -2031,113 +2095,59 @@
                 tr.className = 'hover:bg-slate-800/30 transition group';
                 tr.innerHTML = `
                     <td class="px-4 py-2 text-center text-xs text-slate-500">${i+1}</td>
-                    <td class="px-4 py-2 font-bold text-blue-300">
-                        ${wp.name}
-                        <div class="text-[10px] text-slate-400 font-normal">Elev: ${wp.elev}ft</div>
-                    </td>
+                    <td class="px-4 py-2 font-bold text-blue-300">${wp.name}<div class="text-[10px] text-slate-400 font-normal">Elev: ${wp.elev}ft</div></td>
                     <td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col1Type)}</td>
                     <td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col2Type)}</td>
                     <td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col3Type)}</td>
-                    <td class="px-4 py-2 text-center">
-                        <button type="button" onclick="removeWpFromRoute(${i})" class="text-red-500/50 hover:text-red-400 transition p-1"><i class="fas fa-times"></i></button>
-                    </td>
+                    <td class="px-4 py-2 text-center"><button type="button" onclick="removeWpFromRoute(${i})" class="text-red-500/50 hover:text-red-400 transition p-1"><i class="fas fa-times"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            if (currentRouteWps.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500 italic">No waypoints added yet. Click [+] to build your route.</td></tr>';
-            }
+            if (currentRouteWps.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500 italic">No waypoints added yet. Click [+] to build your route.</td></tr>'; }
 
-            // Update Summary
             document.getElementById('sumDist').textContent = Math.round(totalDist);
             document.getElementById('sumEET').textContent = formatTimeHM(totalDecHours);
             document.getElementById('sumFuel').textContent = Math.round(totalFuel);
             
-            const remFuel = fuelOnboard - totalFuel;
-            const remSpan = document.getElementById('sumRemFuel');
-            remSpan.textContent = Math.round(remFuel);
-            
+            const remFuel = fuelOnboard - totalFuel; const remSpan = document.getElementById('sumRemFuel'); remSpan.textContent = Math.round(remFuel);
             const statusBg = document.getElementById('fuelStatusBg');
-            if (remFuel < 0) {
-                remSpan.className = 'text-red-500';
-                statusBg.className = 'absolute inset-0 bg-red-500/20 opacity-50 animate-pulse';
-            } else if (remFuel < (totalFuel * 0.1)) { // Less than 10% reserve
-                remSpan.className = 'text-orange-400';
-                statusBg.className = 'absolute inset-0 bg-orange-500/20 opacity-50';
-            } else {
-                remSpan.className = 'text-emerald-400';
-                statusBg.className = 'absolute inset-0 bg-emerald-500/10 opacity-50';
-            }
+            if (remFuel < 0) { remSpan.className = 'text-red-500'; statusBg.className = 'absolute inset-0 bg-red-500/20 opacity-50 animate-pulse'; } 
+            else if (remFuel < (totalFuel * 0.1)) { remSpan.className = 'text-orange-400'; statusBg.className = 'absolute inset-0 bg-orange-500/20 opacity-50'; } 
+            else { remSpan.className = 'text-emerald-400'; statusBg.className = 'absolute inset-0 bg-emerald-500/10 opacity-50'; }
         }
 
         function saveRoute() {
-            const id = document.getElementById('rtId').value;
-            const name = document.getElementById('rtName').value.trim();
-            const acId = document.getElementById('rtAircraft').value;
-            const etd = document.getElementById('rtEtd').value;
+            const id = document.getElementById('rtId').value; const name = document.getElementById('rtName').value.trim();
+            const acId = document.getElementById('rtAircraft').value; const etd = document.getElementById('rtEtd').value;
             
-            if(!name || !acId) {
-                alert("Mohon isi Route Name dan pilih Aircraft Profile.");
-                return;
-            }
-            if(currentRouteWps.length < 2) {
-                alert("Operational Flight Plan minimal harus terdiri dari 2 Waypoint (Origin & Destination).");
-                return;
-            }
+            if(!name || !acId) { alert("Mohon isi Route Name dan pilih Aircraft Profile."); return; }
+            if(currentRouteWps.length < 2) { alert("Operational Flight Plan minimal harus terdiri dari 2 Waypoint (Origin & Destination)."); return; }
 
             const ac = aircraftsData.find(a => a.id === acId);
-
-            // Re-calculate totals safely for saving
-            let totalDist = 0;
-            let totalDecHours = 0;
-            const speed = parseFloat(document.getElementById('rtSpeed').value) || 0;
+            let totalDist = 0; let totalDecHours = 0; const speed = parseFloat(document.getElementById('rtSpeed').value) || 0;
 
             for(let i=1; i<currentRouteWps.length; i++) {
-                const prev = currentRouteWps[i-1];
-                const curr = currentRouteWps[i];
+                const prev = currentRouteWps[i-1]; const curr = currentRouteWps[i];
                 const dist = calcDistanceNM(prev.lat, prev.lon, curr.lat, curr.lon);
-                totalDist += dist;
-                if(speed > 0) totalDecHours += (dist / speed);
+                totalDist += dist; if(speed > 0) totalDecHours += (dist / speed);
             }
 
             const newRt = {
-                id: id || 'rt_' + Date.now(),
-                name: name,
-                aircraftId: acId,
-                aircraftReg: ac ? ac.reg : 'UNKNOWN',
-                etd: etd,
-                speed: speed,
-                fuelCons: parseFloat(document.getElementById('rtFuelCons').value) || 0,
-                fuelOnboard: parseFloat(document.getElementById('rtFuelOnboard').value) || 0,
-                waypoints: currentRouteWps,
-                totalDist: Math.round(totalDist),
-                totalEET: formatTimeHM(totalDecHours)
+                id: id || 'rt_' + Date.now(), name: name, aircraftId: acId, aircraftReg: ac ? ac.reg : 'UNKNOWN', etd: etd, speed: speed,
+                fuelCons: parseFloat(document.getElementById('rtFuelCons').value) || 0, fuelOnboard: parseFloat(document.getElementById('rtFuelOnboard').value) || 0,
+                waypoints: currentRouteWps, totalDist: Math.round(totalDist), totalEET: formatTimeHM(totalDecHours)
             };
 
-            if (id) {
-                const idx = routesData.findIndex(r => r.id === id);
-                if(idx !== -1) routesData[idx] = newRt;
-            } else {
-                routesData.push(newRt);
-            }
+            if (id) { const idx = routesData.findIndex(r => r.id === id); if(idx !== -1) routesData[idx] = newRt; } 
+            else { routesData.push(newRt); }
 
-            saveRoutes();
-            renderRouteList();
-            closeRouteForm();
+            saveRoutes(); renderRouteList(); closeRouteForm();
         }
 
-        function editRoute(id) {
-            openRouteForm(id);
-        }
+        function editRoute(id) { openRouteForm(id); }
+        function deleteRoute(id) { if(confirm("Hapus rute ini dari database?")) { routesData = routesData.filter(r => r.id !== id); saveRoutes(); renderRouteList(); } }
 
-        function deleteRoute(id) {
-            if(confirm("Hapus rute ini dari database?")) {
-                routesData = routesData.filter(r => r.id !== id);
-                saveRoutes();
-                renderRouteList();
-            }
-        }
     </script>
 </body>
 </html>
