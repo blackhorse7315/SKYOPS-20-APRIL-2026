@@ -322,86 +322,179 @@
             <!--         BAGIAN 6: TAB - ROUTE              -->
             <!-- ========================================== -->
             <div id="tab-route" class="tab-content absolute inset-0 p-6 hidden">
-                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col md:flex-row gap-6 overflow-y-auto">
-                    <!-- Flight Plan Form -->
-                    <div class="w-full md:w-1/3 space-y-4">
-                        <h2 class="text-xl font-semibold border-b border-slate-700 pb-3"><i class="fas fa-clipboard-list mr-2 text-blue-400"></i>Flight Plan</h2>
-                        <div>
-                            <label class="text-xs text-slate-400">Origin (ICAO)</label>
-                            <input type="text" value="WIMM" class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white uppercase outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Destination (ICAO)</label>
-                            <input type="text" value="WIII" class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white uppercase outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Cruising Altitude (ft)</label>
-                            <input type="number" value="35000" class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white outline-none focus:border-blue-500">
-                        </div>
-                        <button class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white py-3 rounded-xl font-medium shadow-lg transition mt-4">
-                            GENERATE ROUTE
+                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col relative">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold"><i class="fas fa-route mr-2 text-blue-400"></i>Flight Routes Database</h2>
+                        <button onclick="openRouteForm()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add New Route
                         </button>
                     </div>
-                    <!-- Route Visualization / Info -->
-                    <div class="w-full md:w-2/3 bg-slate-900/60 rounded-2xl border border-slate-700/50 p-6">
-                        <h3 class="text-lg font-medium mb-4">Generated Route: WIMM -> WIII</h3>
-                        <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-blue-500 before:to-transparent">
-                            
-                            <!-- Origin -->
-                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-blue-500 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                    <i class="fas fa-plane-departure text-xs"></i>
-                                </div>
-                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-700 bg-slate-800/50 shadow">
-                                    <div class="flex items-center justify-between space-x-2 mb-1">
-                                        <div class="font-bold text-slate-200">WIMM (Kualanamu)</div>
-                                        <time class="text-xs text-cyan-400">TOC 00:00</time>
-                                    </div>
-                                    <div class="text-slate-400 text-xs">Elevation: 23ft | Rwy: 22/04</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Waypoint -->
-                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-full border-4 border-slate-900 bg-slate-600 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                    <i class="fas fa-map-marker-alt text-[10px]"></i>
-                                </div>
-                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded border border-slate-700 bg-slate-800/30 shadow">
-                                    <div class="flex items-center justify-between space-x-2">
-                                        <div class="font-semibold text-sm text-slate-300">NIPTA</div>
-                                        <time class="text-xs text-slate-500">FL350</time>
-                                    </div>
-                                </div>
-                            </div>
+                    
+                    <!-- Route Table List -->
+                    <div class="flex-1 overflow-auto rounded-xl border border-slate-700/50">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-800/80 text-slate-300 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-6 py-4">Route Name</th>
+                                    <th class="px-6 py-4">Aircraft</th>
+                                    <th class="px-6 py-4">Origin -> Dest</th>
+                                    <th class="px-6 py-4">Total Dist</th>
+                                    <th class="px-6 py-4">Total EET</th>
+                                    <th class="px-6 py-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="routeTableBody" class="divide-y divide-slate-700/50 bg-slate-900/40">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                             <!-- Waypoint -->
-                             <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-full border-4 border-slate-900 bg-slate-600 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                    <i class="fas fa-map-marker-alt text-[10px]"></i>
-                                </div>
-                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded border border-slate-700 bg-slate-800/30 shadow">
-                                    <div class="flex items-center justify-between space-x-2">
-                                        <div class="font-semibold text-sm text-slate-300">PLN (Palembang)</div>
-                                        <time class="text-xs text-slate-500">FL350</time>
-                                    </div>
+            <!-- BAGIAN 6.1: ROUTE FORM MODAL -->
+            <div id="routeFormModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div class="glass-panel w-full max-w-5xl h-[90vh] flex flex-col rounded-2xl relative shadow-2xl overflow-hidden">
+                    <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
+                        <h3 id="routeModalTitle" class="text-xl font-bold"><i class="fas fa-clipboard-list text-blue-400 mr-2"></i>Create Operational Flight Plan</h3>
+                        <button onclick="closeRouteForm()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <input type="hidden" id="rtId">
+                        
+                        <!-- Route & Aircraft Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Route Name</label>
+                                <input type="text" id="rtName" required placeholder="e.g. WIMM-WIII" oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-bold text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Aircraft Profile</label>
+                                <select id="rtAircraft" onchange="handleRouteAircraftChange()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <option value="">-- Select Aircraft --</option>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">ETD (Local Time)</label>
+                                <input type="time" id="rtEtd" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500" style="color-scheme: dark;">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Cruising Speed (kts)</label>
+                                <input type="number" id="rtSpeed" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Fuel Consump / Hr</label>
+                                <div class="flex">
+                                    <input type="number" id="rtFuelCons" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <span id="rtFuelUnitLabel1" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 py-2 text-xs flex items-center text-slate-300 uppercase">-</span>
                                 </div>
                             </div>
-
-                            <!-- Dest -->
-                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-emerald-500 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                    <i class="fas fa-plane-arrival text-xs"></i>
-                                </div>
-                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-700 bg-slate-800/50 shadow">
-                                    <div class="flex items-center justify-between space-x-2 mb-1">
-                                        <div class="font-bold text-slate-200">WIII (Soekarno-Hatta)</div>
-                                        <time class="text-xs text-emerald-400">ETA 02:15</time>
-                                    </div>
-                                    <div class="text-slate-400 text-xs">Elevation: 34ft | Rwy: 25L/07R</div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Fuel Onboard</label>
+                                <div class="flex">
+                                    <input type="number" id="rtFuelOnboard" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <span id="rtFuelUnitLabel2" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 py-2 text-xs flex items-center text-slate-300 uppercase">-</span>
                                 </div>
                             </div>
-
                         </div>
+
+                        <!-- OFP Table -->
+                        <div class="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-900/60">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-slate-800/80 text-slate-300 border-b border-slate-700">
+                                    <tr>
+                                        <th class="px-4 py-3 w-10 text-center">#</th>
+                                        <th class="px-4 py-3">Waypoint</th>
+                                        <th class="px-4 py-3">
+                                            <select id="ofpCol1" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer">
+                                                <option value="heading">Heading (Deg)</option>
+                                                <option value="bearing">Bearing (Deg)</option>
+                                                <option value="distance">Distance (NM)</option>
+                                                <option value="eet">EET Leg</option>
+                                                <option value="eta">ETA</option>
+                                                <option value="fuel">Fuel Burn</option>
+                                            </select>
+                                        </th>
+                                        <th class="px-4 py-3">
+                                            <select id="ofpCol2" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer">
+                                                <option value="distance">Distance (NM)</option>
+                                                <option value="heading">Heading (Deg)</option>
+                                                <option value="bearing">Bearing (Deg)</option>
+                                                <option value="eet">EET Leg</option>
+                                                <option value="eta">ETA</option>
+                                                <option value="fuel">Fuel Burn</option>
+                                            </select>
+                                        </th>
+                                        <th class="px-4 py-3">
+                                            <select id="ofpCol3" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer">
+                                                <option value="eet">EET Leg</option>
+                                                <option value="heading">Heading (Deg)</option>
+                                                <option value="bearing">Bearing (Deg)</option>
+                                                <option value="distance">Distance (NM)</option>
+                                                <option value="eta">ETA</option>
+                                                <option value="fuel">Fuel Burn</option>
+                                            </select>
+                                        </th>
+                                        <th class="px-4 py-3 text-center w-16"><i class="fas fa-cog"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ofpTableBody" class="divide-y divide-slate-700/50">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                            <div class="p-3 bg-slate-800/40 border-t border-slate-700 flex justify-center">
+                                <button type="button" onclick="openRouteWpSelector()" class="bg-slate-700 hover:bg-blue-600 text-white text-xs px-4 py-2 rounded-full transition flex items-center shadow">
+                                    <i class="fas fa-plus mr-2"></i> Add Waypoint to Route
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
+                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Total Distance</p>
+                                <p class="text-xl font-bold text-white"><span id="sumDist">0</span> <span class="text-sm font-normal text-slate-500">NM</span></p>
+                            </div>
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
+                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Total EET</p>
+                                <p class="text-xl font-bold text-white" id="sumEET">00:00</p>
+                            </div>
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
+                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Fuel Required</p>
+                                <p class="text-xl font-bold text-orange-400"><span id="sumFuel">0</span></p>
+                            </div>
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center relative overflow-hidden">
+                                <div id="fuelStatusBg" class="absolute inset-0 bg-emerald-500/10 opacity-50"></div>
+                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider relative z-10">Fuel Sisa (Rem.)</p>
+                                <p class="text-xl font-bold relative z-10"><span id="sumRemFuel" class="text-emerald-400">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer Actions -->
+                    <div class="p-6 border-t border-slate-700 bg-slate-900/80 flex justify-end gap-3">
+                        <button type="button" onclick="closeRouteForm()" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-6 py-2.5 rounded-xl text-sm transition">Discard</button>
+                        <button type="button" onclick="saveRoute()" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-8 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Route Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BAGIAN 6.2: WAYPOINT SELECTOR MODAL (UNTUK ROUTE) -->
+            <div id="routeWpSelectModal" class="fixed inset-0 z-[10010] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div class="glass-panel w-full max-w-md h-[70vh] flex flex-col rounded-2xl relative shadow-2xl">
+                    <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                        <h3 class="text-lg font-bold"><i class="fas fa-search text-emerald-400 mr-2"></i>Select Waypoint</h3>
+                        <button onclick="closeRouteWpSelector()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="p-4 border-b border-slate-700">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" id="searchRouteWp" onkeyup="renderRouteWpSelectorList()" placeholder="Search ID or Name..." class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-2" id="routeWpSelectList">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
@@ -563,69 +656,125 @@
             <!--         BAGIAN 8: TAB - AIRCRAFT PROFILE   -->
             <!-- ========================================== -->
             <div id="tab-aircraft" class="tab-content absolute inset-0 p-6 hidden">
-                <div class="w-full h-full glass-panel rounded-3xl p-6 overflow-y-auto">
-                    <h2 class="text-xl font-semibold mb-6 border-b border-slate-700 pb-3"><i class="fas fa-plane mr-2 text-blue-400"></i>Active Aircraft Profile</h2>
+                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col relative">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold"><i class="fas fa-plane mr-2 text-blue-400"></i>Aircraft Profiles</h2>
+                        <button onclick="openAircraftForm()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add New Profile
+                        </button>
+                    </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Visual/Basic Info -->
-                        <div class="space-y-6">
-                            <div class="bg-gradient-to-br from-blue-900/40 to-slate-900/80 border border-blue-500/30 rounded-2xl p-6 flex flex-col items-center justify-center h-48 relative overflow-hidden">
-                                <i class="fas fa-plane text-7xl text-blue-400/20 absolute -right-4 -bottom-4 transform -rotate-45"></i>
-                                <h3 class="text-3xl font-bold text-white tracking-widest z-10">PK-SKY</h3>
-                                <p class="text-cyan-400 font-medium z-10">Boeing 737-800</p>
-                                <span class="mt-4 px-4 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 rounded-full text-xs font-semibold z-10">STATUS: AIRWORTHY</span>
+                    <!-- Aircraft Cards Grid -->
+                    <div class="flex-1 overflow-auto rounded-xl">
+                        <div id="aircraftGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BAGIAN 8.1: AIRCRAFT FORM MODAL -->
+            <div id="aircraftFormModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div class="glass-panel w-full max-w-lg p-6 rounded-2xl relative shadow-2xl">
+                    <button onclick="closeAircraftForm()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+                    <h3 id="acModalTitle" class="text-xl font-bold mb-5 border-b border-slate-700 pb-3"><i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile</h3>
+                    
+                    <form id="aircraftForm" onsubmit="saveAircraft(event)" class="space-y-4">
+                        <input type="hidden" id="acId">
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Registration Number -->
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Registration Number</label>
+                                <input type="text" id="acReg" required placeholder="contoh PK-TWA" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 uppercase">
                             </div>
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                                    <p class="text-xs text-slate-400">Max Takeoff Weight</p>
-                                    <p class="text-lg font-semibold text-white">79,015 <span class="text-xs text-slate-500">kg</span></p>
+                            <!-- Model -->
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Model</label>
+                                <select id="acModel" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <option value="Fixed Wing">Fixed Wing</option>
+                                    <option value="Helicopter">Helicopter</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Aircraft Type (Combobox with Datalist) -->
+                        <div>
+                            <label class="text-xs text-slate-400 mb-1 block">Aircraft Type</label>
+                            <input type="text" id="acType" list="acTypesList" required placeholder="Pilih dari list atau ketik manual..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                            <datalist id="acTypesList">
+                                <option value="Gulfstream IV SP">
+                                <option value="Beechcraft King Air 350i">
+                                <option value="NC212-200">
+                                <option value="Bell 412 EP">
+                                <option value="Agusta 109S Grand">
+                            </datalist>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Cruising Speed -->
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Cruising Speed</label>
+                                <div class="relative">
+                                    <input type="number" id="acSpeed" required placeholder="e.g. 450" class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-3 pr-12 py-2 text-sm outline-none focus:border-blue-500">
+                                    <span class="absolute right-3 top-2 text-xs text-slate-500">knots</span>
                                 </div>
-                                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                                    <p class="text-xs text-slate-400">Max Fuel Capacity</p>
-                                    <p class="text-lg font-semibold text-white">20,896 <span class="text-xs text-slate-500">kg</span></p>
+                            </div>
+                            <!-- Fuel Consumption -->
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Fuel Consumption</label>
+                                <div class="flex">
+                                    <input type="number" id="acFuel" required placeholder="e.g. 2000" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <select id="acFuelUnit" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 text-xs outline-none text-white focus:border-blue-500">
+                                        <option value="lbs">lbs/hr</option>
+                                        <option value="kg">kg/hr</option>
+                                        <option value="liter">liter/hr</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Performance Data -->
-                        <div class="bg-slate-900/60 rounded-2xl border border-slate-700/50 p-6">
-                            <h4 class="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Performance Parameters</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span class="text-slate-400">Cruise Speed (Mach)</span>
-                                        <span class="font-medium">0.78 M</span>
-                                    </div>
-                                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 78%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span class="text-slate-400">Service Ceiling</span>
-                                        <span class="font-medium">41,000 ft</span>
-                                    </div>
-                                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-cyan-500 h-1.5 rounded-full" style="width: 90%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span class="text-slate-400">Avg Fuel Flow</span>
-                                        <span class="font-medium">2,500 kg/hr</span>
-                                    </div>
-                                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-orange-500 h-1.5 rounded-full" style="width: 60%"></div></div>
-                                </div>
-                                <hr class="border-slate-700 my-4">
-                                <div class="grid grid-cols-2 gap-4 mt-4">
-                                    <div>
-                                        <label class="text-xs text-slate-500">Current Payload</label>
-                                        <input type="number" value="15400" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white outline-none">
-                                    </div>
-                                    <div>
-                                        <label class="text-xs text-slate-500">Block Fuel</label>
-                                        <input type="number" value="9500" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white outline-none">
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Actions -->
+                        <div class="flex gap-3 pt-4 border-t border-slate-700 mt-6">
+                            <button type="button" onclick="closeAircraftForm()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-2.5 rounded-xl text-sm transition">Cancel</button>
+                            <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Profile</button>
                         </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- BAGIAN 8.2: AIRCRAFT DETAILS MODAL -->
+            <div id="aircraftDetailModal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div class="glass-panel w-full max-w-md p-6 rounded-3xl relative shadow-2xl overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-900/60 to-slate-900 z-0"></div>
+                    <i id="detailIconBg" class="fas fa-plane text-8xl text-blue-400/10 absolute -right-6 -top-2 z-0 transform -rotate-45"></i>
+                    
+                    <button onclick="closeAircraftDetail()" class="absolute top-4 right-4 text-slate-300 hover:text-white z-10 bg-black/20 rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md"><i class="fas fa-times"></i></button>
+                    
+                    <div class="relative z-10 pt-4 flex flex-col items-center text-center">
+                        <div id="detailIcon" class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl shadow-[0_0_20px_rgba(59,130,246,0.6)] mb-3 border-2 border-slate-800">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <h2 id="detailReg" class="text-3xl font-bold text-white tracking-widest">PK-TWA</h2>
+                        <p id="detailType" class="text-cyan-400 font-medium mt-1">Gulfstream IV SP</p>
+                        <span id="detailModel" class="mt-3 px-4 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-xs font-semibold">FIXED WING</span>
+                    </div>
+
+                    <div class="relative z-10 mt-8 space-y-3">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 flex justify-between items-center">
+                            <div class="flex items-center text-slate-400"><i class="fas fa-tachometer-alt w-6 text-center mr-2"></i> Cruising Speed</div>
+                            <div class="font-bold text-white"><span id="detailSpeed">450</span> <span class="text-xs text-slate-500 font-normal">knots</span></div>
+                        </div>
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 flex justify-between items-center">
+                            <div class="flex items-center text-slate-400"><i class="fas fa-gas-pump w-6 text-center mr-2"></i> Fuel Consumption</div>
+                            <div class="font-bold text-white"><span id="detailFuel">2500</span> <span id="detailFuelUnit" class="text-xs text-slate-500 font-normal">lbs/hr</span></div>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 flex gap-3 pt-6 mt-2">
+                        <input type="hidden" id="detailId">
+                        <button onclick="editAircraftFromDetail()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-500/20"><i class="fas fa-edit mr-2"></i>Edit</button>
+                        <button onclick="deleteAircraftFromDetail()" class="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 py-2.5 rounded-xl text-sm font-medium transition"><i class="fas fa-trash mr-2"></i>Delete</button>
                     </div>
                 </div>
             </div>
@@ -645,8 +794,12 @@
         let currentUser = null;
         let map = null;
         let userMarker = null;
-        let waypointsData = []; // Data State untuk Waypoint
-        let waypointLayerGroup = null; // Layer untuk Tampilan Peta
+        let waypointsData = []; 
+        let waypointLayerGroup = null; 
+        let aircraftsData = []; 
+        
+        let routesData = []; // Data State untuk Routes
+        let currentRouteWps = []; // Temporary penyimpan waypoint saat membuat route
         
         if(!localStorage.getItem('adminUser')) {
             localStorage.setItem('adminUser', 'admin');
@@ -678,7 +831,9 @@
         async function initApp() {
             showView('loginScreen');
             await loadUsers();
-            loadWaypoints(); // Load data waypoint saat aplikasi dimulai
+            loadWaypoints(); 
+            loadAircrafts();
+            loadRoutes(); // Load data route
             document.getElementById('editAdminUser').value = localStorage.getItem('adminUser');
             document.getElementById('editAdminPass').value = localStorage.getItem('adminPass');
         }
@@ -965,7 +1120,15 @@
         // Fungsi Global Placeholder untuk Route
         function addToRoute(id) {
             const wp = waypointsData.find(w => w.id === id);
-            alert(wp.name + ' telah dipilih untuk ditambahkan ke rute.\n\n(Fitur Rute Sedang Dalam Pengembangan)');
+            
+            // Jika dalam mode buka Route tab
+            switchTab('route');
+            if (document.getElementById('routeFormModal').classList.contains('hidden')) {
+                openRouteForm();
+            }
+            
+            addWpToRoute(wp.id);
+            map.closePopup();
         }
 
         // Update seluruh titik waypoint di Peta & Tambahkan Popup
@@ -1397,6 +1560,582 @@
                 saveWaypoints();
                 renderWaypoints();
                 updateMapWaypoints(); // Sinkronisasikan Penghapusan ke Peta
+            }
+        }
+
+        // ==========================================
+        // --- AIRCRAFT PROFILE LOGIC             ---
+        // ==========================================
+
+        function loadAircrafts() {
+            const localAC = localStorage.getItem('skyops_aircrafts');
+            if (localAC) {
+                aircraftsData = JSON.parse(localAC);
+            } else {
+                // Mock Data Default
+                aircraftsData = [
+                    { id: 'ac_1', reg: 'PK-TWA', type: 'Gulfstream IV SP', model: 'Fixed Wing', speed: 450, fuel: 3500, fuelUnit: 'lbs' },
+                    { id: 'ac_2', reg: 'PK-HLY', type: 'Bell 412 EP', model: 'Helicopter', speed: 140, fuel: 250, fuelUnit: 'liter' }
+                ];
+                saveAircrafts();
+            }
+            renderAircrafts();
+        }
+
+        function saveAircrafts() {
+            localStorage.setItem('skyops_aircrafts', JSON.stringify(aircraftsData));
+        }
+
+        function renderAircrafts() {
+            const grid = document.getElementById('aircraftGrid');
+            grid.innerHTML = '';
+            
+            if(aircraftsData.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No aircraft profiles found. Click "Add New Profile" to create one.</div>';
+                return;
+            }
+
+            aircraftsData.forEach(ac => {
+                const isHeli = ac.model === 'Helicopter';
+                const iconClass = isHeli ? 'fa-helicopter' : 'fa-plane';
+                const bgGradient = isHeli ? 'from-purple-900/40 to-slate-900/80' : 'from-blue-900/40 to-slate-900/80';
+                const borderClass = isHeli ? 'border-purple-500/30' : 'border-blue-500/30';
+                
+                const card = document.createElement('div');
+                card.className = `bg-gradient-to-br ${bgGradient} border ${borderClass} rounded-2xl p-5 relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]`;
+                card.onclick = () => viewAircraft(ac.id);
+                card.innerHTML = `
+                    <i class="fas ${iconClass} text-6xl text-white/5 absolute -right-2 -bottom-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}"></i>
+                    <div class="relative z-10 flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white tracking-widest">${ac.reg}</h3>
+                            <p class="text-cyan-400 font-medium text-sm truncate w-40">${ac.type}</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-slate-800/80 border border-slate-600 flex items-center justify-center text-slate-300">
+                            <i class="fas ${iconClass}"></i>
+                        </div>
+                    </div>
+                    <div class="relative z-10 grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-700/50">
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase">Speed</p>
+                            <p class="text-sm font-semibold text-white">${ac.speed} <span class="text-[10px] text-slate-500 font-normal">kts</span></p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase">Fuel Cons.</p>
+                            <p class="text-sm font-semibold text-white">${ac.fuel} <span class="text-[10px] text-slate-500 font-normal">${ac.fuelUnit}/hr</span></p>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center backdrop-blur-[2px]">
+                        <span class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg"><i class="fas fa-eye mr-2"></i>View Details</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- FORM MODAL LOGIC ---
+        function openAircraftForm(id = null) {
+            document.getElementById('aircraftForm').reset();
+            
+            if (id) {
+                const ac = aircraftsData.find(a => a.id === id);
+                if(ac) {
+                    document.getElementById('acId').value = ac.id;
+                    document.getElementById('acReg').value = ac.reg;
+                    document.getElementById('acModel').value = ac.model;
+                    document.getElementById('acType').value = ac.type;
+                    document.getElementById('acSpeed').value = ac.speed;
+                    document.getElementById('acFuel').value = ac.fuel;
+                    document.getElementById('acFuelUnit').value = ac.fuelUnit;
+                    document.getElementById('acModalTitle').innerHTML = '<i class="fas fa-edit text-blue-400 mr-2"></i>Edit Aircraft Profile';
+                }
+            } else {
+                document.getElementById('acId').value = '';
+                document.getElementById('acModalTitle').innerHTML = '<i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile';
+            }
+            
+            document.getElementById('aircraftFormModal').classList.remove('hidden');
+        }
+
+        function closeAircraftForm() {
+            document.getElementById('aircraftFormModal').classList.add('hidden');
+        }
+
+        function saveAircraft(e) {
+            e.preventDefault();
+            const id = document.getElementById('acId').value;
+            
+            const newAC = {
+                id: id || 'ac_' + Date.now(),
+                reg: document.getElementById('acReg').value.toUpperCase(),
+                model: document.getElementById('acModel').value,
+                type: document.getElementById('acType').value,
+                speed: parseFloat(document.getElementById('acSpeed').value),
+                fuel: parseFloat(document.getElementById('acFuel').value),
+                fuelUnit: document.getElementById('acFuelUnit').value
+            };
+
+            if (id) {
+                const idx = aircraftsData.findIndex(a => a.id === id);
+                if(idx !== -1) aircraftsData[idx] = newAC;
+            } else {
+                aircraftsData.push(newAC);
+            }
+
+            saveAircrafts();
+            renderAircrafts();
+            closeAircraftForm();
+            
+            // Jika mengedit dari detail, tutup juga detail modalnya
+            closeAircraftDetail();
+        }
+
+        // --- DETAIL MODAL LOGIC ---
+        function viewAircraft(id) {
+            const ac = aircraftsData.find(a => a.id === id);
+            if(!ac) return;
+
+            const isHeli = ac.model === 'Helicopter';
+            const iconClass = isHeli ? 'fa-helicopter' : 'fa-plane';
+            
+            document.getElementById('detailId').value = ac.id;
+            document.getElementById('detailReg').textContent = ac.reg;
+            document.getElementById('detailType').textContent = ac.type;
+            document.getElementById('detailModel').textContent = ac.model.toUpperCase();
+            document.getElementById('detailSpeed').textContent = ac.speed;
+            document.getElementById('detailFuel').textContent = ac.fuel;
+            document.getElementById('detailFuelUnit').textContent = ac.fuelUnit + '/hr';
+            
+            // Update Icons dynamically
+            document.getElementById('detailIcon').innerHTML = `<i class="fas ${iconClass}"></i>`;
+            document.getElementById('detailIconBg').className = `fas ${iconClass} text-8xl text-blue-400/10 absolute -right-6 -top-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}`;
+            
+            document.getElementById('aircraftDetailModal').classList.remove('hidden');
+        }
+
+        function closeAircraftDetail() {
+            document.getElementById('aircraftDetailModal').classList.add('hidden');
+        }
+
+        function editAircraftFromDetail() {
+            const id = document.getElementById('detailId').value;
+            closeAircraftDetail();
+            openAircraftForm(id);
+        }
+
+        function deleteAircraftFromDetail() {
+            const id = document.getElementById('detailId').value;
+            if(confirm("Hapus Profil Pesawat ini secara permanen?")) {
+                aircraftsData = aircraftsData.filter(a => a.id !== id);
+                saveAircrafts();
+                renderAircrafts();
+                closeAircraftDetail();
+            }
+        }
+
+        // ==========================================
+        // --- ROUTE & OFP LOGIC                  ---
+        // ==========================================
+
+        function loadRoutes() {
+            const localRt = localStorage.getItem('skyops_routes');
+            if (localRt) {
+                routesData = JSON.parse(localRt);
+            } else {
+                routesData = [];
+            }
+            renderRouteList();
+        }
+
+        function saveRoutes() {
+            localStorage.setItem('skyops_routes', JSON.stringify(routesData));
+        }
+
+        function renderRouteList() {
+            const tbody = document.getElementById('routeTableBody');
+            tbody.innerHTML = '';
+            
+            routesData.forEach(rt => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition group';
+                
+                // Cari Origin dan Dest berdasarkan Wp Pertama dan Terakhir
+                let originDest = '-';
+                if (rt.waypoints && rt.waypoints.length >= 2) {
+                    originDest = `<span class="font-semibold text-emerald-400">${rt.waypoints[0].name}</span> <i class="fas fa-arrow-right text-slate-500 text-[10px] mx-1"></i> <span class="font-semibold text-blue-400">${rt.waypoints[rt.waypoints.length-1].name}</span>`;
+                } else if (rt.waypoints && rt.waypoints.length === 1) {
+                    originDest = rt.waypoints[0].name;
+                }
+
+                tr.innerHTML = `
+                    <td class="px-6 py-3 font-bold text-white tracking-wide">${rt.name}</td>
+                    <td class="px-6 py-3 text-cyan-400 text-xs font-medium">${rt.aircraftReg}</td>
+                    <td class="px-6 py-3">${originDest}</td>
+                    <td class="px-6 py-3">${rt.totalDist} NM</td>
+                    <td class="px-6 py-3 text-orange-300">${rt.totalEET}</td>
+                    <td class="px-6 py-3 text-right opacity-50 group-hover:opacity-100 transition">
+                        <button onclick="editRoute('${rt.id}')" class="text-blue-400 hover:text-blue-300 mr-3 p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteRoute('${rt.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openRouteForm(id = null) {
+            populateRouteAircrafts();
+            currentRouteWps = [];
+            
+            if (id) {
+                const rt = routesData.find(r => r.id === id);
+                if (rt) {
+                    document.getElementById('rtId').value = rt.id;
+                    document.getElementById('rtName').value = rt.name;
+                    document.getElementById('rtAircraft').value = rt.aircraftId;
+                    document.getElementById('rtEtd').value = rt.etd || '';
+                    document.getElementById('rtSpeed').value = rt.speed;
+                    document.getElementById('rtFuelCons').value = rt.fuelCons;
+                    document.getElementById('rtFuelOnboard').value = rt.fuelOnboard || 0;
+                    
+                    // Restore waypoints
+                    currentRouteWps = rt.waypoints.map(savedWp => {
+                        // Sinkronkan data koordinat terbaru dari database jika berubah
+                        const dbWp = waypointsData.find(db => db.id === savedWp.id);
+                        return dbWp ? {...dbWp} : savedWp;
+                    });
+                    
+                    document.getElementById('routeModalTitle').innerHTML = '<i class="fas fa-edit text-blue-400 mr-2"></i>Edit Operational Flight Plan';
+                    
+                    // Set Unit Label
+                    const ac = aircraftsData.find(a => a.id === rt.aircraftId);
+                    if(ac) {
+                        document.getElementById('rtFuelUnitLabel1').textContent = ac.fuelUnit;
+                        document.getElementById('rtFuelUnitLabel2').textContent = ac.fuelUnit;
+                    }
+                }
+            } else {
+                document.getElementById('rtId').value = '';
+                document.getElementById('rtName').value = '';
+                document.getElementById('rtAircraft').value = '';
+                document.getElementById('rtEtd').value = '';
+                document.getElementById('rtSpeed').value = '';
+                document.getElementById('rtFuelCons').value = '';
+                document.getElementById('rtFuelOnboard').value = '';
+                document.getElementById('rtFuelUnitLabel1').textContent = '-';
+                document.getElementById('rtFuelUnitLabel2').textContent = '-';
+                document.getElementById('routeModalTitle').innerHTML = '<i class="fas fa-clipboard-list text-blue-400 mr-2"></i>Create Operational Flight Plan';
+            }
+            
+            renderOFPTable();
+            document.getElementById('routeFormModal').classList.remove('hidden');
+        }
+
+        function closeRouteForm() {
+            document.getElementById('routeFormModal').classList.add('hidden');
+        }
+
+        function populateRouteAircrafts() {
+            const select = document.getElementById('rtAircraft');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Select Aircraft --</option>';
+            aircraftsData.forEach(ac => {
+                select.innerHTML += `<option value="${ac.id}">${ac.reg} - ${ac.type}</option>`;
+            });
+            select.value = currentVal; // Restore jika ada isinya
+        }
+
+        function handleRouteAircraftChange() {
+            const id = document.getElementById('rtAircraft').value;
+            const ac = aircraftsData.find(a => a.id === id);
+            if (ac) {
+                document.getElementById('rtSpeed').value = ac.speed;
+                document.getElementById('rtFuelCons').value = ac.fuel;
+                document.getElementById('rtFuelUnitLabel1').textContent = ac.fuelUnit;
+                document.getElementById('rtFuelUnitLabel2').textContent = ac.fuelUnit;
+            } else {
+                document.getElementById('rtSpeed').value = '';
+                document.getElementById('rtFuelCons').value = '';
+                document.getElementById('rtFuelUnitLabel1').textContent = '-';
+                document.getElementById('rtFuelUnitLabel2').textContent = '-';
+            }
+            renderOFPTable();
+        }
+
+        // --- MATH HELPERS FOR OFP ---
+        // Haversine Distance in Nautical Miles (NM)
+        function calcDistanceNM(lat1, lon1, lat2, lon2) {
+            const R = 3440.065; // Radius of Earth in NM
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Initial Bearing (Heading) in Degrees
+        function calcBearingDeg(lat1, lon1, lat2, lon2) {
+            const lat1R = lat1 * Math.PI / 180;
+            const lat2R = lat2 * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+
+            const y = Math.sin(dLon) * Math.cos(lat2R);
+            const x = Math.cos(lat1R) * Math.sin(lat2R) - Math.sin(lat1R) * Math.cos(lat2R) * Math.cos(dLon);
+            let brng = Math.atan2(y, x) * 180 / Math.PI;
+            return (brng + 360) % 360; // Normalize 0-360
+        }
+
+        // Format decimal hours to HH:MM string (Untuk Durasi/EET)
+        function formatTimeHM(decHours) {
+            if (isNaN(decHours) || decHours === Infinity) return "00:00";
+            const hrs = Math.floor(decHours);
+            let mins = Math.round((decHours - hrs) * 60);
+            if (mins === 60) { hrs++; mins = 0; } // Handle rounding overflow
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        }
+
+        // Add Decimal Hours to specific HH:MM time (Untuk ETA)
+        function addDecimalHoursToHHMM(timeStr, decHours) {
+            if (!timeStr) return formatTimeHM(decHours); // Fallback ke durasi jika ETD kosong
+            const parts = timeStr.split(':');
+            let h = parseInt(parts[0]) || 0;
+            let m = parseInt(parts[1]) || 0;
+            
+            let totalDec = h + (m / 60) + decHours;
+            
+            let finalH = Math.floor(totalDec) % 24;
+            let finalM = Math.round((totalDec - Math.floor(totalDec)) * 60);
+            
+            if (finalM === 60) { 
+                finalH = (finalH + 1) % 24; 
+                finalM = 0; 
+            }
+            
+            return `${finalH.toString().padStart(2, '0')}:${finalM.toString().padStart(2, '0')}`;
+        }
+
+        function formatDecimal(val) {
+            return isNaN(val) ? 0 : val.toFixed(1);
+        }
+
+        // --- WAYPOINT SELECTOR FOR ROUTE ---
+        function openRouteWpSelector() {
+            document.getElementById('searchRouteWp').value = '';
+            renderRouteWpSelectorList();
+            document.getElementById('routeWpSelectModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('searchRouteWp').focus(), 100);
+        }
+
+        function closeRouteWpSelector() {
+            document.getElementById('routeWpSelectModal').classList.add('hidden');
+        }
+
+        function renderRouteWpSelectorList() {
+            const listDiv = document.getElementById('routeWpSelectList');
+            const search = document.getElementById('searchRouteWp').value.toLowerCase();
+            listDiv.innerHTML = '';
+
+            const filtered = waypointsData.filter(wp => wp.name.toLowerCase().includes(search) || wp.id.toLowerCase().includes(search));
+
+            if(filtered.length === 0) {
+                listDiv.innerHTML = '<div class="text-center p-4 text-slate-500">No waypoints found.</div>';
+                return;
+            }
+
+            filtered.forEach(wp => {
+                const div = document.createElement('div');
+                div.className = 'p-3 border-b border-slate-700/50 hover:bg-slate-800 cursor-pointer flex justify-between items-center transition';
+                div.onclick = () => addWpToRoute(wp.id);
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="scale-75 origin-left">${getIconHTML(wp.type)}</div>
+                        <div>
+                            <div class="font-bold text-blue-400">${wp.name}</div>
+                            <div class="text-[10px] text-slate-400">${decToDMSStr(wp.lat, true)} | ${decToDMSStr(wp.lon, false)}</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-plus text-emerald-500"></i>
+                `;
+                listDiv.appendChild(div);
+            });
+        }
+
+        function addWpToRoute(wpId) {
+            const wp = waypointsData.find(w => w.id === wpId);
+            if (wp) {
+                currentRouteWps.push({...wp}); // Copy object
+                renderOFPTable();
+                closeRouteWpSelector();
+            }
+        }
+
+        function removeWpFromRoute(index) {
+            currentRouteWps.splice(index, 1);
+            renderOFPTable();
+        }
+
+        // --- RENDER OFP TABLE & CALCULATION ---
+        function renderOFPTable() {
+            const tbody = document.getElementById('ofpTableBody');
+            tbody.innerHTML = '';
+            
+            const etdVal = document.getElementById('rtEtd').value || "00:00";
+            const speed = parseFloat(document.getElementById('rtSpeed').value) || 0;
+            const fuelCons = parseFloat(document.getElementById('rtFuelCons').value) || 0;
+            const fuelOnboard = parseFloat(document.getElementById('rtFuelOnboard').value) || 0;
+
+            const col1Type = document.getElementById('ofpCol1').value;
+            const col2Type = document.getElementById('ofpCol2').value;
+            const col3Type = document.getElementById('ofpCol3').value;
+
+            let totalDist = 0;
+            let totalDecHours = 0;
+            let totalFuel = 0;
+
+            currentRouteWps.forEach((wp, i) => {
+                let dist = 0, brng = 0, decHrs = 0, fuelBurn = 0;
+                let etaHrs = 0;
+
+                // Jika bukan baris pertama, hitung leg dari Wp[i-1] ke Wp[i]
+                if (i > 0) {
+                    const prevWp = currentRouteWps[i-1];
+                    dist = calcDistanceNM(prevWp.lat, prevWp.lon, wp.lat, wp.lon);
+                    brng = calcBearingDeg(prevWp.lat, prevWp.lon, wp.lat, wp.lon);
+                    
+                    if (speed > 0) decHrs = dist / speed;
+                    fuelBurn = decHrs * fuelCons;
+
+                    totalDist += dist;
+                    totalDecHours += decHrs;
+                    totalFuel += fuelBurn;
+                    etaHrs = totalDecHours; // Accumulative ETA
+                }
+
+                // Helper to render cell value based on type selected
+                const getColValueHTML = (type) => {
+                    if (i === 0 && type !== 'eta') return '-'; // Origin biasanya kosong
+                    if (i === 0 && type === 'eta') return document.getElementById('rtEtd').value || '00:00'; // Origin ETA = ETD
+                    switch(type) {
+                        case 'distance': return `${formatDecimal(dist)} <span class="text-[10px] text-slate-500">NM</span>`;
+                        case 'heading':
+                        case 'bearing': return `${Math.round(brng).toString().padStart(3, '0')}°`;
+                        case 'eet': return formatTimeHM(decHrs);
+                        case 'eta': return addDecimalHoursToHHMM(etdVal, etaHrs); // Realtime ETA Calculation
+                        case 'fuel': return formatDecimal(fuelBurn);
+                        default: return '-';
+                    }
+                };
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/30 transition group';
+                tr.innerHTML = `
+                    <td class="px-4 py-2 text-center text-xs text-slate-500">${i+1}</td>
+                    <td class="px-4 py-2 font-bold text-blue-300">
+                        ${wp.name}
+                        <div class="text-[10px] text-slate-400 font-normal">Elev: ${wp.elev}ft</div>
+                    </td>
+                    <td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col1Type)}</td>
+                    <td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col2Type)}</td>
+                    <td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col3Type)}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button type="button" onclick="removeWpFromRoute(${i})" class="text-red-500/50 hover:text-red-400 transition p-1"><i class="fas fa-times"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (currentRouteWps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500 italic">No waypoints added yet. Click [+] to build your route.</td></tr>';
+            }
+
+            // Update Summary
+            document.getElementById('sumDist').textContent = Math.round(totalDist);
+            document.getElementById('sumEET').textContent = formatTimeHM(totalDecHours);
+            document.getElementById('sumFuel').textContent = Math.round(totalFuel);
+            
+            const remFuel = fuelOnboard - totalFuel;
+            const remSpan = document.getElementById('sumRemFuel');
+            remSpan.textContent = Math.round(remFuel);
+            
+            const statusBg = document.getElementById('fuelStatusBg');
+            if (remFuel < 0) {
+                remSpan.className = 'text-red-500';
+                statusBg.className = 'absolute inset-0 bg-red-500/20 opacity-50 animate-pulse';
+            } else if (remFuel < (totalFuel * 0.1)) { // Less than 10% reserve
+                remSpan.className = 'text-orange-400';
+                statusBg.className = 'absolute inset-0 bg-orange-500/20 opacity-50';
+            } else {
+                remSpan.className = 'text-emerald-400';
+                statusBg.className = 'absolute inset-0 bg-emerald-500/10 opacity-50';
+            }
+        }
+
+        function saveRoute() {
+            const id = document.getElementById('rtId').value;
+            const name = document.getElementById('rtName').value.trim();
+            const acId = document.getElementById('rtAircraft').value;
+            const etd = document.getElementById('rtEtd').value;
+            
+            if(!name || !acId) {
+                alert("Mohon isi Route Name dan pilih Aircraft Profile.");
+                return;
+            }
+            if(currentRouteWps.length < 2) {
+                alert("Operational Flight Plan minimal harus terdiri dari 2 Waypoint (Origin & Destination).");
+                return;
+            }
+
+            const ac = aircraftsData.find(a => a.id === acId);
+
+            // Re-calculate totals safely for saving
+            let totalDist = 0;
+            let totalDecHours = 0;
+            const speed = parseFloat(document.getElementById('rtSpeed').value) || 0;
+
+            for(let i=1; i<currentRouteWps.length; i++) {
+                const prev = currentRouteWps[i-1];
+                const curr = currentRouteWps[i];
+                const dist = calcDistanceNM(prev.lat, prev.lon, curr.lat, curr.lon);
+                totalDist += dist;
+                if(speed > 0) totalDecHours += (dist / speed);
+            }
+
+            const newRt = {
+                id: id || 'rt_' + Date.now(),
+                name: name,
+                aircraftId: acId,
+                aircraftReg: ac ? ac.reg : 'UNKNOWN',
+                etd: etd,
+                speed: speed,
+                fuelCons: parseFloat(document.getElementById('rtFuelCons').value) || 0,
+                fuelOnboard: parseFloat(document.getElementById('rtFuelOnboard').value) || 0,
+                waypoints: currentRouteWps,
+                totalDist: Math.round(totalDist),
+                totalEET: formatTimeHM(totalDecHours)
+            };
+
+            if (id) {
+                const idx = routesData.findIndex(r => r.id === id);
+                if(idx !== -1) routesData[idx] = newRt;
+            } else {
+                routesData.push(newRt);
+            }
+
+            saveRoutes();
+            renderRouteList();
+            closeRouteForm();
+        }
+
+        function editRoute(id) {
+            openRouteForm(id);
+        }
+
+        function deleteRoute(id) {
+            if(confirm("Hapus rute ini dari database?")) {
+                routesData = routesData.filter(r => r.id !== id);
+                saveRoutes();
+                renderRouteList();
             }
         }
     </script>
