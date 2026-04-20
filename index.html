@@ -1,502 +1,811 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkyOps Navigation Pro V.00</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#1e3a8a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SkyOps Pro">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-">
-    
-    <!-- Dynamic Manifest Generation -->
-    <link id="manifest-link" rel="manifest">
-
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #f8fafc;
-            overflow: hidden;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
-        .fade-out { animation: fadeOut 0.6s ease-in forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        /* Custom Styles & Animations */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        .tab-active {
-            color: #2563eb;
-            background: #eff6ff;
-            border-radius: 12px;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        .login-card {
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-        }
-        .nav-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .loader {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3498db;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .fade-in { animation: fadeIn 1s ease-in forwards; }
+        .fade-out { animation: fadeOut 1s ease-out forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(1.05); }
+        }
+
+        /* Radar Animation for Map Tab */
+        .radar {
+            position: relative;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            background: radial-gradient(circle, rgba(15,23,42,1) 0%, rgba(30,64,175,0.2) 100%);
+            overflow: hidden;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .radar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 150px;
+            background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.8) 0%, transparent 60%);
+            transform-origin: 0 0;
+            animation: spin 4s linear infinite;
+        }
+        .radar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(90deg, transparent 49.5%, rgba(59, 130, 246, 0.3) 50%, transparent 50.5%),
+                linear-gradient(0deg, transparent 49.5%, rgba(59, 130, 246, 0.3) 50%, transparent 50.5%);
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .tech-grid {
-            background-image: linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.8); }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="antialiased selection:bg-blue-500 selection:text-white relative">
 
-    <!-- SPLASH SCREEN -->
-    <div id="splash" class="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-white">
-        <div class="w-24 h-24 mb-6">
-            <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-full h-full object-contain animate-pulse" />
+    <!-- 1. SPLASH SCREEN -->
+    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f172a] transition-opacity duration-1000">
+        <div class="w-48 h-48 mb-8 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
         </div>
-        <div class="text-center">
-            <h1 class="text-3xl font-light tracking-[0.3em] fade-in">SKYOPS <span class="font-bold">PRO</span></h1>
-            <p class="mt-2 text-slate-400 tracking-widest text-[10px] uppercase">Navigation Systems v0.00</p>
-        </div>
+        <h1 class="text-3xl md:text-5xl font-light tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 fade-in" style="animation-delay: 0.3s;">
+            Welcome To
+        </h1>
+        <h2 class="text-2xl md:text-4xl font-bold mt-2 text-white tracking-widest fade-in" style="animation-delay: 0.6s;">
+            SkyOps Navigation Pro <span class="text-blue-500 text-lg align-top">V.00</span>
+        </h2>
     </div>
 
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" class="hidden fixed inset-0 z-40 bg-slate-50 flex items-center justify-center p-4">
-        <div class="glass p-10 rounded-[2.5rem] w-full max-w-md login-card border border-white/50">
-            <div class="flex justify-center mb-8">
-                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-20 h-20 object-contain" />
-            </div>
-            <h2 class="text-2xl font-black text-center text-slate-800 mb-1">Terminal Pilot</h2>
-            <p class="text-center text-slate-500 mb-10 text-sm">Autentikasi Dek Penerbangan Aman</p>
+    <!-- 2. LOGIN SCREEN -->
+    <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md relative overflow-hidden">
+            <!-- Decorative blur -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
             
-            <div class="space-y-5">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-4 flex items-center text-slate-400">
-                        <i data-lucide="user" class="w-5 h-5"></i>
-                    </span>
-                    <input type="text" id="username" class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all" placeholder="Username">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 p-2 glass-panel rounded-full flex items-center justify-center">
+                    <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-16 h-16 object-contain" />
                 </div>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-4 flex items-center text-slate-400">
-                        <i data-lucide="key" class="w-5 h-5"></i>
-                    </span>
-                    <input type="password" id="password" class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all" placeholder="Password">
-                </div>
-                <button id="btnLogin" onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 mt-4 flex items-center justify-center space-x-3">
-                    <span>AUTHENTICATE</span>
-                </button>
             </div>
-            <p id="loginError" class="text-red-500 text-[10px] mt-6 text-center hidden font-black uppercase tracking-widest bg-red-50 p-3 rounded-xl border border-red-100"></p>
             
-            <div id="dbStatus" class="mt-8 flex items-center justify-center space-x-3 opacity-60">
-                <div class="loader" id="dbLoader"></div>
-                <span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]" id="dbStatusText">Menghubungkan Database...</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- MAIN APP INTERFACE -->
-    <div id="mainApp" class="hidden h-full flex flex-col">
-        <!-- Header -->
-        <header class="nav-header text-white px-6 py-4 flex justify-between items-center shadow-2xl relative z-10">
-            <div class="flex items-center space-x-4">
-                <div class="p-2 bg-white/10 rounded-xl">
-                    <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-8 h-8 object-contain brightness-0 invert" />
-                </div>
-                <div>
-                    <h1 class="text-base font-black tracking-tight uppercase">SkyOps Pro V.00</h1>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <p class="text-[10px] text-blue-100 font-bold uppercase tracking-widest" id="userGreeting">Initializing...</p>
+            <h2 class="text-2xl font-semibold text-center mb-2">Secure Login</h2>
+            <p class="text-sm text-slate-400 text-center mb-8">Access SkyOps Navigation System</p>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1 pl-1"><i class="fas fa-user mr-2"></i>Username</label>
+                        <input type="text" id="loginUsername" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Enter username">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1 pl-1"><i class="fas fa-lock mr-2"></i>Password</label>
+                        <input type="password" id="loginPassword" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Enter password">
+                    </div>
+                    <div id="loginError" class="hidden text-red-400 text-sm text-center bg-red-900/30 py-2 rounded-lg border border-red-500/30">
+                        Invalid credentials or account expired.
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+                        AUTHENTICATE <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. ADMIN DASHBOARD -->
+    <div id="adminScreen" class="hidden min-h-screen flex flex-col">
+        <!-- Admin Header -->
+        <header class="glass-panel sticky top-0 z-40 border-b border-slate-700/50 px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-10 h-10 object-contain" />
+                <div>
+                    <h1 class="font-bold text-xl tracking-wide">SkyOps <span class="text-blue-400">Admin</span></h1>
+                    <p class="text-xs text-slate-400">System Management Console</p>
                 </div>
             </div>
-            <div class="text-right bg-black/10 px-4 py-2 rounded-2xl border border-white/10">
-                <p class="text-[9px] uppercase tracking-widest text-blue-200 font-bold">Integritas Sistem</p>
-                <p class="text-xs font-mono font-bold text-white" id="expiryInfo">EXP: --/--/----</p>
+            <div class="flex items-center gap-4">
+                <button onclick="syncWithGoogleSheet()" class="text-sm bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-lg hover:bg-emerald-600/40 transition">
+                    <i class="fas fa-sync-alt mr-2"></i>Sync Sheet
+                </button>
+                <button onclick="logout()" class="text-sm bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg hover:bg-red-500/40 transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
             </div>
         </header>
 
-        <!-- Shortcut Tab -->
-        <nav class="bg-white border-b border-slate-200 px-4 py-2 flex justify-around md:justify-center md:space-x-4 overflow-x-auto no-scrollbar shadow-sm">
-            <button onclick="switchTab('map')" id="tab-map" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all tab-active">
-                <i data-lucide="map" class="w-5 h-5"></i>
-                <span class="text-[9px] md:text-xs uppercase tracking-widest">Map</span>
-            </button>
-            <button onclick="switchTab('route')" id="tab-route" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all">
-                <i data-lucide="navigation" class="w-5 h-5"></i>
-                <span class="text-[9px] md:text-xs uppercase tracking-widest">Route</span>
-            </button>
-            <button onclick="switchTab('waypoint')" id="tab-waypoint" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all">
-                <i data-lucide="database" class="w-5 h-5"></i>
-                <span class="text-[9px] md:text-xs uppercase tracking-widest">Waypoint</span>
-            </button>
-            <button onclick="switchTab('aircraft')" id="tab-aircraft" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-slate-400 font-bold transition-all">
-                <i data-lucide="plane" class="w-5 h-5"></i>
-                <span class="text-[9px] md:text-xs uppercase tracking-widest">Aircraft</span>
-            </button>
-            <div class="w-px h-6 bg-slate-200 self-center hidden md:block"></div>
-            <button onclick="logout()" class="py-3 px-5 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-3 text-red-400 font-bold transition-all hover:bg-red-50 rounded-xl">
-                <i data-lucide="power" class="w-5 h-5"></i>
-                <span class="text-[9px] md:text-xs uppercase tracking-widest">Exit</span>
-            </button>
-        </nav>
-
-        <main class="flex-1 overflow-auto bg-slate-50 tech-grid p-4 md:p-8">
-            <div id="content-map" class="h-full fade-in">
-                <div class="w-full h-full rounded-[2.5rem] bg-slate-900 border-4 border-white shadow-2xl relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#2563eb 1px, transparent 1px); background-size: 50px 50px;"></div>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-blue-500/20 rounded-full"></div>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-blue-500/20 to-transparent rounded-full animate-[spin_4s_linear_infinite] origin-center opacity-30"></div>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10 p-6 text-center">
-                        <div class="p-5 bg-blue-600/10 backdrop-blur-xl rounded-full border border-blue-500/30 mb-4">
-                            <i data-lucide="satellite" class="w-12 h-12 text-blue-400 animate-pulse"></i>
-                        </div>
-                        <h3 class="text-blue-400 font-black tracking-[0.3em] text-sm uppercase">Mesin GPS: Siaga</h3>
-                    </div>
-                </div>
-            </div>
-            <!-- Konten tab lainnya tetap ada namun disembunyikan secara default -->
-            <div id="content-route" class="hidden fade-in"></div>
-            <div id="content-waypoint" class="hidden fade-in"></div>
-            <div id="content-aircraft" class="hidden fade-in"></div>
-        </main>
-    </div>
-
-    <!-- ADMIN PANEL -->
-    <div id="adminPanel" class="hidden fixed inset-0 z-50 bg-slate-900 overflow-auto p-4 md:p-10">
-        <div class="max-w-5xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-black text-white flex items-center uppercase tracking-widest">
-                    <i data-lucide="shield" class="mr-3 text-yellow-400 w-8 h-8"></i> Terminal Admin
-                </h1>
-                <div class="flex space-x-2">
-                    <button onclick="logout()" class="bg-red-500/20 text-red-400 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">Logout</button>
-                    <button onclick="closeAdmin()" id="adminCloseBtn" class="bg-white/10 text-white p-3 rounded-full hover:bg-white/20 transition-all">
-                        <i data-lucide="x"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-slate-50">
+        <div class="flex-1 p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Admin Credentials Mgmt -->
+            <div class="glass-panel p-6 rounded-2xl h-fit">
+                <h3 class="text-lg font-semibold mb-4 border-b border-slate-700 pb-2"><i class="fas fa-user-shield mr-2 text-blue-400"></i>Master Admin Credentials</h3>
+                <form id="adminCredsForm" onsubmit="updateAdminCreds(event)" class="space-y-4">
                     <div>
-                        <h2 class="text-xl font-black text-slate-800">Registri Pilot</h2>
-                        <p class="text-xs text-slate-400 font-bold uppercase">Total Database: <span id="pilotCount" class="text-blue-600">0</span> Akun</p>
+                        <label class="text-xs text-slate-400">Admin Username</label>
+                        <input type="text" id="editAdminUser" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 outline-none">
                     </div>
-                    <button onclick="showUserModal()" class="bg-blue-600 text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-200">
-                        Tambah Pilot Baru
-                    </button>
+                    <div>
+                        <label class="text-xs text-slate-400">Admin Password</label>
+                        <input type="text" id="editAdminPass" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm py-2 rounded-lg transition">Update Admin Data</button>
+                </form>
+            </div>
+
+            <!-- User Database Mgmt -->
+            <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                    <h3 class="text-lg font-semibold"><i class="fas fa-users mr-2 text-blue-400"></i>User Database</h3>
+                    <button onclick="openUserModal()" class="bg-blue-600 hover:bg-blue-500 text-xs px-3 py-2 rounded-lg transition"><i class="fas fa-plus mr-1"></i> Add User</button>
                 </div>
+                
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-100/50 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="text-slate-400 bg-slate-800/50">
                             <tr>
-                                <th class="px-8 py-5">Nama Lengkap</th>
-                                <th class="px-8 py-5">Username</th>
-                                <th class="px-8 py-5">Role</th>
-                                <th class="px-8 py-5">Masa Berlaku</th>
-                                <th class="px-8 py-5 text-center">Kelola</th>
+                                <th class="px-4 py-3 rounded-tl-lg">Name</th>
+                                <th class="px-4 py-3">Role</th>
+                                <th class="px-4 py-3">Username</th>
+                                <th class="px-4 py-3">Password</th>
+                                <th class="px-4 py-3">Expired Until</th>
+                                <th class="px-4 py-3 rounded-tr-lg">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="userTableBody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="userTableBody" class="divide-y divide-slate-700/50">
+                            <!-- Populated by JS -->
+                        </ul>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- USER MODAL (FORM REGISTER) -->
-    <div id="userModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] w-full max-w-sm p-10 shadow-2xl">
-            <h2 id="modalTitle" class="text-xl font-black text-slate-800 mb-8 uppercase">Kelola Akun</h2>
-            <div class="space-y-4">
-                <input type="text" id="m_name" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Nama Lengkap">
-                <input type="text" id="m_user" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Username">
-                <input type="text" id="m_pass" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono" placeholder="Password">
-                
+    <!-- Add/Edit User Modal -->
+    <div id="userModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="glass-panel w-full max-w-md p-6 rounded-2xl relative">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4">Add New User</h3>
+            <form id="userForm" onsubmit="saveUser(event)" class="space-y-4">
+                <input type="hidden" id="userId">
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Hak Akses (Role)</label>
-                    <select id="m_role" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                        <option value="user">USER (Pilot)</option>
-                        <option value="admin">ADMIN (Operations)</option>
+                    <label class="text-xs text-slate-400">Full Name</label>
+                    <input type="text" id="uName" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Role</label>
+                    <select id="uRole" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm outline-none focus:border-blue-500">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Lisensi Berlaku Hingga</label>
-                    <input type="date" id="m_expiry" class="w-full px-5 py-4 bg-slate-50 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <label class="text-xs text-slate-400">Username</label>
+                    <input type="text" id="uUsername" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm outline-none focus:border-blue-500">
                 </div>
-                
-                <div class="flex space-x-3 pt-6">
-                    <button onclick="hideUserModal()" class="flex-1 px-4 py-4 rounded-2xl font-black text-xs text-slate-400 uppercase">Batal</button>
-                    <button onclick="saveUser()" id="btnSave" class="flex-1 bg-blue-600 text-white px-4 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">Simpan</button>
+                <div>
+                    <label class="text-xs text-slate-400">Password</label>
+                    <input type="text" id="uPassword" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm outline-none focus:border-blue-500">
                 </div>
-            </div>
+                <div>
+                    <label class="text-xs text-slate-400">Expired Until</label>
+                    <input type="date" id="uExpired" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm outline-none focus:border-blue-500" style="color-scheme: dark;">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeUserModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg text-sm transition">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2 rounded-lg text-sm transition font-medium">Save User</button>
+                </div>
+            </form>
         </div>
     </div>
 
+
+    <!-- 4. MAIN APP SCREEN (USER) -->
+    <div id="mainScreen" class="hidden h-screen flex flex-col bg-[#0b1121]">
+        <!-- Header -->
+        <header class="glass-panel px-6 py-3 flex justify-between items-center shadow-md z-30">
+            <div class="flex items-center gap-4">
+                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-12 h-12 object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl text-white tracking-wide">Welcome to SkyOps Navigation Pro <span class="text-blue-400 text-sm">V.00</span></h1>
+                    <p class="text-xs text-cyan-400 flex items-center mt-0.5"><i class="fas fa-check-circle mr-1"></i> License Valid Until: <span id="displayExpired" class="ml-1 font-semibold text-white"></span></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-medium text-white" id="displayUserName">Pilot</p>
+                    <p class="text-xs text-slate-400">Active Session</p>
+                </div>
+                <button onclick="logout()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 transition flex items-center justify-center text-slate-300">
+                    <i class="fas fa-power-off"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Top Navigation Tabs -->
+        <nav class="bg-slate-900/80 border-b border-slate-800 px-4 py-2 z-20 overflow-x-auto no-scrollbar">
+            <ul class="flex space-x-2 min-w-max justify-center md:justify-start">
+                <li>
+                    <button onclick="switchTab('map')" id="tabBtn-map" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 bg-blue-600/20 text-blue-400 border border-blue-500/50">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Map
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('route')" id="tabBtn-route" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                        <i class="fas fa-route mr-2"></i>Route
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('waypoint')" id="tabBtn-waypoint" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                        <i class="fas fa-database mr-2"></i>Waypoint Database
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('aircraft')" id="tabBtn-aircraft" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                        <i class="fas fa-plane mr-2"></i>Aircraft Profile
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
+            
+            <!-- TAB: MAP -->
+            <div id="tab-map" class="tab-content absolute inset-0 p-6 flex items-center justify-center fade-in">
+                <!-- Mock Map Interface -->
+                <div class="w-full h-full glass-panel rounded-3xl p-4 flex flex-col relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-400 via-slate-900 to-slate-900 pointer-events-none"></div>
+                    
+                    <div class="flex justify-between items-center mb-4 z-10">
+                        <h2 class="text-xl font-semibold"><i class="fas fa-satellite-dish mr-2 text-cyan-400"></i>Live Tracking Map</h2>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs animate-pulse">GPS ACTIVE</span>
+                            <span class="px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-xs">LAT: 3.5952° N | LON: 98.6722° E</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 rounded-2xl border border-slate-700/50 bg-slate-900/80 flex items-center justify-center relative overflow-hidden z-10">
+                        <!-- Grid Background -->
+                        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px); background-size: 40px 40px;"></div>
+                        <!-- Radar Element -->
+                        <div class="radar shadow-[0_0_50px_rgba(59,130,246,0.2)]"></div>
+                        <!-- Mock Waypoints -->
+                        <div class="absolute top-1/4 left-1/3 w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_red]"></div>
+                        <div class="absolute bottom-1/3 right-1/4 w-3 h-3 bg-cyan-500 rounded-full shadow-[0_0_10px_cyan]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: ROUTE -->
+            <div id="tab-route" class="tab-content absolute inset-0 p-6 hidden">
+                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col md:flex-row gap-6 overflow-y-auto">
+                    <!-- Flight Plan Form -->
+                    <div class="w-full md:w-1/3 space-y-4">
+                        <h2 class="text-xl font-semibold border-b border-slate-700 pb-3"><i class="fas fa-clipboard-list mr-2 text-blue-400"></i>Flight Plan</h2>
+                        <div>
+                            <label class="text-xs text-slate-400">Origin (ICAO)</label>
+                            <input type="text" value="WIMM" class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white uppercase outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Destination (ICAO)</label>
+                            <input type="text" value="WIII" class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white uppercase outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Cruising Altitude (ft)</label>
+                            <input type="number" value="35000" class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white outline-none focus:border-blue-500">
+                        </div>
+                        <button class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white py-3 rounded-xl font-medium shadow-lg transition mt-4">
+                            GENERATE ROUTE
+                        </button>
+                    </div>
+                    <!-- Route Visualization / Info -->
+                    <div class="w-full md:w-2/3 bg-slate-900/60 rounded-2xl border border-slate-700/50 p-6">
+                        <h3 class="text-lg font-medium mb-4">Generated Route: WIMM -> WIII</h3>
+                        <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-blue-500 before:to-transparent">
+                            
+                            <!-- Origin -->
+                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-blue-500 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                    <i class="fas fa-plane-departure text-xs"></i>
+                                </div>
+                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-700 bg-slate-800/50 shadow">
+                                    <div class="flex items-center justify-between space-x-2 mb-1">
+                                        <div class="font-bold text-slate-200">WIMM (Kualanamu)</div>
+                                        <time class="text-xs text-cyan-400">TOC 00:00</time>
+                                    </div>
+                                    <div class="text-slate-400 text-xs">Elevation: 23ft | Rwy: 22/04</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Waypoint -->
+                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full border-4 border-slate-900 bg-slate-600 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                    <i class="fas fa-map-marker-alt text-[10px]"></i>
+                                </div>
+                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded border border-slate-700 bg-slate-800/30 shadow">
+                                    <div class="flex items-center justify-between space-x-2">
+                                        <div class="font-semibold text-sm text-slate-300">NIPTA</div>
+                                        <time class="text-xs text-slate-500">FL350</time>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Waypoint -->
+                             <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full border-4 border-slate-900 bg-slate-600 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                    <i class="fas fa-map-marker-alt text-[10px]"></i>
+                                </div>
+                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded border border-slate-700 bg-slate-800/30 shadow">
+                                    <div class="flex items-center justify-between space-x-2">
+                                        <div class="font-semibold text-sm text-slate-300">PLN (Palembang)</div>
+                                        <time class="text-xs text-slate-500">FL350</time>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dest -->
+                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-emerald-500 text-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                    <i class="fas fa-plane-arrival text-xs"></i>
+                                </div>
+                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-700 bg-slate-800/50 shadow">
+                                    <div class="flex items-center justify-between space-x-2 mb-1">
+                                        <div class="font-bold text-slate-200">WIII (Soekarno-Hatta)</div>
+                                        <time class="text-xs text-emerald-400">ETA 02:15</time>
+                                    </div>
+                                    <div class="text-slate-400 text-xs">Elevation: 34ft | Rwy: 25L/07R</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: WAYPOINT DB -->
+            <div id="tab-waypoint" class="tab-content absolute inset-0 p-6 hidden">
+                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold"><i class="fas fa-database mr-2 text-blue-400"></i>Global Waypoint Database</h2>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                            <input type="text" placeholder="Search ID or Name..." class="bg-slate-800/80 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-blue-500 w-64">
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-auto rounded-xl border border-slate-700/50">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-800/80 text-slate-300 sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-4">ID</th>
+                                    <th class="px-6 py-4">Type</th>
+                                    <th class="px-6 py-4">Name / Location</th>
+                                    <th class="px-6 py-4">Latitude</th>
+                                    <th class="px-6 py-4">Longitude</th>
+                                    <th class="px-6 py-4">Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/50 bg-slate-900/40">
+                                <tr class="hover:bg-slate-800/50 transition">
+                                    <td class="px-6 py-3 font-semibold text-blue-400">WIMM</td>
+                                    <td class="px-6 py-3"><span class="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs">AIRPORT</span></td>
+                                    <td class="px-6 py-3">Kualanamu Intl</td>
+                                    <td class="px-6 py-3">03° 38' 14" N</td>
+                                    <td class="px-6 py-3">098° 52' 43" E</td>
+                                    <td class="px-6 py-3 text-slate-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50 transition">
+                                    <td class="px-6 py-3 font-semibold text-blue-400">MDN</td>
+                                    <td class="px-6 py-3"><span class="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded text-xs">VOR/DME</span></td>
+                                    <td class="px-6 py-3">Medan</td>
+                                    <td class="px-6 py-3">03° 33' 50" N</td>
+                                    <td class="px-6 py-3">098° 40' 15" E</td>
+                                    <td class="px-6 py-3">112.80 MHz</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50 transition">
+                                    <td class="px-6 py-3 font-semibold text-blue-400">NIPTA</td>
+                                    <td class="px-6 py-3"><span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs">WAYPOINT</span></td>
+                                    <td class="px-6 py-3">Intersection</td>
+                                    <td class="px-6 py-3">02° 15' 00" N</td>
+                                    <td class="px-6 py-3">100° 30' 00" E</td>
+                                    <td class="px-6 py-3 text-slate-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50 transition">
+                                    <td class="px-6 py-3 font-semibold text-blue-400">WIII</td>
+                                    <td class="px-6 py-3"><span class="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs">AIRPORT</span></td>
+                                    <td class="px-6 py-3">Soekarno-Hatta Intl</td>
+                                    <td class="px-6 py-3">06° 07' 32" S</td>
+                                    <td class="px-6 py-3">106° 39' 21" E</td>
+                                    <td class="px-6 py-3 text-slate-500">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: AIRCRAFT PROFILE -->
+            <div id="tab-aircraft" class="tab-content absolute inset-0 p-6 hidden">
+                <div class="w-full h-full glass-panel rounded-3xl p-6 overflow-y-auto">
+                    <h2 class="text-xl font-semibold mb-6 border-b border-slate-700 pb-3"><i class="fas fa-plane mr-2 text-blue-400"></i>Active Aircraft Profile</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Visual/Basic Info -->
+                        <div class="space-y-6">
+                            <div class="bg-gradient-to-br from-blue-900/40 to-slate-900/80 border border-blue-500/30 rounded-2xl p-6 flex flex-col items-center justify-center h-48 relative overflow-hidden">
+                                <i class="fas fa-plane text-7xl text-blue-400/20 absolute -right-4 -bottom-4 transform -rotate-45"></i>
+                                <h3 class="text-3xl font-bold text-white tracking-widest z-10">PK-SKY</h3>
+                                <p class="text-cyan-400 font-medium z-10">Boeing 737-800</p>
+                                <span class="mt-4 px-4 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 rounded-full text-xs font-semibold z-10">STATUS: AIRWORTHY</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                    <p class="text-xs text-slate-400">Max Takeoff Weight</p>
+                                    <p class="text-lg font-semibold text-white">79,015 <span class="text-xs text-slate-500">kg</span></p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                                    <p class="text-xs text-slate-400">Max Fuel Capacity</p>
+                                    <p class="text-lg font-semibold text-white">20,896 <span class="text-xs text-slate-500">kg</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Data -->
+                        <div class="bg-slate-900/60 rounded-2xl border border-slate-700/50 p-6">
+                            <h4 class="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Performance Parameters</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-400">Cruise Speed (Mach)</span>
+                                        <span class="font-medium">0.78 M</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 78%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-400">Service Ceiling</span>
+                                        <span class="font-medium">41,000 ft</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-cyan-500 h-1.5 rounded-full" style="width: 90%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-400">Avg Fuel Flow</span>
+                                        <span class="font-medium">2,500 kg/hr</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-orange-500 h-1.5 rounded-full" style="width: 60%"></div></div>
+                                </div>
+                                <hr class="border-slate-700 my-4">
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label class="text-xs text-slate-500">Current Payload</label>
+                                        <input type="number" value="15400" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-500">Block Fuel</label>
+                                        <input type="number" value="9500" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Application Logic -->
     <script>
-        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyA72bv5TGhc6gTSbfEPPfs7dKWbQtXneHmpsYkcGy0HTnLXFPr2NXLmI-f5CE9HQtR5w/exec';
-
+        // ==========================================
+        // KONFIGURASI GOOGLE SHEETS
+        // ==========================================
+        // PASTE URL WEB APP GOOGLE SCRIPT ANDA DI SINI
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMlhosuNlACgKpQR7sOv_WJMqSLHX0L1dL0QO8k0I4mqLZDpC9Szem3qw8vfBDt585NA/exec'; 
+        // Jika URL kosong, aplikasi akan menggunakan LocalStorage (Offline Mode)
+        
+        // State Management
+        let usersData = [];
         let currentUser = null;
-        let allUsers = [];
-        let isDbReady = false;
-
-        function setupPWA() {
-            const manifest = {
-                "name": "SkyOps Navigation Pro",
-                "short_name": "SkyOps",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#0f172a",
-                "theme_color": "#1e3a8a",
-                "icons": [{ "src": "https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
-            };
-            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-            document.querySelector('#manifest-link').setAttribute('href', URL.createObjectURL(blob));
-            if ('serviceWorker' in navigator) {
-                const swCode = `self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));`;
-                const swBlob = new Blob([swCode], {type: 'application/javascript'});
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
-            }
+        
+        // Inisialisasi Data Admin Default
+        if(!localStorage.getItem('adminUser')) {
+            localStorage.setItem('adminUser', 'admin');
+            localStorage.setItem('adminPass', 'ramdan28');
         }
 
-        window.onload = function() {
-            setupPWA();
-            lucide.createIcons();
+        // --- View Controller ---
+        function showView(viewId) {
+            document.getElementById('splashScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.add('hidden');
             
+            const view = document.getElementById(viewId);
+            view.classList.remove('hidden');
+            view.classList.add('fade-in');
+        }
+
+        // --- Splash Screen Logic ---
+        window.onload = () => {
             setTimeout(() => {
-                const splash = document.getElementById('splash');
+                const splash = document.getElementById('splashScreen');
+                splash.classList.remove('fade-in');
                 splash.classList.add('fade-out');
                 setTimeout(() => {
-                    splash.style.display = 'none';
-                    const loginPage = document.getElementById('loginPage');
-                    loginPage.style.display = 'flex';
-                    loginPage.classList.add('fade-in');
-                }, 600);
-            }, 2500);
-
-            fetchUsers();
+                    initApp();
+                }, 1000); // Wait for fade out
+            }, 3000); // 3 seconds splash
         };
 
-        async function fetchUsers() {
-            const statusText = document.getElementById('dbStatusText');
-            const statusLoader = document.getElementById('dbLoader');
-            try {
-                const response = await fetch(SHEET_API_URL);
-                if (!response.ok) throw new Error("Server Response Error");
-                const data = await response.json();
-                allUsers = data;
-                isDbReady = true;
-                statusText.textContent = "Sinkronisasi Aktif";
-                statusText.className = "text-[9px] font-black text-green-600 uppercase tracking-[0.2em]";
-                statusLoader.style.display = 'none';
-                renderUserTable();
-            } catch (e) { 
-                console.error("Fetch Failure:", e);
-                statusText.textContent = "Mode Offline Aktif";
-                statusText.className = "text-[9px] font-black text-amber-500 uppercase tracking-[0.2em]";
-                statusLoader.style.display = 'none';
-                isDbReady = true;
+        async function initApp() {
+            showView('loginScreen');
+            await loadUsers();
+            
+            // Fill admin creds form
+            document.getElementById('editAdminUser').value = localStorage.getItem('adminUser');
+            document.getElementById('editAdminPass').value = localStorage.getItem('adminPass');
+        }
+
+        // --- Data Management (Google Sheet / LocalStorage) ---
+        async function loadUsers() {
+            if (GOOGLE_SCRIPT_URL !== '') {
+                try {
+                    // Fetch dari Google Sheets
+                    const response = await fetch(GOOGLE_SCRIPT_URL);
+                    usersData = await response.json();
+                } catch (error) {
+                    console.error("Gagal mengambil data dari Google Sheets, menggunakan data lokal", error);
+                    loadLocalUsers();
+                }
+            } else {
+                loadLocalUsers();
+            }
+            renderUserTable();
+        }
+
+        function loadLocalUsers() {
+            const localData = localStorage.getItem('skyops_users');
+            if(localData) {
+                usersData = JSON.parse(localData);
+            } else {
+                // Mock Default User
+                const nextMonth = new Date();
+                nextMonth.setMonth(nextMonth.getMonth() + 1);
+                usersData = [{
+                    id: Date.now().toString(),
+                    name: 'Demo Pilot',
+                    role: 'user',
+                    username: 'pilot',
+                    password: '123',
+                    expired: nextMonth.toISOString().split('T')[0]
+                }];
+                saveToLocal();
             }
         }
 
-        function handleLogin() {
-            const userIn = document.getElementById('username').value.trim().toLowerCase();
-            const passIn = document.getElementById('password').value.trim();
-            const errorEl = document.getElementById('loginError');
-            const btnLogin = document.getElementById('btnLogin');
+        function saveToLocal() {
+            localStorage.setItem('skyops_users', JSON.stringify(usersData));
+        }
+
+        async function syncWithGoogleSheet() {
+            if (GOOGLE_SCRIPT_URL === '') {
+                alert('URL Google Script belum diatur di dalam kode HTML.');
+                return;
+            }
+            alert('Fitur sinkronisasi POST ke Google Sheet memerlukan penyesuaian endpoint script. Saat ini sinkronisasi mengambil data terbaru.');
+            await loadUsers();
+            alert('Data tersinkronisasi!');
+        }
+
+        // --- Auth Logic ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const userIn = document.getElementById('loginUsername').value;
+            const passIn = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
             
-            errorEl.classList.add('hidden');
+            // Check Admin
+            const adminU = localStorage.getItem('adminUser');
+            const adminP = localStorage.getItem('adminPass');
 
-            if (!isDbReady) {
-                errorEl.textContent = "AKSES DITOLAK: DATABASE SEDANG BOOTING";
-                errorEl.classList.remove('hidden');
+            if(userIn === adminU && passIn === adminP) {
+                errorDiv.classList.add('hidden');
+                currentUser = { name: 'Super Admin', role: 'admin' };
+                document.getElementById('loginForm').reset();
+                showView('adminScreen');
                 return;
             }
 
-            // Hardcoded Admin Safety Net
-            if (userIn === 'admin' && passIn === 'ramdan28') {
-                openAdmin();
-                document.getElementById('adminCloseBtn').style.display = 'none'; // Admin utama tidak bisa close panel tanpa logout
-                resetLoginButton();
-                return;
-            }
-
-            const user = allUsers.find(u => {
-                const dbUser = (u.username || '').toString().toLowerCase().trim();
-                const dbPass = (u.password || '').toString().trim();
-                return dbUser === userIn && dbPass === passIn;
-            });
-
-            if (user) {
-                const expDateStr = user.expireduntil || user.expiredUntil || '';
-                const expiry = new Date(expDateStr);
+            // Check User Database
+            const userRecord = usersData.find(u => u.username === userIn && u.password === passIn);
+            
+            if(userRecord) {
+                // Check Expired
                 const today = new Date();
                 today.setHours(0,0,0,0);
-
-                if (!expDateStr || expiry < today) {
-                    errorEl.textContent = "AKSES DITANGGUHKAN: LISENSI KADALUWARSA";
-                    errorEl.classList.remove('hidden');
-                    resetLoginButton();
-                    return;
-                }
-
-                // Check Role
-                const role = (user.role || 'user').toLowerCase();
-                currentUser = user;
-
-                if (role === 'admin') {
-                    openAdmin();
-                    document.getElementById('adminCloseBtn').style.display = 'block';
+                const expDate = new Date(userRecord.expired);
+                
+                if(expDate >= today) {
+                    errorDiv.classList.add('hidden');
+                    currentUser = userRecord;
+                    document.getElementById('loginForm').reset();
+                    setupMainApp(userRecord);
+                    showView('mainScreen');
                 } else {
-                    enterMainApp();
+                    errorDiv.textContent = "Your account license has expired.";
+                    errorDiv.classList.remove('hidden');
                 }
-                resetLoginButton();
             } else {
-                errorEl.textContent = "AUTENTIKASI GAGAL: KREDENSIAL SALAH";
-                errorEl.classList.remove('hidden');
-                resetLoginButton();
+                errorDiv.textContent = "Invalid credentials.";
+                errorDiv.classList.remove('hidden');
             }
         }
 
-        function enterMainApp() {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userGreeting').textContent = `Pilot ID: ${currentUser.name}`;
-            document.getElementById('expiryInfo').textContent = `EXP: ${currentUser.expireduntil || currentUser.expiredUntil}`;
-            lucide.createIcons();
+        function logout() {
+            currentUser = null;
+            showView('loginScreen');
         }
 
-        function resetLoginButton() {
-            const btnLogin = document.getElementById('btnLogin');
-            btnLogin.innerHTML = `<span>AUTHENTICATE</span>`;
-            btnLogin.disabled = false;
-        }
-
-        function logout() { location.reload(); }
-
-        function switchTab(tabId) {
-            ['map', 'route', 'waypoint', 'aircraft'].forEach(id => {
-                document.getElementById(`content-${id}`).classList.add('hidden');
-                document.getElementById(`tab-${id}`).classList.remove('tab-active');
-                document.getElementById(`tab-${id}`).classList.add('text-slate-400');
-            });
-            const active = document.getElementById(`content-${tabId}`);
-            active.classList.remove('hidden');
-            const activeTab = document.getElementById(`tab-${tabId}`);
-            activeTab.classList.add('tab-active');
-            activeTab.classList.remove('text-slate-400');
-        }
-
-        function openAdmin() { 
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('adminPanel').classList.remove('hidden'); 
-        }
-
-        function closeAdmin() { 
-            document.getElementById('adminPanel').classList.add('hidden'); 
-            document.getElementById('loginPage').classList.remove('hidden');
+        // --- Admin Dashboard Logic ---
+        function updateAdminCreds(e) {
+            e.preventDefault();
+            const nu = document.getElementById('editAdminUser').value;
+            const np = document.getElementById('editAdminPass').value;
+            localStorage.setItem('adminUser', nu);
+            localStorage.setItem('adminPass', np);
+            alert('Admin credentials updated successfully!');
         }
 
         function renderUserTable() {
-            const body = document.getElementById('userTableBody');
-            const count = document.getElementById('pilotCount');
-            if (count) count.textContent = allUsers.length;
-            if (!body) return;
-            
-            body.innerHTML = '';
-            allUsers.forEach((user, idx) => {
-                const expDate = user.expireduntil || user.expiredUntil || 'N/A';
-                const roleLabel = (user.role || 'user').toUpperCase();
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+            usersData.forEach(user => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                    <td class="px-8 py-6 font-bold text-slate-800 text-sm">${user.name}</td>
-                    <td class="px-8 py-6 text-slate-500 text-xs">${user.username}</td>
-                    <td class="px-8 py-6 text-xs"><span class="px-2 py-1 ${roleLabel === 'ADMIN' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'} rounded-lg font-black">${roleLabel}</span></td>
-                    <td class="px-8 py-6 text-xs font-black text-blue-600 uppercase">${expDate}</td>
-                    <td class="px-8 py-6 text-center">
-                        <button onclick="editUser(${idx})" class="bg-blue-50 text-blue-600 p-3 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                            <i data-lucide="edit-2" class="w-4 h-4"></i>
-                        </button>
+                    <td class="px-4 py-3">${user.name}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 ${user.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'} rounded text-xs">${user.role.toUpperCase()}</span></td>
+                    <td class="px-4 py-3">${user.username}</td>
+                    <td class="px-4 py-3 text-slate-500">******</td>
+                    <td class="px-4 py-3 ${new Date(user.expired) < new Date() ? 'text-red-400' : 'text-emerald-400'}">${user.expired}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="editUser('${user.id}')" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteUser('${user.id}')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
-                body.appendChild(tr);
+                tbody.appendChild(tr);
             });
-            lucide.createIcons();
         }
 
-        function showUserModal() {
-            document.getElementById('modalTitle').textContent = "Register Pilot";
-            ['m_name', 'm_user', 'm_pass', 'm_expiry'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('m_role').value = 'user';
+        function openUserModal() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('modalTitle').textContent = 'Add New User';
             document.getElementById('userModal').classList.remove('hidden');
         }
 
-        function hideUserModal() { document.getElementById('userModal').classList.add('hidden'); }
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
 
-        async function saveUser() {
-            const data = {
-                action: 'addOrUpdate',
-                name: document.getElementById('m_name').value,
-                username: document.getElementById('m_user').value.toLowerCase().trim(),
-                password: document.getElementById('m_pass').value.trim(),
-                role: document.getElementById('m_role').value,
-                expiredUntil: document.getElementById('m_expiry').value
+        function saveUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('userId').value;
+            const userData = {
+                id: id || Date.now().toString(),
+                name: document.getElementById('uName').value,
+                role: document.getElementById('uRole').value,
+                username: document.getElementById('uUsername').value,
+                password: document.getElementById('uPassword').value,
+                expired: document.getElementById('uExpired').value,
             };
 
-            if (!data.name || !data.username || !data.password) return;
+            if(id) {
+                // Update
+                const idx = usersData.findIndex(u => u.id === id);
+                if(idx !== -1) usersData[idx] = userData;
+            } else {
+                // Add
+                usersData.push(userData);
+            }
 
-            const btn = document.getElementById('btnSave');
-            btn.disabled = true;
-            btn.textContent = "Sinkronisasi...";
-
-            try {
-                await fetch(SHEET_API_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors',
-                    body: JSON.stringify(data) 
-                });
-                setTimeout(fetchUsers, 1500);
-            } catch (e) { console.error("Cloud Sync Failed"); }
-
-            btn.disabled = false;
-            btn.textContent = "Simpan";
-            hideUserModal();
+            saveToLocal();
+            renderUserTable();
+            closeUserModal();
         }
 
-        function editUser(idx) {
-            const u = allUsers[idx];
-            document.getElementById('modalTitle').textContent = "Modifikasi Profil";
-            document.getElementById('m_name').value = u.name;
-            document.getElementById('m_user').value = u.username;
-            document.getElementById('m_pass').value = u.password;
-            document.getElementById('m_role').value = u.role || 'user';
-            document.getElementById('m_expiry').value = u.expireduntil || u.expiredUntil;
-            document.getElementById('userModal').classList.remove('hidden');
+        function editUser(id) {
+            const user = usersData.find(u => u.id === id);
+            if(user) {
+                document.getElementById('userId').value = user.id;
+                document.getElementById('uName').value = user.name;
+                document.getElementById('uRole').value = user.role;
+                document.getElementById('uUsername').value = user.username;
+                document.getElementById('uPassword').value = user.password;
+                document.getElementById('uExpired').value = user.expired;
+                document.getElementById('modalTitle').textContent = 'Edit User';
+                document.getElementById('userModal').classList.remove('hidden');
+            }
         }
+
+        function deleteUser(id) {
+            if(confirm("Are you sure you want to delete this user?")) {
+                usersData = usersData.filter(u => u.id !== id);
+                saveToLocal();
+                renderUserTable();
+            }
+        }
+
+        // --- Main App Logic ---
+        function setupMainApp(user) {
+            document.getElementById('displayUserName').textContent = user.name;
+            
+            // Format date beautifully
+            const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = new Date(user.expired).toLocaleDateString('id-ID', dateOpts);
+            document.getElementById('displayExpired').textContent = formattedDate;
+
+            // Reset tabs to Map
+            switchTab('map');
+        }
+
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('fade-in');
+            });
+            // Reset all buttons
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-blue-600/20', 'text-blue-400', 'border', 'border-blue-500/50');
+                el.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+            });
+
+            // Show selected tab
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('fade-in');
+
+            // Highlight selected button
+            const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+            activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+            activeBtn.classList.add('bg-blue-600/20', 'text-blue-400', 'border', 'border-blue-500/50');
+        }
+
     </script>
 </body>
 </html>
