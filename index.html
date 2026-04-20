@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SkyOps Navigation Pro V.00</title>
     
     <!-- PWA / Installability Tags -->
@@ -32,6 +32,7 @@
             color: #f8fafc;
             min-height: 100vh;
             overflow-x: hidden;
+            overscroll-behavior-y: none;
         }
 
         .glass-panel {
@@ -42,17 +43,17 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        .fade-in { animation: fadeIn 1s ease-in forwards; }
-        .fade-out { animation: fadeOut 1s ease-out forwards; }
+        .fade-in { animation: fadeIn 0.8s ease-in forwards; }
+        .fade-out { animation: fadeOut 0.8s ease-out forwards; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.98); }
             to { opacity: 1; transform: scale(1); }
         }
 
         @keyframes fadeOut {
             from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(1.05); }
+            to { opacity: 0; transform: scale(1.02); }
         }
 
         /* GPS Pulse Animation for Real Map Marker */
@@ -75,7 +76,7 @@
         /* Active Route Midpoint Drag Marker */
         .midpoint-marker {
             background-color: #ffffff;
-            border: 3px solid #d946ef; /* Magenta-500 */
+            border: 3px solid #d946ef; 
             border-radius: 50%;
             cursor: grab;
             box-shadow: 0 0 8px rgba(0,0,0,0.8);
@@ -103,16 +104,14 @@
 
         /* Flight HUD Data Box */
         .hud-data-box {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(59, 130, 246, 0.4);
             border-radius: 8px;
-            padding: 8px 12px;
             text-align: center;
-            min-width: 80px;
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
         ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.8); }
@@ -124,53 +123,53 @@
         }
     </style>
 </head>
-<body class="antialiased selection:bg-blue-500 selection:text-white relative">
+<body class="antialiased selection:bg-blue-500 selection:text-white relative h-screen w-screen overflow-hidden">
 
     <!-- ========================================== -->
     <!--         BAGIAN 1: SPLASH SCREEN            -->
     <!-- ========================================== -->
-    <div id="splashScreen" class="print:hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f172a] transition-opacity duration-1000">
-        <div class="w-48 h-48 mb-8 fade-in">
+    <div id="splashScreen" class="print:hidden fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#0f172a] transition-opacity duration-1000">
+        <div class="w-40 h-40 md:w-48 md:h-48 mb-8 fade-in">
             <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
         </div>
-        <h1 class="text-3xl md:text-5xl font-light tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 fade-in" style="animation-delay: 0.3s;">
+        <h1 class="text-2xl md:text-5xl font-light tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 fade-in" style="animation-delay: 0.3s;">
             Welcome To
         </h1>
-        <h2 class="text-2xl md:text-4xl font-bold mt-2 text-white tracking-widest fade-in" style="animation-delay: 0.6s;">
-            SkyOps Navigation Pro <span class="text-blue-500 text-lg align-top">V.00</span>
+        <h2 class="text-xl md:text-4xl font-bold mt-2 text-white tracking-widest fade-in text-center px-4" style="animation-delay: 0.6s;">
+            SkyOps Navigation Pro <span class="text-blue-500 text-sm md:text-lg align-top">V.00</span>
         </h2>
     </div>
 
     <!-- ========================================== -->
     <!--         BAGIAN 2: LOGIN SCREEN             -->
     <!-- ========================================== -->
-    <div id="loginScreen" class="print:hidden hidden min-h-screen flex items-center justify-center p-4">
-        <div class="glass-panel p-8 rounded-3xl w-full max-w-md relative overflow-hidden">
+    <div id="loginScreen" class="print:hidden hidden h-full w-full flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel p-6 md:p-8 rounded-3xl w-full max-w-md relative overflow-hidden my-auto">
             <div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
             
             <div class="flex justify-center mb-6">
-                <div class="w-24 h-24 p-2 glass-panel rounded-full flex items-center justify-center">
-                    <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-16 h-16 object-contain" />
+                <div class="w-20 h-20 md:w-24 md:h-24 p-2 glass-panel rounded-full flex items-center justify-center">
+                    <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain" />
                 </div>
             </div>
             
-            <h2 class="text-2xl font-semibold text-center mb-2">Secure Login</h2>
-            <p class="text-sm text-slate-400 text-center mb-8">Access SkyOps Navigation System</p>
+            <h2 class="text-xl md:text-2xl font-semibold text-center mb-2">Secure Login</h2>
+            <p class="text-xs md:text-sm text-slate-400 text-center mb-8">Access SkyOps Navigation System</p>
             
             <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="space-y-5">
+                <div class="space-y-4 md:space-y-5">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-1 pl-1"><i class="fas fa-user mr-2"></i>Username</label>
-                        <input type="text" id="loginUsername" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Enter username">
+                        <label class="block text-xs md:text-sm font-medium text-slate-300 mb-1 pl-1"><i class="fas fa-user mr-2"></i>Username</label>
+                        <input type="text" id="loginUsername" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-sm md:text-base text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Enter username">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-1 pl-1"><i class="fas fa-lock mr-2"></i>Password</label>
-                        <input type="password" id="loginPassword" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Enter password">
+                        <label class="block text-xs md:text-sm font-medium text-slate-300 mb-1 pl-1"><i class="fas fa-lock mr-2"></i>Password</label>
+                        <input type="password" id="loginPassword" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-sm md:text-base text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Enter password">
                     </div>
-                    <div id="loginError" class="hidden text-red-400 text-sm text-center bg-red-900/30 py-2 rounded-lg border border-red-500/30">
+                    <div id="loginError" class="hidden text-red-400 text-xs md:text-sm text-center bg-red-900/30 py-2 rounded-lg border border-red-500/30">
                         Invalid credentials or account expired.
                     </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] text-sm md:text-base mt-2">
                         AUTHENTICATE <i class="fas fa-arrow-right ml-2"></i>
                     </button>
                 </div>
@@ -181,73 +180,75 @@
     <!-- ========================================== -->
     <!--         BAGIAN 3: ADMIN DASHBOARD          -->
     <!-- ========================================== -->
-    <div id="adminScreen" class="print:hidden hidden min-h-screen flex flex-col">
-        <header class="glass-panel sticky top-0 z-40 border-b border-slate-700/50 px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-10 h-10 object-contain" />
+    <div id="adminScreen" class="print:hidden hidden h-full w-full flex flex-col overflow-hidden">
+        <header class="glass-panel sticky top-0 z-40 border-b border-slate-700/50 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3 md:gap-4">
+                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-8 h-8 md:w-10 md:h-10 object-contain" />
                 <div>
-                    <h1 class="font-bold text-xl tracking-wide">SkyOps <span class="text-blue-400">Admin</span></h1>
-                    <p class="text-xs text-slate-400">System Management Console</p>
+                    <h1 class="font-bold text-base md:text-xl tracking-wide">SkyOps <span class="text-blue-400">Admin</span></h1>
+                    <p class="text-[10px] md:text-xs text-slate-400 hidden sm:block">System Management Console</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <button onclick="syncWithGoogleSheet()" class="text-sm bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-lg hover:bg-emerald-600/40 transition">
-                    <i class="fas fa-sync-alt mr-2"></i>Sync Sheet
+            <div class="flex items-center gap-2 md:gap-4">
+                <button onclick="syncWithGoogleSheet()" class="text-xs md:text-sm bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 md:px-4 py-2 rounded-lg hover:bg-emerald-600/40 transition">
+                    <i class="fas fa-sync-alt sm:mr-2"></i><span class="hidden sm:inline">Sync Sheet</span>
                 </button>
-                <button onclick="logout()" class="text-sm bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg hover:bg-red-500/40 transition">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                <button onclick="logout()" class="text-xs md:text-sm bg-red-500/20 text-red-400 border border-red-500/30 px-3 md:px-4 py-2 rounded-lg hover:bg-red-500/40 transition">
+                    <i class="fas fa-sign-out-alt sm:mr-2"></i><span class="hidden sm:inline">Logout</span>
                 </button>
             </div>
         </header>
 
-        <div class="flex-1 p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="glass-panel p-6 rounded-2xl h-fit">
-                <h3 class="text-lg font-semibold mb-4 border-b border-slate-700 pb-2"><i class="fas fa-user-shield mr-2 text-blue-400"></i>Master Admin Credentials</h3>
-                <form id="adminCredsForm" onsubmit="updateAdminCreds(event)" class="space-y-4">
-                    <div>
-                        <label class="text-xs text-slate-400">Admin Username</label>
-                        <input type="text" id="editAdminUser" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-400">Admin Password</label>
-                        <input type="text" id="editAdminPass" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm py-2 rounded-lg transition">Update Admin Data</button>
-                </form>
-            </div>
-
-            <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
-                <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
-                    <h3 class="text-lg font-semibold"><i class="fas fa-users mr-2 text-blue-400"></i>User Database</h3>
-                    <button onclick="openUserModal()" class="bg-blue-600 hover:bg-blue-500 text-xs px-3 py-2 rounded-lg transition"><i class="fas fa-plus mr-1"></i> Add User</button>
+        <div class="flex-1 overflow-y-auto p-4 md:p-6">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="glass-panel p-5 md:p-6 rounded-2xl h-fit">
+                    <h3 class="text-base md:text-lg font-semibold mb-4 border-b border-slate-700 pb-2"><i class="fas fa-user-shield mr-2 text-blue-400"></i>Master Admin Credentials</h3>
+                    <form id="adminCredsForm" onsubmit="updateAdminCreds(event)" class="space-y-4">
+                        <div>
+                            <label class="text-xs text-slate-400">Admin Username</label>
+                            <input type="text" id="editAdminUser" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Admin Password</label>
+                            <input type="text" id="editAdminPass" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm py-2 rounded-lg transition">Update Admin Data</button>
+                    </form>
                 </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="text-slate-400 bg-slate-800/50">
-                            <tr>
-                                <th class="px-4 py-3 rounded-tl-lg">Name</th>
-                                <th class="px-4 py-3">Role</th>
-                                <th class="px-4 py-3">Username</th>
-                                <th class="px-4 py-3">Password</th>
-                                <th class="px-4 py-3">Expired Until</th>
-                                <th class="px-4 py-3 rounded-tr-lg">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody" class="divide-y divide-slate-700/50">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
+
+                <div class="glass-panel p-4 md:p-6 rounded-2xl xl:col-span-2 flex flex-col">
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                        <h3 class="text-base md:text-lg font-semibold"><i class="fas fa-users mr-2 text-blue-400"></i>User Database</h3>
+                        <button onclick="openUserModal()" class="bg-blue-600 hover:bg-blue-500 text-xs md:text-sm px-3 py-2 rounded-lg transition"><i class="fas fa-plus mr-1"></i> Add User</button>
+                    </div>
+                    
+                    <div class="flex-1 overflow-x-auto min-h-[300px]">
+                        <table class="w-full text-left text-xs md:text-sm whitespace-nowrap">
+                            <thead class="text-slate-400 bg-slate-800/50 sticky top-0">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-tl-lg">Name</th>
+                                    <th class="px-4 py-3">Role</th>
+                                    <th class="px-4 py-3">Username</th>
+                                    <th class="px-4 py-3">Password</th>
+                                    <th class="px-4 py-3">Expired Until</th>
+                                    <th class="px-4 py-3 rounded-tr-lg text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody" class="divide-y divide-slate-700/50">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Add/Edit User Modal -->
-    <div id="userModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div class="glass-panel w-full max-w-md p-6 rounded-2xl relative">
-            <h3 id="modalTitle" class="text-xl font-bold mb-4">Add New User</h3>
-            <form id="userForm" onsubmit="saveUser(event)" class="space-y-4">
+    <div id="userModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+        <div class="glass-panel w-full max-w-md p-5 sm:p-6 rounded-2xl relative">
+            <button onclick="closeUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer z-50 p-1"><i class="fas fa-times text-lg"></i></button>
+            <h3 id="modalTitle" class="text-lg sm:text-xl font-bold mb-4 pr-6">Add New User</h3>
+            <form id="userForm" onsubmit="saveUser(event)" class="space-y-3 sm:space-y-4">
                 <input type="hidden" id="userId">
                 <div>
                     <label class="text-xs text-slate-400">Full Name</label>
@@ -272,7 +273,7 @@
                     <label class="text-xs text-slate-400">Expired Until</label>
                     <input type="date" id="uExpired" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 mt-1 text-sm outline-none focus:border-blue-500" style="color-scheme: dark;">
                 </div>
-                <div class="flex gap-3 pt-4">
+                <div class="flex gap-3 pt-2 sm:pt-4">
                     <button type="button" onclick="closeUserModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg text-sm transition">Cancel</button>
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2 rounded-lg text-sm transition font-medium">Save User</button>
                 </div>
@@ -284,156 +285,156 @@
     <!-- ========================================== -->
     <!--         BAGIAN 4: MAIN APP CONTAINER       -->
     <!-- ========================================== -->
-    <div id="mainScreen" class="print:hidden hidden h-screen flex flex-col bg-[#0b1121]">
-        <header class="glass-panel px-6 py-3 flex justify-between items-center shadow-md z-30 relative">
-            <div class="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-12 h-12 object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+    <div id="mainScreen" class="print:hidden hidden h-full w-full flex flex-col bg-[#0b1121] overflow-hidden">
+        <header class="glass-panel px-4 md:px-6 py-2 md:py-3 flex justify-between items-center shadow-md z-30 relative shrink-0">
+            <div class="flex items-center gap-3 md:gap-4">
+                <img src="https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-" alt="Logo" class="w-10 h-10 md:w-12 md:h-12 object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                 <div>
-                    <h1 class="font-bold text-lg md:text-xl text-white tracking-wide">Welcome to SkyOps Navigation Pro <span class="text-blue-400 text-sm">V.00</span></h1>
-                    <p class="text-xs text-cyan-400 flex items-center mt-0.5"><i class="fas fa-check-circle mr-1"></i> License Valid Until: <span id="displayExpired" class="ml-1 font-semibold text-white"></span></p>
+                    <h1 class="font-bold text-sm md:text-lg text-white tracking-wide leading-tight">SkyOps Navigation Pro <span class="text-blue-400 text-xs">V.00</span></h1>
+                    <p class="text-[10px] md:text-xs text-cyan-400 flex items-center mt-0.5"><i class="fas fa-check-circle mr-1 hidden sm:inline"></i> <span class="hidden sm:inline">License Valid Until: </span><span id="displayExpired" class="sm:ml-1 font-semibold text-white"></span></p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 md:gap-4">
                 <div class="text-right hidden md:block">
                     <p class="text-sm font-medium text-white" id="displayUserName">Pilot</p>
                     <p class="text-xs text-slate-400">Active Session</p>
                 </div>
-                <button onclick="syncWithGoogleSheet()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/50 transition flex items-center justify-center text-slate-300" title="Sync Data dari Cloud">
-                    <i class="fas fa-sync-alt"></i>
+                <button onclick="syncWithGoogleSheet()" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/50 transition flex items-center justify-center text-slate-300" title="Sync Data dari Cloud">
+                    <i class="fas fa-sync-alt text-xs md:text-base"></i>
                 </button>
-                <button onclick="logout()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 transition flex items-center justify-center text-slate-300" title="Logout">
-                    <i class="fas fa-power-off"></i>
+                <button onclick="logout()" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 transition flex items-center justify-center text-slate-300" title="Logout">
+                    <i class="fas fa-power-off text-xs md:text-base"></i>
                 </button>
             </div>
         </header>
 
-        <nav class="bg-slate-900/80 border-b border-slate-800 px-4 py-2 z-20 overflow-x-auto no-scrollbar relative">
-            <ul class="flex space-x-2 min-w-max justify-center md:justify-start">
+        <nav class="bg-slate-900/80 border-b border-slate-800 px-2 md:px-4 py-2 z-20 overflow-x-auto no-scrollbar relative shrink-0">
+            <ul class="flex space-x-1 md:space-x-2 min-w-max justify-start md:justify-center px-2">
                 <li>
-                    <button onclick="switchTab('map')" id="tabBtn-map" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 bg-blue-600/20 text-blue-400 border border-blue-500/50">
+                    <button onclick="switchTab('map')" id="tabBtn-map" class="tab-btn px-4 py-2 md:px-6 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 bg-blue-600/20 text-blue-400 border border-blue-500/50 flex items-center">
                         <i class="fas fa-map-marked-alt mr-2"></i>Map
                     </button>
                 </li>
                 <li>
-                    <button onclick="switchTab('route')" id="tabBtn-route" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                    <button onclick="switchTab('route')" id="tabBtn-route" class="tab-btn px-4 py-2 md:px-6 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center">
                         <i class="fas fa-route mr-2"></i>Route
                     </button>
                 </li>
                 <li>
-                    <button onclick="switchTab('waypoint')" id="tabBtn-waypoint" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
-                        <i class="fas fa-database mr-2"></i>Waypoint Database
+                    <button onclick="switchTab('waypoint')" id="tabBtn-waypoint" class="tab-btn px-4 py-2 md:px-6 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center">
+                        <i class="fas fa-database mr-2"></i><span class="hidden sm:inline">Waypoint </span>DB
                     </button>
                 </li>
                 <li>
-                    <button onclick="switchTab('aircraft')" id="tabBtn-aircraft" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
-                        <i class="fas fa-plane mr-2"></i>Aircraft Profile
+                    <button onclick="switchTab('aircraft')" id="tabBtn-aircraft" class="tab-btn px-4 py-2 md:px-6 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center">
+                        <i class="fas fa-plane mr-2"></i>Aircraft<span class="hidden sm:inline"> Profile</span>
                     </button>
                 </li>
             </ul>
         </nav>
 
-        <main class="flex-1 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5 z-10">
+        <main class="flex-1 relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5 z-10 w-full">
             
             <!-- ========================================== -->
             <!--         BAGIAN 5: TAB - MAP                -->
             <!-- ========================================== -->
-            <div id="tab-map" class="tab-content absolute inset-0 fade-in">
-                <!-- Map Wrapper untuk Scale & Rotation Track-Up (FULL SCREEN) -->
-                <div id="mapTransformWrapper" class="absolute inset-0 z-0 bg-[#0f172a]">
-                    <!-- Real Leaflet Map Container -->
-                    <div id="realMap" class="cursor-crosshair w-full h-full"></div>
+            <div id="tab-map" class="tab-content absolute inset-0 fade-in h-full w-full">
+                <div id="mapTransformWrapper" class="absolute inset-0 z-0 bg-[#0f172a] overflow-hidden">
+                    <div id="realMap" class="absolute w-[150%] h-[150%] -left-[25%] -top-[25%] cursor-crosshair" style="transition: transform 0.1s linear;"></div>
                 </div>
 
-                <!-- Floating Status Bar (Top Right) -->
-                <div class="absolute top-4 right-4 z-[1000] flex gap-0 shadow-lg rounded-full backdrop-blur-sm">
-                    <span id="gps-status" class="px-4 py-2 bg-slate-900/80 text-slate-400 border border-slate-700 rounded-l-full text-xs transition-colors font-bold tracking-wider">GPS STANDBY</span>
-                    <span id="gps-coordinates" class="px-4 py-2 bg-slate-900/80 text-slate-300 border border-slate-700 border-l-0 rounded-r-full text-xs font-mono">LAT: -- | LON: --</span>
-                </div>
-
-                <!-- Flight HUD Overlay (Simulation / Navigation) -->
-                <div id="flightHUDOverlay" class="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1100] hidden w-max max-w-[90%]">
-                    <div class="glass-panel p-3 rounded-2xl flex gap-3 md:gap-6 shadow-2xl border-t border-blue-400/30">
-                        <div class="hud-data-box">
-                            <p class="text-[10px] text-cyan-400 font-bold mb-1 tracking-wider">HDG</p>
-                            <p class="text-xl md:text-2xl font-bold text-white font-mono" id="hudHdg">000°</p>
-                        </div>
-                        <div class="hud-data-box">
-                            <p class="text-[10px] text-cyan-400 font-bold mb-1 tracking-wider">SPD (kts)</p>
-                            <p class="text-xl md:text-2xl font-bold text-white font-mono" id="hudSpd">0</p>
-                        </div>
-                        <div class="hud-data-box">
-                            <p class="text-[10px] text-orange-400 font-bold mb-1 tracking-wider">EET WP</p>
-                            <p class="text-lg md:text-xl font-bold text-white font-mono mt-1" id="hudEet">00:00</p>
-                        </div>
-                        <div class="hud-data-box">
-                            <p class="text-[10px] text-emerald-400 font-bold mb-1 tracking-wider">ETA DEST</p>
-                            <p class="text-lg md:text-xl font-bold text-white font-mono mt-1" id="hudEta">00:00</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Panel Kontrol Mode -->
-                    <div class="mt-2 flex items-center justify-center gap-4 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur shadow-lg">
-                        <span id="flightModeLabel" class="text-xs font-bold text-magenta-400 uppercase tracking-widest"><i class="fas fa-play-circle mr-1"></i> SIMULATION</span>
-                        <div id="simSpeedControl" class="flex items-center gap-2 border-l border-slate-600 pl-4">
-                            <i class="fas fa-tachometer-alt text-slate-400 text-xs"></i>
-                            <input type="range" id="simSpeedSlider" min="10" max="2000" value="400" class="w-24 accent-blue-500">
-                        </div>
-                        <button onclick="stopFlightMode()" class="bg-red-600/80 hover:bg-red-500 text-white text-xs px-3 py-1 rounded transition ml-2"><i class="fas fa-stop"></i> End</button>
-                    </div>
+                <!-- Floating Status Bar (Top Left) -->
+                <div class="absolute top-2 left-2 sm:top-4 sm:left-4 z-[1000] flex gap-0 shadow-lg rounded-full backdrop-blur-sm transform scale-90 sm:scale-100 origin-top-left">
+                    <span id="gps-status" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-900/80 text-slate-400 border border-slate-700 rounded-l-full text-[10px] sm:text-xs transition-colors font-bold tracking-wider">GPS STANDBY</span>
+                    <span id="gps-coordinates" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-900/80 text-slate-300 border border-slate-700 border-l-0 rounded-r-full text-[10px] sm:text-xs font-mono">LAT: -- | LON: --</span>
                 </div>
 
                 <!-- Map Overlay (For Active Route Indicator - Non Sim) -->
-                <div id="activeRouteOverlay" class="absolute top-4 left-4 z-[1000] hidden">
-                    <div class="bg-black/70 backdrop-blur border border-magenta-500/50 rounded-xl p-3 shadow-lg flex flex-col gap-2 min-w-[250px]">
-                        <div class="flex justify-between items-start gap-4">
+                <div id="activeRouteOverlay" class="absolute top-14 left-2 sm:top-20 sm:left-4 z-[1000] hidden">
+                    <div class="bg-black/80 backdrop-blur border border-magenta-500/50 rounded-xl p-2.5 sm:p-3 shadow-lg flex flex-col gap-2 min-w-[200px] sm:min-w-[250px]">
+                        <div class="flex justify-between items-start gap-3">
                             <div>
-                                <p class="text-[10px] text-magenta-400 uppercase tracking-widest font-bold mb-1"><i class="fas fa-route mr-1"></i> ACTIVE FLIGHT PLAN</p>
-                                <h3 id="activeRouteOverlayName" class="text-sm font-bold text-white uppercase">WIMM-WIII</h3>
+                                <p class="text-[9px] sm:text-[10px] text-magenta-400 uppercase tracking-widest font-bold mb-0.5"><i class="fas fa-route mr-1"></i> ACTIVE FLIGHT PLAN</p>
+                                <h3 id="activeRouteOverlayName" class="text-xs sm:text-sm font-bold text-white uppercase">WIMM-WIII</h3>
                             </div>
-                            <button onclick="clearActiveMapRoute()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-red-500/20 hover:text-red-400 border border-slate-600 transition flex items-center justify-center text-slate-300 shadow">
-                                <i class="fas fa-times"></i>
+                            <button onclick="clearActiveMapRoute()" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-800 hover:bg-red-500/20 hover:text-red-400 border border-slate-600 transition flex items-center justify-center text-slate-300 shadow cursor-pointer z-50">
+                                <i class="fas fa-times text-xs"></i>
                             </button>
                         </div>
-                        <div class="flex items-center justify-between border-t border-slate-700/50 pt-2 mt-1 gap-2">
-                            <button onclick="fitMapToActiveRoute()" class="text-[10px] text-slate-300 font-bold uppercase bg-slate-800 px-2 py-1.5 rounded hover:bg-slate-700 border border-slate-600 transition flex items-center gap-1 flex-1 justify-center shadow">
-                                <i class="fas fa-compress-arrows-alt text-cyan-400"></i> Fit Route
+                        <div class="flex items-center justify-between border-t border-slate-700/50 pt-2 mt-0.5 gap-2">
+                            <button onclick="fitMapToActiveRoute()" class="text-[9px] sm:text-[10px] text-slate-300 font-bold uppercase bg-slate-800 px-2 py-1.5 rounded hover:bg-slate-700 border border-slate-600 transition flex items-center gap-1 flex-1 justify-center shadow">
+                                <i class="fas fa-compress-arrows-alt text-cyan-400"></i> Fit
                             </button>
-                            <label class="flex items-center gap-2 cursor-pointer bg-slate-800 px-2 py-1.5 rounded hover:bg-slate-700 border border-slate-600 transition flex-1 justify-center shadow">
-                                <span class="text-[10px] text-slate-300 font-bold uppercase">All WPs</span>
+                            <label class="flex items-center gap-1 sm:gap-2 cursor-pointer bg-slate-800 px-2 py-1.5 rounded hover:bg-slate-700 border border-slate-600 transition flex-1 justify-center shadow">
+                                <span class="text-[9px] sm:text-[10px] text-slate-300 font-bold uppercase">All WPs</span>
                                 <input type="checkbox" id="toggleAllWps" onchange="toggleAllWaypointsMap()" class="accent-magenta-500 w-3 h-3">
                             </label>
                         </div>
-                        <p class="text-[9px] text-slate-400 italic text-center mt-1">Drag titik putih untuk edit rute.</p>
+                        <p class="text-[8px] sm:text-[9px] text-slate-400 italic text-center">Drag titik putih untuk edit rute.</p>
                     </div>
                 </div>
 
-                <button id="btnAutoDetectMap" onclick="locateUser()" title="Auto Detect Position" class="absolute bottom-6 right-6 z-[1000] w-12 h-12 bg-blue-600/90 hover:bg-blue-500 backdrop-blur border border-blue-400/50 text-white rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 group">
-                    <i class="fas fa-crosshairs text-xl group-hover:rotate-90 transition-transform duration-500"></i>
+                <!-- Flight HUD Overlay (DIPINDAHKAN KE BAWAH & RESPONSIVE) -->
+                <div id="flightHUDOverlay" class="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[1100] hidden w-full px-2 sm:w-max sm:px-0">
+                    <div class="glass-panel p-2 sm:p-3 rounded-2xl grid grid-cols-4 gap-2 sm:gap-6 shadow-2xl border border-blue-400/30 w-full">
+                        <div class="hud-data-box px-1 py-1.5 sm:px-3 sm:py-2">
+                            <p class="text-[8px] sm:text-[10px] text-cyan-400 font-bold mb-0.5 tracking-wider">HDG</p>
+                            <p class="text-xs sm:text-2xl font-bold text-white font-mono" id="hudHdg">000°</p>
+                        </div>
+                        <div class="hud-data-box px-1 py-1.5 sm:px-3 sm:py-2">
+                            <p class="text-[8px] sm:text-[10px] text-cyan-400 font-bold mb-0.5 tracking-wider">SPD(kts)</p>
+                            <p class="text-xs sm:text-2xl font-bold text-white font-mono" id="hudSpd">0</p>
+                        </div>
+                        <div class="hud-data-box px-1 py-1.5 sm:px-3 sm:py-2">
+                            <p class="text-[8px] sm:text-[10px] text-orange-400 font-bold mb-0.5 tracking-wider">EET WP</p>
+                            <p class="text-xs sm:text-xl font-bold text-white font-mono sm:mt-1" id="hudEet">00:00</p>
+                        </div>
+                        <div class="hud-data-box px-1 py-1.5 sm:px-3 sm:py-2">
+                            <p class="text-[8px] sm:text-[10px] text-emerald-400 font-bold mb-0.5 tracking-wider">ETA DEST</p>
+                            <p class="text-xs sm:text-xl font-bold text-white font-mono sm:mt-1" id="hudEta">00:00</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2 flex flex-row sm:flex-row items-center justify-between sm:justify-center gap-2 sm:gap-4 bg-slate-900/90 p-2 rounded-xl border border-slate-700 backdrop-blur shadow-lg w-full">
+                        <span id="flightModeLabel" class="text-[10px] sm:text-xs font-bold text-magenta-400 uppercase tracking-widest hidden sm:inline-block"><i class="fas fa-play-circle mr-1"></i> SIMULATION</span>
+                        <div id="simSpeedControl" class="flex flex-1 sm:flex-initial items-center gap-2 sm:border-l sm:border-slate-600 sm:pl-4">
+                            <i class="fas fa-tachometer-alt text-slate-400 text-[10px] sm:text-xs hidden sm:block"></i>
+                            <div class="flex flex-row sm:flex-col items-center flex-1 gap-2 sm:gap-0">
+                                <input type="range" id="simSpeedSlider" min="10" max="2000" value="400" class="w-full sm:w-32 accent-blue-500" oninput="document.getElementById('simSpeedLabel').textContent = this.value + ' kts'">
+                                <span id="simSpeedLabel" class="text-[10px] text-slate-400 font-mono w-12 text-center">400 kts</span>
+                            </div>
+                        </div>
+                        <button onclick="stopFlightMode()" class="bg-red-600/80 hover:bg-red-500 text-white text-[10px] sm:text-xs px-3 py-1.5 rounded transition font-bold shrink-0"><i class="fas fa-stop mr-1"></i> END</button>
+                    </div>
+                </div>
+
+                <button id="btnAutoDetectMap" onclick="locateUser()" title="Auto Detect Position" class="absolute bottom-20 right-2 sm:bottom-6 sm:right-6 z-[1000] w-10 h-10 sm:w-12 sm:h-12 bg-blue-600/90 hover:bg-blue-500 backdrop-blur border border-blue-400/50 text-white rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)] flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 group">
+                    <i class="fas fa-crosshairs text-base sm:text-xl group-hover:rotate-90 transition-transform duration-500"></i>
                 </button>
             </div>
 
             <!-- ========================================== -->
             <!--         BAGIAN 6: TAB - ROUTE              -->
             <!-- ========================================== -->
-            <div id="tab-route" class="tab-content absolute inset-0 p-6 hidden">
-                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col relative">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold"><i class="fas fa-route mr-2 text-blue-400"></i>Flight Routes Database</h2>
-                        <button onclick="openRouteForm()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
-                            <i class="fas fa-plus mr-2"></i> Add New Route
+            <div id="tab-route" class="tab-content absolute inset-0 p-3 sm:p-6 hidden h-full overflow-hidden">
+                <div class="w-full h-full glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 sm:mb-6 shrink-0">
+                        <h2 class="text-base sm:text-xl font-semibold"><i class="fas fa-route mr-2 text-blue-400"></i>Flight Routes</h2>
+                        <button onclick="openRouteForm()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
+                            <i class="fas fa-plus sm:mr-2"></i> <span class="hidden sm:inline">Add New Route</span>
                         </button>
                     </div>
                     
-                    <div class="flex-1 overflow-auto rounded-xl border border-slate-700/50">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
+                    <div class="flex-1 overflow-auto rounded-xl border border-slate-700/50 bg-slate-900/20 h-full">
+                        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
                             <thead class="bg-slate-800/80 text-slate-300 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-6 py-4">Route Name</th>
-                                    <th class="px-6 py-4">Aircraft</th>
-                                    <th class="px-6 py-4">Origin -> Dest</th>
-                                    <th class="px-6 py-4">Total Dist</th>
-                                    <th class="px-6 py-4">Total EET</th>
-                                    <th class="px-6 py-4 text-right">Action</th>
+                                    <th class="px-4 py-3">Route Name</th>
+                                    <th class="px-4 py-3 hidden md:table-cell">Aircraft</th>
+                                    <th class="px-4 py-3">Origin -> Dest</th>
+                                    <th class="px-4 py-3 hidden sm:table-cell">Total Dist</th>
+                                    <th class="px-4 py-3 hidden sm:table-cell">Total EET</th>
+                                    <th class="px-4 py-3 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="routeTableBody" class="divide-y divide-slate-700/50 bg-slate-900/40">
@@ -444,124 +445,126 @@
             </div>
 
             <!-- BAGIAN 6.1: ROUTE FORM MODAL -->
-            <div id="routeFormModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="glass-panel w-full max-w-5xl h-[90vh] flex flex-col rounded-2xl relative shadow-2xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
-                        <h3 id="routeModalTitle" class="text-xl font-bold"><i class="fas fa-clipboard-list text-blue-400 mr-2"></i>Create Operational Flight Plan</h3>
-                        <button onclick="closeRouteForm()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            <div id="routeFormModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
+                <div class="glass-panel w-full sm:max-w-5xl h-full sm:h-[90vh] flex flex-col rounded-none sm:rounded-2xl relative shadow-2xl overflow-hidden bg-[#0f172a] sm:bg-transparent">
+                    <div class="p-4 sm:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900/80 shrink-0">
+                        <h3 id="routeModalTitle" class="text-base sm:text-xl font-bold"><i class="fas fa-clipboard-list text-blue-400 mr-2"></i>Operational Flight Plan</h3>
+                        <button onclick="closeRouteForm()" class="text-slate-400 hover:text-white p-2 z-50 cursor-pointer"><i class="fas fa-times text-xl"></i></button>
                     </div>
                     
-                    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
                         <input type="hidden" id="rtId">
                         
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 bg-slate-800/40 p-3 sm:p-4 rounded-xl border border-slate-700/50">
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Route Name</label>
-                                <input type="text" id="rtName" required placeholder="e.g. WIMM-WIII" oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-bold text-white">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Route Name</label>
+                                <input type="text" id="rtName" required placeholder="e.g. WIMM-WIII" oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500 font-bold text-white">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Aircraft Profile</label>
-                                <select id="rtAircraft" onchange="handleRouteAircraftChange()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Aircraft Profile</label>
+                                <select id="rtAircraft" onchange="handleRouteAircraftChange()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                                     <option value="">-- Select Aircraft --</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">ETD (Local Time)</label>
-                                <input type="time" id="rtEtd" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500" style="color-scheme: dark;">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">ETD (Local Time)</label>
+                                <input type="time" id="rtEtd" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500" style="color-scheme: dark;">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Cruising Speed (kts)</label>
-                                <input type="number" id="rtSpeed" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Cruising Speed (kts)</label>
+                                <input type="number" id="rtSpeed" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Fuel Consump / Hr</label>
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Fuel Consump / Hr</label>
                                 <div class="flex">
-                                    <input type="number" id="rtFuelCons" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
-                                    <span id="rtFuelUnitLabel1" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 py-2 text-xs flex items-center text-slate-300 uppercase">-</span>
+                                    <input type="number" id="rtFuelCons" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
+                                    <span id="rtFuelUnitLabel1" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 py-2 text-[10px] sm:text-xs flex items-center text-slate-300 uppercase">-</span>
                                 </div>
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Fuel Onboard</label>
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Fuel Onboard</label>
                                 <div class="flex">
-                                    <input type="number" id="rtFuelOnboard" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
-                                    <span id="rtFuelUnitLabel2" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 py-2 text-xs flex items-center text-slate-300 uppercase">-</span>
+                                    <input type="number" id="rtFuelOnboard" required oninput="renderOFPTable()" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
+                                    <span id="rtFuelUnitLabel2" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 py-2 text-[10px] sm:text-xs flex items-center text-slate-300 uppercase">-</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-900/60">
-                            <table class="w-full text-left text-sm whitespace-nowrap">
+                        <!-- OFP Table -->
+                        <div class="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-900/60 overflow-x-auto">
+                            <table class="w-full text-left text-[10px] sm:text-sm whitespace-nowrap min-w-[600px]">
                                 <thead class="bg-slate-800/80 text-slate-300 border-b border-slate-700">
                                     <tr>
-                                        <th class="px-4 py-3 w-10 text-center">#</th>
-                                        <th class="px-4 py-3">Waypoint</th>
-                                        <th class="px-4 py-3">
-                                            <select id="ofpCol1" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer">
-                                                <option value="heading">Heading (Deg)</option>
-                                                <option value="bearing">Bearing (Deg)</option>
-                                                <option value="distance">Distance (NM)</option>
-                                                <option value="eet">EET Leg</option>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3 w-8 sm:w-10 text-center">#</th>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3">Waypoint</th>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3">
+                                            <select id="ofpCol1" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer w-full">
+                                                <option value="heading">Heading</option>
+                                                <option value="bearing">Bearing</option>
+                                                <option value="distance">Dist(NM)</option>
+                                                <option value="eet">EET</option>
                                                 <option value="eta">ETA</option>
-                                                <option value="fuel">Fuel Burn</option>
+                                                <option value="fuel">Fuel</option>
                                             </select>
                                         </th>
-                                        <th class="px-4 py-3">
-                                            <select id="ofpCol2" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer">
-                                                <option value="distance">Distance (NM)</option>
-                                                <option value="heading">Heading (Deg)</option>
-                                                <option value="bearing">Bearing (Deg)</option>
-                                                <option value="eet">EET Leg</option>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3">
+                                            <select id="ofpCol2" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer w-full">
+                                                <option value="distance" selected>Dist(NM)</option>
+                                                <option value="heading">Heading</option>
+                                                <option value="bearing">Bearing</option>
+                                                <option value="eet">EET</option>
                                                 <option value="eta">ETA</option>
-                                                <option value="fuel">Fuel Burn</option>
+                                                <option value="fuel">Fuel</option>
                                             </select>
                                         </th>
-                                        <th class="px-4 py-3">
-                                            <select id="ofpCol3" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer">
-                                                <option value="eet">EET Leg</option>
-                                                <option value="heading">Heading (Deg)</option>
-                                                <option value="bearing">Bearing (Deg)</option>
-                                                <option value="distance">Distance (NM)</option>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3">
+                                            <select id="ofpCol3" onchange="renderOFPTable()" class="bg-transparent border-b border-slate-500 text-blue-400 outline-none font-semibold cursor-pointer w-full">
+                                                <option value="eet" selected>EET</option>
+                                                <option value="heading">Heading</option>
+                                                <option value="bearing">Bearing</option>
+                                                <option value="distance">Dist(NM)</option>
                                                 <option value="eta">ETA</option>
-                                                <option value="fuel">Fuel Burn</option>
+                                                <option value="fuel">Fuel</option>
                                             </select>
                                         </th>
-                                        <th class="px-4 py-3 text-center w-16"><i class="fas fa-cog"></i></th>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3 text-center w-20 sm:w-24"><i class="fas fa-cog"></i> Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ofpTableBody" class="divide-y divide-slate-700/50">
                                 </tbody>
                             </table>
-                            <div class="p-3 bg-slate-800/40 border-t border-slate-700 flex justify-center">
-                                <button type="button" onclick="openRouteWpSelector()" class="bg-slate-700 hover:bg-blue-600 text-white text-xs px-4 py-2 rounded-full transition flex items-center shadow">
-                                    <i class="fas fa-plus mr-2"></i> Add Waypoint to Route
+                            <div class="p-2 sm:p-3 bg-slate-800/40 border-t border-slate-700 flex justify-center">
+                                <button type="button" onclick="openRouteWpSelector()" class="bg-slate-700 hover:bg-blue-600 text-white text-[10px] sm:text-xs px-4 py-2 rounded-full transition flex items-center shadow">
+                                    <i class="fas fa-plus mr-2"></i> Add Waypoint
                                 </button>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
-                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Total Distance</p>
-                                <p class="text-xl font-bold text-white"><span id="sumDist">0</span> <span class="text-sm font-normal text-slate-500">NM</span></p>
+                        <!-- Summary -->
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-3 sm:p-4 text-center">
+                                <p class="text-[9px] sm:text-xs text-slate-400 mb-1 uppercase tracking-wider">Total Dist</p>
+                                <p class="text-base sm:text-xl font-bold text-white"><span id="sumDist">0</span> <span class="text-[10px] sm:text-sm font-normal text-slate-500">NM</span></p>
                             </div>
-                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
-                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Total EET</p>
-                                <p class="text-xl font-bold text-white" id="sumEET">00:00</p>
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-3 sm:p-4 text-center">
+                                <p class="text-[9px] sm:text-xs text-slate-400 mb-1 uppercase tracking-wider">Total EET</p>
+                                <p class="text-base sm:text-xl font-bold text-white" id="sumEET">00:00</p>
                             </div>
-                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center">
-                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Fuel Required</p>
-                                <p class="text-xl font-bold text-orange-400"><span id="sumFuel">0</span></p>
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-3 sm:p-4 text-center">
+                                <p class="text-[9px] sm:text-xs text-slate-400 mb-1 uppercase tracking-wider">Fuel Req</p>
+                                <p class="text-base sm:text-xl font-bold text-orange-400"><span id="sumFuel">0</span></p>
                             </div>
-                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-center relative overflow-hidden">
+                            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-3 sm:p-4 text-center relative overflow-hidden">
                                 <div id="fuelStatusBg" class="absolute inset-0 bg-emerald-500/10 opacity-50"></div>
-                                <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider relative z-10">Fuel Sisa (Rem.)</p>
-                                <p class="text-xl font-bold relative z-10"><span id="sumRemFuel" class="text-emerald-400">0</span></p>
+                                <p class="text-[9px] sm:text-xs text-slate-400 mb-1 uppercase tracking-wider relative z-10">Fuel Rem.</p>
+                                <p class="text-base sm:text-xl font-bold relative z-10"><span id="sumRemFuel" class="text-emerald-400">0</span></p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-6 border-t border-slate-700 bg-slate-900/80 flex justify-end gap-3">
-                        <button type="button" onclick="closeRouteForm()" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-6 py-2.5 rounded-xl text-sm transition">Discard</button>
-                        <button type="button" onclick="saveRoute()" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-8 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Route Plan</button>
+                    <div class="p-4 sm:p-6 border-t border-slate-700 bg-slate-900/90 flex justify-end gap-2 sm:gap-3 shrink-0">
+                        <button type="button" onclick="closeRouteForm()" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition">Discard</button>
+                        <button type="button" onclick="saveRoute()" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-6 sm:px-8 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Plan</button>
                     </div>
                 </div>
             </div>
@@ -569,14 +572,14 @@
             <!-- BAGIAN 6.2: WAYPOINT SELECTOR MODAL (UNTUK ROUTE) -->
             <div id="routeWpSelectModal" class="print:hidden fixed inset-0 z-[10010] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                 <div class="glass-panel w-full max-w-md h-[70vh] flex flex-col rounded-2xl relative shadow-2xl">
-                    <div class="p-4 border-b border-slate-700 flex justify-between items-center">
-                        <h3 class="text-lg font-bold"><i class="fas fa-search text-emerald-400 mr-2"></i>Select Waypoint</h3>
-                        <button onclick="closeRouteWpSelector()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+                    <div class="p-4 border-b border-slate-700 flex justify-between items-center shrink-0">
+                        <h3 class="text-base sm:text-lg font-bold"><i class="fas fa-search text-emerald-400 mr-2"></i>Select Waypoint</h3>
+                        <button onclick="closeRouteWpSelector()" class="text-slate-400 hover:text-white p-2 z-50 cursor-pointer"><i class="fas fa-times"></i></button>
                     </div>
-                    <div class="p-4 border-b border-slate-700">
+                    <div class="p-4 border-b border-slate-700 shrink-0">
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                            <input type="text" id="searchRouteWp" onkeyup="renderRouteWpSelectorList()" placeholder="Search ID or Name..." class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white outline-none focus:border-emerald-500">
+                            <input type="text" id="searchRouteWp" onkeyup="renderRouteWpSelectorList()" placeholder="Search ID or Name..." class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-10 pr-4 py-2 sm:py-2.5 text-sm text-white outline-none focus:border-emerald-500">
                         </div>
                     </div>
                     <div class="flex-1 overflow-y-auto p-2" id="routeWpSelectList"></div>
@@ -584,58 +587,60 @@
             </div>
 
             <!-- BAGIAN 6.3: ROUTE DETAIL MODAL -->
-            <div id="routeDetailModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="glass-panel w-full max-w-lg p-0 rounded-2xl relative shadow-2xl overflow-hidden flex flex-col">
-                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-900/80 to-slate-900 z-0"></div>
-                    <i class="fas fa-route text-8xl text-blue-400/10 absolute -right-4 -top-4 z-0 transform -rotate-12"></i>
+            <!-- PERBAIKAN: z-index, position button close, max-w-lg untuk responsif layar kecil -->
+            <div id="routeDetailModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+                <div class="glass-panel w-[95%] sm:w-full max-w-lg p-0 rounded-2xl relative shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+                    <div class="absolute top-0 left-0 w-full h-24 sm:h-32 bg-gradient-to-br from-blue-900/80 to-slate-900 z-0"></div>
+                    <i class="fas fa-route text-6xl sm:text-8xl text-blue-400/10 absolute -right-2 sm:-right-4 -top-2 sm:-top-4 z-0 transform -rotate-12"></i>
                     
-                    <button onclick="closeRouteDetailModal()" class="absolute top-4 right-4 text-slate-300 hover:text-white z-10 bg-black/20 rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md"><i class="fas fa-times"></i></button>
+                    <!-- PERBAIKAN TOMBOL CLOSE: Lebih jelas & dipastikan terklik -->
+                    <button onclick="closeRouteDetailModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-300 hover:text-white z-[100] bg-black/40 hover:bg-black/60 rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md cursor-pointer transition"><i class="fas fa-times"></i></button>
                     
-                    <div class="relative z-10 p-6 pt-10 flex flex-col">
-                        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-[10px] font-bold tracking-widest mb-3 w-max">ACTIVE PLAN</span>
-                        <h2 id="detRtName" class="text-3xl font-bold text-white tracking-widest mb-1">WIMM-WIII</h2>
-                        <p class="text-cyan-400 font-medium text-sm flex items-center"><i class="fas fa-plane mr-2 text-xs"></i> <span id="detRtAircraft">PK-TWA (Gulfstream IV SP)</span></p>
+                    <div class="relative z-10 p-5 sm:p-6 pt-6 sm:pt-10 flex flex-col shrink-0">
+                        <span class="px-2 sm:px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-[8px] sm:text-[10px] font-bold tracking-widest mb-2 w-max">ACTIVE PLAN</span>
+                        <h2 id="detRtName" class="text-xl sm:text-3xl font-bold text-white tracking-widest mb-1 pr-8">WIMM-WIII</h2>
+                        <p class="text-cyan-400 font-medium text-xs sm:text-sm flex items-center truncate"><i class="fas fa-plane mr-2 text-[10px] sm:text-xs"></i> <span id="detRtAircraft">PK-TWA (Gulfstream IV SP)</span></p>
                     </div>
 
-                    <div class="relative z-10 p-6 pt-0 space-y-4">
-                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 flex flex-col gap-3">
-                            <div class="flex justify-between items-center pb-3 border-b border-slate-700/50">
-                                <span class="text-xs text-slate-400 uppercase">Routing</span>
-                                <span id="detRtOriginDest" class="font-bold text-white text-sm">WIMM <i class="fas fa-arrow-right text-blue-400 mx-2 text-xs"></i> WIII</span>
+                    <div class="relative z-10 p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4 overflow-y-auto flex-1">
+                        <div class="bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-slate-700/50 flex flex-col gap-3">
+                            <div class="flex justify-between items-center pb-2 sm:pb-3 border-b border-slate-700/50">
+                                <span class="text-[10px] sm:text-xs text-slate-400 uppercase">Routing</span>
+                                <span id="detRtOriginDest" class="font-bold text-white text-xs sm:text-sm truncate max-w-[60%]">WIMM <i class="fas fa-arrow-right text-blue-400 mx-1 sm:mx-2 text-[8px] sm:text-xs"></i> WIII</span>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                            <div class="grid grid-cols-3 gap-1 sm:gap-2 text-center pt-1">
                                 <div>
-                                    <p class="text-[10px] text-slate-500 uppercase">Total Dist</p>
-                                    <p class="text-sm font-semibold text-white"><span id="detRtDist">0</span> <span class="text-[10px] text-slate-400">NM</span></p>
+                                    <p class="text-[8px] sm:text-[10px] text-slate-500 uppercase">Total Dist</p>
+                                    <p class="text-xs sm:text-sm font-semibold text-white"><span id="detRtDist">0</span> <span class="text-[8px] sm:text-[10px] text-slate-400">NM</span></p>
                                 </div>
                                 <div class="border-l border-r border-slate-700/50">
-                                    <p class="text-[10px] text-slate-500 uppercase">Total EET</p>
-                                    <p id="detRtEET" class="text-sm font-semibold text-orange-300">00:00</p>
+                                    <p class="text-[8px] sm:text-[10px] text-slate-500 uppercase">Total EET</p>
+                                    <p id="detRtEET" class="text-xs sm:text-sm font-semibold text-orange-300">00:00</p>
                                 </div>
                                 <div>
-                                    <p class="text-[10px] text-slate-500 uppercase">Fuel Req</p>
-                                    <p class="text-sm font-semibold text-emerald-400"><span id="detRtFuel">0</span></p>
+                                    <p class="text-[8px] sm:text-[10px] text-slate-500 uppercase">Fuel Req</p>
+                                    <p class="text-xs sm:text-sm font-semibold text-emerald-400"><span id="detRtFuel">0</span></p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="grid grid-cols-2 gap-3 mt-2">
-                            <button id="btnDetSimulate" class="bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-sm transition font-bold flex justify-center items-center shadow-lg shadow-indigo-500/20"><i class="fas fa-play-circle mr-2 text-lg"></i> Simulasi Route</button>
-                            <button id="btnDetNavigate" class="bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl text-sm transition font-bold flex justify-center items-center shadow-lg shadow-emerald-500/20"><i class="fas fa-location-arrow mr-2 text-lg"></i> Jalankan Route</button>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3 mt-1 sm:mt-2 pb-2">
+                            <button id="btnDetSimulate" class="bg-indigo-600 hover:bg-indigo-500 text-white py-2 sm:py-3 rounded-xl text-xs sm:text-sm transition font-bold flex justify-center items-center shadow-lg shadow-indigo-500/20"><i class="fas fa-play-circle mr-1.5 sm:mr-2 text-sm sm:text-lg"></i> Simulate</button>
+                            <button id="btnDetNavigate" class="bg-emerald-600 hover:bg-emerald-500 text-white py-2 sm:py-3 rounded-xl text-xs sm:text-sm transition font-bold flex justify-center items-center shadow-lg shadow-emerald-500/20"><i class="fas fa-location-arrow mr-1.5 sm:mr-2 text-sm sm:text-lg"></i> Navigate</button>
                             
-                            <button id="btnDetViewMap" class="col-span-2 bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-xl text-sm transition font-medium flex items-center justify-center mt-2 border border-slate-600">
+                            <button id="btnDetViewMap" class="col-span-2 bg-slate-700 hover:bg-slate-600 text-white py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition font-medium flex items-center justify-center mt-1 sm:mt-2 border border-slate-600">
                                 <i class="fas fa-map-marked-alt mr-2"></i> View Route on Map
                             </button>
 
-                            <button id="btnDetPrint" class="col-span-2 bg-slate-200 hover:bg-slate-300 text-slate-900 py-2.5 rounded-xl text-sm transition font-bold flex items-center justify-center mt-2 border border-slate-300">
+                            <button id="btnDetPrint" class="col-span-2 bg-slate-200 hover:bg-slate-300 text-slate-900 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition font-bold flex items-center justify-center border border-slate-300 mb-1 sm:mb-2">
                                 <i class="fas fa-file-pdf mr-2 text-red-600"></i> Print OFP (PDF / A4)
                             </button>
 
-                            <button id="btnDetEdit" class="bg-slate-800 hover:bg-blue-600/50 border border-slate-700 text-slate-300 hover:text-white py-2 rounded-xl text-xs transition font-medium flex justify-center items-center"><i class="fas fa-edit mr-2"></i> Edit</button>
-                            <button id="btnDetDuplicate" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white py-2 rounded-xl text-xs transition font-medium flex justify-center items-center"><i class="fas fa-copy mr-2"></i> Duplicate</button>
-                            <button id="btnDetInvert" class="bg-slate-800 hover:bg-orange-600/50 border border-slate-700 text-slate-300 hover:text-white py-2 rounded-xl text-xs transition font-medium flex justify-center items-center"><i class="fas fa-exchange-alt mr-2"></i> Invert Route</button>
-                            <button id="btnDetDelete" class="bg-slate-800 hover:bg-red-600/50 border border-slate-700 text-red-400 hover:text-white py-2 rounded-xl text-xs transition font-medium flex justify-center items-center"><i class="fas fa-trash mr-2"></i> Delete</button>
+                            <button id="btnDetEdit" class="bg-slate-800 hover:bg-blue-600/50 border border-slate-700 text-slate-300 hover:text-white py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs transition font-medium flex justify-center items-center"><i class="fas fa-edit mr-1 sm:mr-2"></i> Edit</button>
+                            <button id="btnDetDuplicate" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs transition font-medium flex justify-center items-center"><i class="fas fa-copy mr-1 sm:mr-2"></i> Dup</button>
+                            <button id="btnDetInvert" class="bg-slate-800 hover:bg-orange-600/50 border border-slate-700 text-slate-300 hover:text-white py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs transition font-medium flex justify-center items-center"><i class="fas fa-exchange-alt mr-1 sm:mr-2"></i> Invert</button>
+                            <button id="btnDetDelete" class="bg-slate-800 hover:bg-red-600/50 border border-slate-700 text-red-400 hover:text-white py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs transition font-medium flex justify-center items-center"><i class="fas fa-trash mr-1 sm:mr-2"></i> Del</button>
                         </div>
                     </div>
                 </div>
@@ -644,33 +649,39 @@
             <!-- ========================================== -->
             <!--         BAGIAN 7: TAB - WAYPOINT DB        -->
             <!-- ========================================== -->
-            <div id="tab-waypoint" class="tab-content absolute inset-0 p-6 hidden">
-                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col relative">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold"><i class="fas fa-database mr-2 text-blue-400"></i>Global Waypoint Database</h2>
-                        <div class="flex items-center gap-4">
-                            <div class="relative hidden sm:block">
+            <div id="tab-waypoint" class="tab-content absolute inset-0 p-3 sm:p-6 hidden h-full overflow-hidden">
+                <div class="w-full h-full glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 sm:mb-6 shrink-0">
+                        <h2 class="text-base sm:text-xl font-semibold"><i class="fas fa-database mr-2 text-blue-400"></i><span class="hidden sm:inline">Global </span>Waypoint DB</h2>
+                        <div class="flex items-center gap-2 sm:gap-4">
+                            <div class="relative hidden lg:block">
                                 <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
-                                <input type="text" id="searchInputWaypoint" onkeyup="renderWaypoints()" placeholder="Search Name..." class="bg-slate-800/80 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-blue-500 w-64">
+                                <input type="text" id="searchInputWaypoint" onkeyup="renderWaypoints()" placeholder="Search Name..." class="bg-slate-800/80 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-white outline-none focus:border-blue-500 w-48 xl:w-64">
                             </div>
-                            <button onclick="openParseModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-500/20 flex items-center">
-                                <i class="fas fa-file-import mr-2"></i> Parse Waypoint
+                            <button onclick="openParseModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-500/20 flex items-center">
+                                <i class="fas fa-file-import sm:mr-2"></i> <span class="hidden sm:inline">Parse Waypoint</span>
                             </button>
-                            <button onclick="openWaypointModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
-                                <i class="fas fa-plus mr-2"></i> Add New Waypoint
+                            <button onclick="openWaypointModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
+                                <i class="fas fa-plus sm:mr-2"></i> <span class="hidden sm:inline">Add New</span>
                             </button>
                         </div>
                     </div>
                     
-                    <div class="flex-1 overflow-auto rounded-xl border border-slate-700/50">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
+                    <!-- Search input visible only on small screens -->
+                    <div class="relative block lg:hidden mb-3 shrink-0">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInputWaypointMobile" onkeyup="document.getElementById('searchInputWaypoint').value = this.value; renderWaypoints();" placeholder="Search Waypoint Name..." class="w-full bg-slate-800/80 border border-slate-700 rounded-lg pl-8 pr-4 py-2 text-xs text-white outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <div class="flex-1 overflow-auto rounded-xl border border-slate-700/50 h-full">
+                        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap min-w-[400px]">
                             <thead class="bg-slate-800/80 text-slate-300 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-6 py-4 w-24">Type</th>
-                                    <th class="px-6 py-4">Waypoint Name</th>
-                                    <th class="px-6 py-4">Coordinates (DMS)</th>
-                                    <th class="px-6 py-4">Elevation (ft)</th>
-                                    <th class="px-6 py-4 text-right">Action</th>
+                                    <th class="px-3 sm:px-6 py-3 sm:py-4 w-16 sm:w-24">Type</th>
+                                    <th class="px-3 sm:px-6 py-3 sm:py-4">Name</th>
+                                    <th class="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">Coordinates (DMS)</th>
+                                    <th class="px-3 sm:px-6 py-3 sm:py-4">Elev.</th>
+                                    <th class="px-3 sm:px-6 py-3 sm:py-4 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="waypointTableBody" class="divide-y divide-slate-700/50 bg-slate-900/40">
@@ -681,22 +692,22 @@
             </div>
 
             <!-- BAGIAN 7.1: WAYPOINT MODAL -->
-            <div id="waypointModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="glass-panel w-full max-w-lg p-6 rounded-2xl relative shadow-2xl">
-                    <button onclick="closeWaypointModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-                    <h3 id="wpModalTitle" class="text-xl font-bold mb-5 border-b border-slate-700 pb-3"><i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>Add New Waypoint</h3>
+            <div id="waypointModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+                <div class="glass-panel w-full max-w-lg p-5 sm:p-6 rounded-2xl relative shadow-2xl max-h-[95vh] overflow-y-auto">
+                    <button onclick="closeWaypointModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white z-50 cursor-pointer p-1"><i class="fas fa-times text-lg"></i></button>
+                    <h3 id="wpModalTitle" class="text-base sm:text-xl font-bold mb-4 sm:mb-5 border-b border-slate-700 pb-2 sm:pb-3"><i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>Add New Waypoint</h3>
                     
-                    <form id="waypointForm" onsubmit="saveWaypoint(event)" class="space-y-4">
+                    <form id="waypointForm" onsubmit="saveWaypoint(event)" class="space-y-3 sm:space-y-4">
                         <input type="hidden" id="wpId">
                         
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Waypoint Name</label>
-                                <input type="text" id="wpName" required placeholder="e.g. WIMM" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 uppercase">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Waypoint Name</label>
+                                <input type="text" id="wpName" required placeholder="e.g. WIMM" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500 uppercase">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Waypoint Type</label>
-                                <select id="wpType" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Waypoint Type</label>
+                                <select id="wpType" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                                     <option value="vfr">VFR</option>
                                     <option value="airport">Airport</option>
                                     <option value="heliport">Heliport</option>
@@ -705,82 +716,82 @@
                         </div>
 
                         <!-- Coordinate Format Toggle -->
-                        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 mt-4">
-                            <label class="text-xs text-slate-400 mb-2 block font-semibold">Coordinate Format</label>
-                            <div class="flex gap-4 mb-3 text-sm">
-                                <label class="flex items-center gap-2 cursor-pointer">
+                        <div class="bg-slate-900/50 p-2 sm:p-3 rounded-lg border border-slate-700/50 mt-2 sm:mt-4">
+                            <label class="text-[10px] sm:text-xs text-slate-400 mb-2 block font-semibold">Coordinate Format</label>
+                            <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3 text-[10px] sm:text-sm">
+                                <label class="flex items-center gap-2 cursor-pointer w-max">
                                     <input type="radio" name="coordFormat" value="decimal" checked onchange="toggleCoordFormat()" class="accent-blue-500"> Decimal
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
+                                <label class="flex items-center gap-2 cursor-pointer w-max">
                                     <input type="radio" name="coordFormat" value="dms" onchange="toggleCoordFormat()" class="accent-blue-500"> Derajat Menit Detik (DMS)
                                 </label>
                             </div>
 
                             <!-- Decimal Inputs -->
-                            <div id="coordDecimalGroup" class="grid grid-cols-2 gap-4">
+                            <div id="coordDecimalGroup" class="grid grid-cols-2 gap-3 sm:gap-4">
                                 <div>
-                                    <label class="text-[10px] text-slate-500 uppercase">Latitude</label>
-                                    <input type="number" step="any" id="wpLatDec" placeholder="e.g. 3.5952" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <label class="text-[9px] sm:text-[10px] text-slate-500 uppercase">Latitude</label>
+                                    <input type="number" step="any" id="wpLatDec" placeholder="e.g. 3.5952" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] text-slate-500 uppercase">Longitude</label>
-                                    <input type="number" step="any" id="wpLonDec" placeholder="e.g. 98.6722" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                    <label class="text-[9px] sm:text-[10px] text-slate-500 uppercase">Longitude</label>
+                                    <input type="number" step="any" id="wpLonDec" placeholder="e.g. 98.6722" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                                 </div>
                             </div>
 
                             <!-- DMS Inputs -->
-                            <div id="coordDMSGroup" class="hidden space-y-3">
-                                <div class="flex items-end gap-2">
-                                    <div class="w-16"><label class="text-[10px] text-slate-500">LAT Deg</label><input type="number" id="latDeg" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none text-center" placeholder="°"></div>
-                                    <div class="w-16"><label class="text-[10px] text-slate-500">Min</label><input type="number" id="latMin" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none text-center" placeholder="'"></div>
-                                    <div class="w-20"><label class="text-[10px] text-slate-500">Sec</label><input type="number" step="any" id="latSec" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none text-center" placeholder="&quot;"></div>
-                                    <div class="flex-1"><label class="text-[10px] text-slate-500">Dir</label><select id="latDir" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none"><option value="N">N (North)</option><option value="S">S (South)</option></select></div>
+                            <div id="coordDMSGroup" class="hidden space-y-2 sm:space-y-3">
+                                <div class="flex items-end gap-1 sm:gap-2">
+                                    <div class="w-12 sm:w-16"><label class="text-[8px] sm:text-[10px] text-slate-500">LAT Deg</label><input type="number" id="latDeg" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none text-center" placeholder="°"></div>
+                                    <div class="w-12 sm:w-16"><label class="text-[8px] sm:text-[10px] text-slate-500">Min</label><input type="number" id="latMin" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none text-center" placeholder="'"></div>
+                                    <div class="w-16 sm:w-20"><label class="text-[8px] sm:text-[10px] text-slate-500">Sec</label><input type="number" step="any" id="latSec" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none text-center" placeholder="&quot;"></div>
+                                    <div class="flex-1"><label class="text-[8px] sm:text-[10px] text-slate-500">Dir</label><select id="latDir" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none"><option value="N">N(North)</option><option value="S">S(South)</option></select></div>
                                 </div>
-                                <div class="flex items-end gap-2">
-                                    <div class="w-16"><label class="text-[10px] text-slate-500">LON Deg</label><input type="number" id="lonDeg" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none text-center" placeholder="°"></div>
-                                    <div class="w-16"><label class="text-[10px] text-slate-500">Min</label><input type="number" id="lonMin" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none text-center" placeholder="'"></div>
-                                    <div class="w-20"><label class="text-[10px] text-slate-500">Sec</label><input type="number" step="any" id="lonSec" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none text-center" placeholder="&quot;"></div>
-                                    <div class="flex-1"><label class="text-[10px] text-slate-500">Dir</label><select id="lonDir" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sm outline-none"><option value="E">E (East)</option><option value="W">W (West)</option></select></div>
+                                <div class="flex items-end gap-1 sm:gap-2">
+                                    <div class="w-12 sm:w-16"><label class="text-[8px] sm:text-[10px] text-slate-500">LON Deg</label><input type="number" id="lonDeg" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none text-center" placeholder="°"></div>
+                                    <div class="w-12 sm:w-16"><label class="text-[8px] sm:text-[10px] text-slate-500">Min</label><input type="number" id="lonMin" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none text-center" placeholder="'"></div>
+                                    <div class="w-16 sm:w-20"><label class="text-[8px] sm:text-[10px] text-slate-500">Sec</label><input type="number" step="any" id="lonSec" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none text-center" placeholder="&quot;"></div>
+                                    <div class="flex-1"><label class="text-[8px] sm:text-[10px] text-slate-500">Dir</label><select id="lonDir" class="w-full bg-slate-800 border border-slate-700 rounded px-1 sm:px-2 py-1.5 text-xs sm:text-sm outline-none"><option value="E">E(East)</option><option value="W">W(West)</option></select></div>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label class="text-xs text-slate-400 mb-1 block">Elevation (Feet)</label>
+                            <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Elevation (Feet)</label>
                             <div class="flex gap-2">
-                                <input type="number" step="any" id="wpElev" required class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="e.g. 23">
-                                <button type="button" onclick="syncElevation()" id="btnSyncElev" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-medium transition flex items-center">
-                                    <i class="fas fa-cloud-download-alt mr-2"></i>Sync Elevasi
+                                <input type="number" step="any" id="wpElev" required class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500" placeholder="e.g. 23">
+                                <button type="button" onclick="syncElevation()" id="btnSyncElev" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-xs font-medium transition flex items-center shrink-0">
+                                    <i class="fas fa-cloud-download-alt mr-1 sm:mr-2"></i><span class="hidden sm:inline">Sync </span>Elevasi
                                 </button>
                             </div>
-                            <p id="elevStatus" class="text-[10px] text-emerald-400 mt-1 hidden"></p>
+                            <p id="elevStatus" class="text-[9px] sm:text-[10px] text-emerald-400 mt-1 hidden"></p>
                         </div>
 
-                        <div class="flex gap-3 pt-4 border-t border-slate-700 mt-6">
-                            <button type="button" onclick="closeWaypointModal()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-2.5 rounded-xl text-sm transition">Cancel</button>
-                            <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Data</button>
+                        <div class="flex gap-3 pt-2 sm:pt-4 border-t border-slate-700 mt-4 sm:mt-6">
+                            <button type="button" onclick="closeWaypointModal()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition">Cancel</button>
+                            <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Data</button>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- BAGIAN 7.2: PARSE WAYPOINT MODAL -->
-            <div id="parseWaypointModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="glass-panel w-full max-w-2xl p-6 rounded-2xl relative shadow-2xl">
-                    <button onclick="closeParseModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-                    <h3 class="text-xl font-bold mb-3 border-b border-slate-700 pb-3"><i class="fas fa-file-import text-emerald-400 mr-2"></i>Parse Bulk Waypoints</h3>
+            <div id="parseWaypointModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+                <div class="glass-panel w-full max-w-2xl p-5 sm:p-6 rounded-2xl relative shadow-2xl max-h-[95vh] flex flex-col">
+                    <button onclick="closeParseModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white z-50 cursor-pointer p-1"><i class="fas fa-times text-lg"></i></button>
+                    <h3 class="text-base sm:text-xl font-bold mb-2 sm:mb-3 border-b border-slate-700 pb-2 sm:pb-3 shrink-0"><i class="fas fa-file-import text-emerald-400 mr-2"></i>Parse Bulk Waypoints</h3>
                     
-                    <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+                    <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 leading-relaxed shrink-0">
                         Masukkan lebih dari 100 waypoint sekaligus dengan format: <br>
-                        <code class="bg-slate-800 px-2 py-1 rounded text-blue-300">NAMA DIR_LAT DEG MIN'SEC" DIR_LON DEG MIN'SEC" TYPE</code> <br>
+                        <code class="bg-slate-800 px-1 sm:px-2 py-0.5 sm:py-1 rounded text-blue-300 break-all sm:break-normal">NAMA DIR_LAT DEG MIN'SEC" DIR_LON DEG MIN'SEC" TYPE</code> <br>
                         Contoh: <code class="text-emerald-300">RANDU S07 06'10" E109 19'31" VFR</code>
                     </p>
                     
-                    <textarea id="bulkWaypointData" rows="8" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-sm text-white font-mono outline-none focus:border-blue-500 whitespace-pre" placeholder="RANDU S07 06'10&quot; E109 19'31&quot; VFR&#10;KNO N03 38'14&quot; E098 52'43&quot; AIRPORT"></textarea>
+                    <textarea id="bulkWaypointData" class="w-full flex-1 min-h-[150px] bg-slate-800/80 border border-slate-700 rounded-xl p-3 sm:p-4 text-[10px] sm:text-sm text-white font-mono outline-none focus:border-blue-500 whitespace-pre" placeholder="RANDU S07 06'10&quot; E109 19'31&quot; VFR&#10;KNO N03 38'14&quot; E098 52'43&quot; AIRPORT"></textarea>
                     
-                    <div class="flex gap-3 pt-4 mt-2">
-                        <button onclick="closeParseModal()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-3 rounded-xl text-sm transition font-medium">Batal</button>
-                        <button id="btnProcessBulk" onclick="processBulkWaypoints()" class="flex-[2] bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 py-3 rounded-xl text-sm font-bold transition shadow-lg shadow-emerald-500/20 text-white flex items-center justify-center">
+                    <div class="flex gap-2 sm:gap-3 pt-3 sm:pt-4 mt-1 sm:mt-2 shrink-0">
+                        <button onclick="closeParseModal()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-2 sm:py-3 rounded-xl text-xs sm:text-sm transition font-medium">Batal</button>
+                        <button id="btnProcessBulk" onclick="processBulkWaypoints()" class="flex-[2] bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 py-2 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition shadow-lg shadow-emerald-500/20 text-white flex items-center justify-center">
                             Import & Auto Sync Elevasi
                         </button>
                     </div>
@@ -790,39 +801,39 @@
             <!-- ========================================== -->
             <!--         BAGIAN 8: TAB - AIRCRAFT PROFILE   -->
             <!-- ========================================== -->
-            <div id="tab-aircraft" class="tab-content absolute inset-0 p-6 hidden">
-                <div class="w-full h-full glass-panel rounded-3xl p-6 flex flex-col relative">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold"><i class="fas fa-plane mr-2 text-blue-400"></i>Aircraft Profiles</h2>
-                        <button onclick="openAircraftForm()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
-                            <i class="fas fa-plus mr-2"></i> Add New Profile
+            <div id="tab-aircraft" class="tab-content absolute inset-0 p-3 sm:p-6 hidden h-full overflow-hidden">
+                <div class="w-full h-full glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 sm:mb-6 shrink-0">
+                        <h2 class="text-base sm:text-xl font-semibold"><i class="fas fa-plane mr-2 text-blue-400"></i>Aircraft Profiles</h2>
+                        <button onclick="openAircraftForm()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg transition shadow-lg shadow-blue-500/20 flex items-center">
+                            <i class="fas fa-plus sm:mr-2"></i> <span class="hidden sm:inline">Add New Profile</span>
                         </button>
                     </div>
                     
-                    <div class="flex-1 overflow-auto rounded-xl">
-                        <div id="aircraftGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+                    <div class="flex-1 overflow-y-auto rounded-xl">
+                        <div id="aircraftGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 pb-6">
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- BAGIAN 8.1: AIRCRAFT FORM MODAL -->
-            <div id="aircraftFormModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="glass-panel w-full max-w-lg p-6 rounded-2xl relative shadow-2xl">
-                    <button onclick="closeAircraftForm()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-                    <h3 id="acModalTitle" class="text-xl font-bold mb-5 border-b border-slate-700 pb-3"><i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile</h3>
+            <div id="aircraftFormModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+                <div class="glass-panel w-full max-w-lg p-5 sm:p-6 rounded-2xl relative shadow-2xl max-h-[95vh] overflow-y-auto">
+                    <button onclick="closeAircraftForm()" class="absolute top-4 right-4 text-slate-400 hover:text-white z-50 cursor-pointer p-1"><i class="fas fa-times text-lg"></i></button>
+                    <h3 id="acModalTitle" class="text-base sm:text-xl font-bold mb-4 sm:mb-5 border-b border-slate-700 pb-2 sm:pb-3"><i class="fas fa-plane text-blue-400 mr-2"></i>Add Aircraft Profile</h3>
                     
-                    <form id="aircraftForm" onsubmit="saveAircraft(event)" class="space-y-4">
+                    <form id="aircraftForm" onsubmit="saveAircraft(event)" class="space-y-3 sm:space-y-4">
                         <input type="hidden" id="acId">
                         
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Registration Number</label>
-                                <input type="text" id="acReg" required placeholder="contoh PK-TWA" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 uppercase">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Reg Number</label>
+                                <input type="text" id="acReg" required placeholder="contoh PK-TWA" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500 uppercase">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Model</label>
-                                <select id="acModel" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Model</label>
+                                <select id="acModel" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                                     <option value="Fixed Wing">Fixed Wing</option>
                                     <option value="Helicopter">Helicopter</option>
                                 </select>
@@ -830,8 +841,8 @@
                         </div>
 
                         <div>
-                            <label class="text-xs text-slate-400 mb-1 block">Aircraft Type</label>
-                            <input type="text" id="acType" list="acTypesList" required placeholder="Pilih dari list atau ketik manual..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
+                            <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Aircraft Type</label>
+                            <input type="text" id="acType" list="acTypesList" required placeholder="Pilih / ketik manual..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
                             <datalist id="acTypesList">
                                 <option value="Gulfstream IV SP">
                                 <option value="Beechcraft King Air 350i">
@@ -841,67 +852,67 @@
                             </datalist>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Cruising Speed</label>
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Cruising Speed</label>
                                 <div class="relative">
-                                    <input type="number" id="acSpeed" required placeholder="e.g. 450" class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-3 pr-12 py-2 text-sm outline-none focus:border-blue-500">
-                                    <span class="absolute right-3 top-2 text-xs text-slate-500">knots</span>
+                                    <input type="number" id="acSpeed" required placeholder="e.g. 450" class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-3 pr-10 sm:pr-12 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
+                                    <span class="absolute right-2 sm:right-3 top-2 text-[10px] sm:text-xs text-slate-500">knots</span>
                                 </div>
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400 mb-1 block">Fuel Consumption</label>
+                                <label class="text-[10px] sm:text-xs text-slate-400 mb-1 block">Fuel Cons.</label>
                                 <div class="flex">
-                                    <input type="number" id="acFuel" required placeholder="e.g. 2000" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-3 py-2 text-sm outline-none focus:border-blue-500">
-                                    <select id="acFuelUnit" class="bg-slate-700 border border-slate-700 rounded-r-lg px-2 text-xs outline-none text-white focus:border-blue-500">
-                                        <option value="lbs">lbs/hr</option>
-                                        <option value="kg">kg/hr</option>
-                                        <option value="liter">liter/hr</option>
+                                    <input type="number" id="acFuel" required placeholder="e.g. 2000" class="w-full bg-slate-800 border border-slate-700 rounded-l-lg px-2 sm:px-3 py-2 text-xs sm:text-sm outline-none focus:border-blue-500">
+                                    <select id="acFuelUnit" class="bg-slate-700 border border-slate-700 rounded-r-lg px-1 sm:px-2 text-[10px] sm:text-xs outline-none text-white focus:border-blue-500">
+                                        <option value="lbs">lbs/h</option>
+                                        <option value="kg">kg/h</option>
+                                        <option value="liter">L/h</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex gap-3 pt-4 border-t border-slate-700 mt-6">
-                            <button type="button" onclick="closeAircraftForm()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-2.5 rounded-xl text-sm transition">Cancel</button>
-                            <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Profile</button>
+                        <div class="flex gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-slate-700 mt-4 sm:mt-6">
+                            <button type="button" onclick="closeAircraftForm()" class="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition">Cancel</button>
+                            <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition shadow-lg shadow-blue-500/20 text-white">Save Profile</button>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- BAGIAN 8.2: AIRCRAFT DETAILS MODAL -->
-            <div id="aircraftDetailModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="glass-panel w-full max-w-md p-6 rounded-3xl relative shadow-2xl overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-900/60 to-slate-900 z-0"></div>
-                    <i id="detailIconBg" class="fas fa-plane text-8xl text-blue-400/10 absolute -right-6 -top-2 z-0 transform -rotate-45"></i>
+            <div id="aircraftDetailModal" class="print:hidden fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+                <div class="glass-panel w-full max-w-md p-5 sm:p-6 rounded-2xl sm:rounded-3xl relative shadow-2xl overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-24 sm:h-32 bg-gradient-to-br from-blue-900/60 to-slate-900 z-0"></div>
+                    <i id="detailIconBg" class="fas fa-plane text-6xl sm:text-8xl text-blue-400/10 absolute -right-4 sm:-right-6 -top-2 z-0 transform -rotate-45"></i>
                     
-                    <button onclick="closeAircraftDetail()" class="absolute top-4 right-4 text-slate-300 hover:text-white z-10 bg-black/20 rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md"><i class="fas fa-times"></i></button>
+                    <button onclick="closeAircraftDetail()" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-300 hover:text-white z-50 bg-black/40 hover:bg-black/60 rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md cursor-pointer transition"><i class="fas fa-times"></i></button>
                     
-                    <div class="relative z-10 pt-4 flex flex-col items-center text-center">
-                        <div id="detailIcon" class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl shadow-[0_0_20px_rgba(59,130,246,0.6)] mb-3 border-2 border-slate-800">
+                    <div class="relative z-10 pt-2 sm:pt-4 flex flex-col items-center text-center">
+                        <div id="detailIcon" class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg sm:text-2xl shadow-[0_0_20px_rgba(59,130,246,0.6)] mb-2 sm:mb-3 border-2 border-slate-800">
                             <i class="fas fa-plane"></i>
                         </div>
-                        <h2 id="detailReg" class="text-3xl font-bold text-white tracking-widest">PK-TWA</h2>
-                        <p id="detailType" class="text-cyan-400 font-medium mt-1">Gulfstream IV SP</p>
-                        <span id="detailModel" class="mt-3 px-4 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-xs font-semibold">FIXED WING</span>
+                        <h2 id="detailReg" class="text-2xl sm:text-3xl font-bold text-white tracking-widest">PK-TWA</h2>
+                        <p id="detailType" class="text-cyan-400 font-medium mt-0.5 sm:mt-1 text-xs sm:text-base">Gulfstream IV SP</p>
+                        <span id="detailModel" class="mt-2 sm:mt-3 px-3 py-1 sm:px-4 sm:py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-[10px] sm:text-xs font-semibold">FIXED WING</span>
                     </div>
 
-                    <div class="relative z-10 mt-8 space-y-3">
-                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 flex justify-between items-center">
-                            <div class="flex items-center text-slate-400"><i class="fas fa-tachometer-alt w-6 text-center mr-2"></i> Cruising Speed</div>
-                            <div class="font-bold text-white"><span id="detailSpeed">450</span> <span class="text-xs text-slate-500 font-normal">knots</span></div>
+                    <div class="relative z-10 mt-6 sm:mt-8 space-y-2 sm:space-y-3">
+                        <div class="bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-slate-700/50 flex justify-between items-center">
+                            <div class="flex items-center text-slate-400 text-xs sm:text-sm"><i class="fas fa-tachometer-alt w-5 sm:w-6 text-center mr-1 sm:mr-2"></i> Cruising Speed</div>
+                            <div class="font-bold text-white text-sm sm:text-base"><span id="detailSpeed">450</span> <span class="text-[10px] sm:text-xs text-slate-500 font-normal">knots</span></div>
                         </div>
-                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 flex justify-between items-center">
-                            <div class="flex items-center text-slate-400"><i class="fas fa-gas-pump w-6 text-center mr-2"></i> Fuel Consumption</div>
-                            <div class="font-bold text-white"><span id="detailFuel">2500</span> <span id="detailFuelUnit" class="text-xs text-slate-500 font-normal">lbs/hr</span></div>
+                        <div class="bg-slate-900/80 p-3 sm:p-4 rounded-xl border border-slate-700/50 flex justify-between items-center">
+                            <div class="flex items-center text-slate-400 text-xs sm:text-sm"><i class="fas fa-gas-pump w-5 sm:w-6 text-center mr-1 sm:mr-2"></i> Fuel Consump.</div>
+                            <div class="font-bold text-white text-sm sm:text-base"><span id="detailFuel">2500</span> <span id="detailFuelUnit" class="text-[10px] sm:text-xs text-slate-500 font-normal">lbs/hr</span></div>
                         </div>
                     </div>
 
-                    <div class="relative z-10 flex gap-3 pt-6 mt-2">
+                    <div class="relative z-10 flex gap-2 sm:gap-3 pt-4 sm:pt-6 mt-1 sm:mt-2">
                         <input type="hidden" id="detailId">
-                        <button onclick="editAircraftFromDetail()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-500/20"><i class="fas fa-edit mr-2"></i>Edit</button>
-                        <button onclick="deleteAircraftFromDetail()" class="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 py-2.5 rounded-xl text-sm font-medium transition"><i class="fas fa-trash mr-2"></i>Delete</button>
+                        <button onclick="editAircraftFromDetail()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition shadow-lg shadow-blue-500/20"><i class="fas fa-edit mr-1 sm:mr-2"></i>Edit</button>
+                        <button onclick="deleteAircraftFromDetail()" class="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition"><i class="fas fa-trash mr-1 sm:mr-2"></i>Delete</button>
                     </div>
                 </div>
             </div>
@@ -1119,7 +1130,7 @@
             const tbody = document.getElementById('userTableBody'); tbody.innerHTML = '';
             usersData.forEach(user => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="px-4 py-3">${user.name}</td><td class="px-4 py-3"><span class="px-2 py-1 ${user.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'} rounded text-xs">${user.role.toUpperCase()}</span></td><td class="px-4 py-3">${user.username}</td><td class="px-4 py-3 text-slate-500">******</td><td class="px-4 py-3 ${new Date(user.expired) < new Date() ? 'text-red-400' : 'text-emerald-400'}">${user.expired}</td><td class="px-4 py-3"><button onclick="editUser('${user.id}')" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fas fa-edit"></i></button><button onclick="deleteUser('${user.id}')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></td>`;
+                tr.innerHTML = `<td class="px-4 py-3">${user.name}</td><td class="px-4 py-3"><span class="px-2 py-1 ${user.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'} rounded text-xs">${user.role.toUpperCase()}</span></td><td class="px-4 py-3">${user.username}</td><td class="px-4 py-3 text-slate-500">******</td><td class="px-4 py-3 ${new Date(user.expired) < new Date() ? 'text-red-400' : 'text-emerald-400'}">${user.expired}</td><td class="px-4 py-3 text-right"><button onclick="editUser('${user.id}')" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fas fa-edit"></i></button><button onclick="deleteUser('${user.id}')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -1165,6 +1176,10 @@
             satelliteHybrid.addTo(map);
             L.control.layers({ "Satellite (Default)": satelliteHybrid, "Street View": streetMap, "Terrain View": terrainMap }, null, { position: 'topright' }).addTo(map);
             
+            // Pindahkan kontrol layer ke luar dari div yang akan berotasi / membesar 150%
+            const controlContainer = map.getContainer().querySelector('.leaflet-control-container');
+            document.getElementById('tab-map').appendChild(controlContainer);
+
             map.on('click', handleMapClick);
 
             waypointLayerGroup = L.layerGroup().addTo(map);
@@ -1203,15 +1218,15 @@
         function locateUser() {
             if (flightMode !== 'none') return; if (!map) return;
             const statusBadge = document.getElementById('gps-status'); const coordBadge = document.getElementById('gps-coordinates');
-            statusBadge.textContent = 'LOCATING...'; statusBadge.className = 'px-3 py-1 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-full text-xs animate-pulse';
+            statusBadge.textContent = 'LOCATING...'; statusBadge.className = 'px-3 py-1.5 sm:px-4 sm:py-2 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-l-full text-[10px] sm:text-xs animate-pulse';
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const lat = position.coords.latitude; const lng = position.coords.longitude; map.flyTo([lat, lng], 14, { animate: true, duration: 1.5 });
                         const pulseIcon = L.divIcon({ className: 'custom-div-icon', html: "<div class='gps-pulse'></div>", iconSize: [16, 16], iconAnchor: [8, 8] });
                         if (userMarker) { userMarker.setLatLng([lat, lng]); } else { userMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map); }
-                        coordBadge.textContent = `LAT: ${lat.toFixed(4)}° | LON: ${lng.toFixed(4)}°`; statusBadge.textContent = 'GPS ACTIVE'; statusBadge.className = 'px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs animate-pulse';
-                    }, (error) => { statusBadge.textContent = 'GPS ERROR'; statusBadge.className = 'px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full text-xs'; alert('Gagal mendeteksi lokasi.'); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                        coordBadge.textContent = `LAT: ${lat.toFixed(4)}° | LON: ${lng.toFixed(4)}°`; statusBadge.textContent = 'GPS ACTIVE'; statusBadge.className = 'px-3 py-1.5 sm:px-4 sm:py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-l-full text-[10px] sm:text-xs animate-pulse';
+                    }, (error) => { statusBadge.textContent = 'GPS ERROR'; statusBadge.className = 'px-3 py-1.5 sm:px-4 sm:py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-l-full text-[10px] sm:text-xs'; alert('Gagal mendeteksi lokasi.'); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else { alert('Geolocation tidak didukung browser.'); }
         }
@@ -1239,13 +1254,14 @@
             if (!activeMapRouteId || !map) return;
             const rt = routesData.find(r => r.id === activeMapRouteId);
             if (!rt || !rt.waypoints || rt.waypoints.length === 0) return;
-            
-            // Kumpulkan semua titik koordinat pada rute dan jadikan bounds area
             const latlngs = rt.waypoints.map(wp => [wp.lat, wp.lon]);
             const bounds = L.latLngBounds(latlngs);
             
-            // Peta akan otomatis melakukan zoom out / in (animasi terbang) menyesuaikan rute
-            map.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
+            // Hitung kompensasi padding karena ukuran Map di-set 150% di belakang layar
+            const padX = (window.innerWidth * 0.25) + 50;
+            const padY = (window.innerHeight * 0.25) + 50;
+            
+            map.flyToBounds(bounds, { paddingTopLeft: [padX, padY], paddingBottomRight: [padX, padY], duration: 1.5 });
         }
 
         function drawActiveRoute() {
@@ -1317,7 +1333,7 @@
             const filtered = waypointsData.filter(wp => wp.name.toLowerCase().includes(search));
             filtered.forEach(wp => {
                 const tr = document.createElement('tr'); tr.className = 'hover:bg-slate-800/50 transition group';
-                tr.innerHTML = `<td class="px-6 py-3">${getIconHTML(wp.type)}</td><td class="px-6 py-3 font-bold text-blue-400 tracking-wide">${wp.name.toUpperCase()}</td><td class="px-6 py-3 text-slate-300"><div class="text-xs">${decToDMSStr(wp.lat, true)}</div><div class="text-xs text-slate-400">${decToDMSStr(wp.lon, false)}</div></td><td class="px-6 py-3 font-medium">${wp.elev} <span class="text-[10px] text-slate-500">ft</span></td><td class="px-6 py-3 text-right opacity-50 group-hover:opacity-100 transition"><button onclick="editWaypoint('${wp.id}')" class="text-blue-400 hover:text-blue-300 mr-3 p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button><button onclick="deleteWaypoint('${wp.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button></td>`;
+                tr.innerHTML = `<td class="px-3 sm:px-6 py-3 sm:py-4">${getIconHTML(wp.type)}</td><td class="px-3 sm:px-6 py-3 sm:py-4 font-bold text-blue-400 tracking-wide">${wp.name.toUpperCase()}</td><td class="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell text-slate-300"><div class="text-[10px] sm:text-xs">${decToDMSStr(wp.lat, true)}</div><div class="text-[10px] sm:text-xs text-slate-400">${decToDMSStr(wp.lon, false)}</div></td><td class="px-3 sm:px-6 py-3 sm:py-4 font-medium">${wp.elev} <span class="text-[8px] sm:text-[10px] text-slate-500">ft</span></td><td class="px-3 sm:px-6 py-3 sm:py-4 text-right opacity-50 group-hover:opacity-100 transition"><button onclick="editWaypoint('${wp.id}')" class="text-blue-400 hover:text-blue-300 mr-2 sm:mr-3 p-1.5 sm:p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button><button onclick="deleteWaypoint('${wp.id}')" class="text-red-400 hover:text-red-300 p-1.5 sm:p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -1454,8 +1470,8 @@
             if(aircraftsData.length === 0) { grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No aircraft profiles found.</div>'; return; }
             aircraftsData.forEach(ac => {
                 const isHeli = ac.model === 'Helicopter'; const iconClass = isHeli ? 'fa-helicopter' : 'fa-plane'; const bgGradient = isHeli ? 'from-purple-900/40 to-slate-900/80' : 'from-blue-900/40 to-slate-900/80'; const borderClass = isHeli ? 'border-purple-500/30' : 'border-blue-500/30';
-                const card = document.createElement('div'); card.className = `bg-gradient-to-br ${bgGradient} border ${borderClass} rounded-2xl p-5 relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]`; card.onclick = () => viewAircraft(ac.id);
-                card.innerHTML = `<i class="fas ${iconClass} text-6xl text-white/5 absolute -right-2 -bottom-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}"></i><div class="relative z-10 flex justify-between items-start mb-4"><div><h3 class="text-2xl font-bold text-white tracking-widest">${ac.reg}</h3><p class="text-cyan-400 font-medium text-sm truncate w-40">${ac.type}</p></div><div class="w-10 h-10 rounded-full bg-slate-800/80 border border-slate-600 flex items-center justify-center text-slate-300"><i class="fas ${iconClass}"></i></div></div><div class="relative z-10 grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-700/50"><div><p class="text-[10px] text-slate-400 uppercase">Speed</p><p class="text-sm font-semibold text-white">${ac.speed} <span class="text-[10px] text-slate-500 font-normal">kts</span></p></div><div><p class="text-[10px] text-slate-400 uppercase">Fuel Cons.</p><p class="text-sm font-semibold text-white">${ac.fuel} <span class="text-[10px] text-slate-500 font-normal">${ac.fuelUnit}/hr</span></p></div></div><div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center backdrop-blur-[2px]"><span class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg"><i class="fas fa-eye mr-2"></i>View Details</span></div>`;
+                const card = document.createElement('div'); card.className = `bg-gradient-to-br ${bgGradient} border ${borderClass} rounded-2xl p-4 sm:p-5 relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]`; card.onclick = () => viewAircraft(ac.id);
+                card.innerHTML = `<i class="fas ${iconClass} text-5xl sm:text-6xl text-white/5 absolute -right-2 -bottom-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}"></i><div class="relative z-10 flex justify-between items-start mb-4"><div><h3 class="text-xl sm:text-2xl font-bold text-white tracking-widest">${ac.reg}</h3><p class="text-cyan-400 font-medium text-[10px] sm:text-sm truncate w-32 sm:w-40">${ac.type}</p></div><div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-800/80 border border-slate-600 flex items-center justify-center text-slate-300"><i class="fas ${iconClass} text-xs sm:text-base"></i></div></div><div class="relative z-10 grid grid-cols-2 gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-slate-700/50"><div><p class="text-[8px] sm:text-[10px] text-slate-400 uppercase">Speed</p><p class="text-xs sm:text-sm font-semibold text-white">${ac.speed} <span class="text-[8px] sm:text-[10px] text-slate-500 font-normal">kts</span></p></div><div><p class="text-[8px] sm:text-[10px] text-slate-400 uppercase">Fuel Cons.</p><p class="text-xs sm:text-sm font-semibold text-white">${ac.fuel} <span class="text-[8px] sm:text-[10px] text-slate-500 font-normal">${ac.fuelUnit}/hr</span></p></div></div>`;
                 grid.appendChild(card);
             });
         }
@@ -1481,7 +1497,7 @@
             const ac = aircraftsData.find(a => a.id === id); if(!ac) return;
             const isHeli = ac.model === 'Helicopter'; const iconClass = isHeli ? 'fa-helicopter' : 'fa-plane';
             document.getElementById('detailId').value = ac.id; document.getElementById('detailReg').textContent = ac.reg; document.getElementById('detailType').textContent = ac.type; document.getElementById('detailModel').textContent = ac.model.toUpperCase(); document.getElementById('detailSpeed').textContent = ac.speed; document.getElementById('detailFuel').textContent = ac.fuel; document.getElementById('detailFuelUnit').textContent = ac.fuelUnit + '/hr';
-            document.getElementById('detailIcon').innerHTML = `<i class="fas ${iconClass}"></i>`; document.getElementById('detailIconBg').className = `fas ${iconClass} text-8xl text-blue-400/10 absolute -right-6 -top-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}`;
+            document.getElementById('detailIcon').innerHTML = `<i class="fas ${iconClass}"></i>`; document.getElementById('detailIconBg').className = `fas ${iconClass} text-6xl sm:text-8xl text-blue-400/10 absolute -right-4 sm:-right-6 -top-2 z-0 transform ${!isHeli ? '-rotate-45' : ''}`;
             document.getElementById('aircraftDetailModal').classList.remove('hidden');
         }
         function closeAircraftDetail() { document.getElementById('aircraftDetailModal').classList.add('hidden'); }
@@ -1507,8 +1523,8 @@
             const tbody = document.getElementById('routeTableBody'); tbody.innerHTML = '';
             routesData.forEach(rt => {
                 const tr = document.createElement('tr'); tr.className = 'hover:bg-slate-800/50 transition group cursor-pointer'; tr.onclick = () => openRouteDetailModal(rt.id); 
-                let originDest = '-'; if (rt.waypoints && rt.waypoints.length >= 2) { originDest = `<span class="font-semibold text-emerald-400">${rt.waypoints[0].name}</span> <i class="fas fa-arrow-right text-slate-500 text-[10px] mx-1"></i> <span class="font-semibold text-blue-400">${rt.waypoints[rt.waypoints.length-1].name}</span>`; } else if (rt.waypoints && rt.waypoints.length === 1) { originDest = rt.waypoints[0].name; }
-                tr.innerHTML = `<td class="px-6 py-3 font-bold text-white tracking-wide">${rt.name}</td><td class="px-6 py-3 text-cyan-400 text-xs font-medium">${rt.aircraftReg}</td><td class="px-6 py-3">${originDest}</td><td class="px-6 py-3">${rt.totalDist} NM</td><td class="px-6 py-3 text-orange-300">${rt.totalEET}</td><td class="px-6 py-3 text-right opacity-50 group-hover:opacity-100 transition"><button onclick="event.stopPropagation(); editRoute('${rt.id}')" class="text-blue-400 hover:text-blue-300 mr-3 p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button><button onclick="event.stopPropagation(); deleteRoute('${rt.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button></td>`;
+                let originDest = '-'; if (rt.waypoints && rt.waypoints.length >= 2) { originDest = `<span class="font-semibold text-emerald-400">${rt.waypoints[0].name}</span> <i class="fas fa-arrow-right text-slate-500 text-[8px] sm:text-[10px] mx-1"></i> <span class="font-semibold text-blue-400">${rt.waypoints[rt.waypoints.length-1].name}</span>`; } else if (rt.waypoints && rt.waypoints.length === 1) { originDest = rt.waypoints[0].name; }
+                tr.innerHTML = `<td class="px-4 py-3 font-bold text-white tracking-wide">${rt.name}</td><td class="px-4 py-3 text-cyan-400 text-[10px] sm:text-xs font-medium hidden md:table-cell">${rt.aircraftReg}</td><td class="px-4 py-3 text-xs sm:text-sm">${originDest}</td><td class="px-4 py-3 hidden sm:table-cell">${rt.totalDist} NM</td><td class="px-4 py-3 text-orange-300 hidden sm:table-cell">${rt.totalEET}</td><td class="px-4 py-3 text-right opacity-50 group-hover:opacity-100 transition"><button onclick="event.stopPropagation(); editRoute('${rt.id}')" class="text-blue-400 hover:text-blue-300 mr-2 sm:mr-3 p-1.5 sm:p-2 bg-blue-500/10 rounded-lg"><i class="fas fa-edit"></i></button><button onclick="event.stopPropagation(); deleteRoute('${rt.id}')" class="text-red-400 hover:text-red-300 p-1.5 sm:p-2 bg-red-500/10 rounded-lg"><i class="fas fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -1516,7 +1532,7 @@
         function openRouteDetailModal(id) {
             const rt = routesData.find(r => r.id === id); if(!rt) return;
             document.getElementById('detRtName').textContent = rt.name; const ac = aircraftsData.find(a => a.id === rt.aircraftId); document.getElementById('detRtAircraft').textContent = ac ? `${ac.reg} (${ac.type})` : rt.aircraftReg;
-            let originDest = '-'; if (rt.waypoints && rt.waypoints.length >= 2) { originDest = `${rt.waypoints[0].name} <i class="fas fa-arrow-right text-blue-400 mx-2 text-xs"></i> ${rt.waypoints[rt.waypoints.length-1].name}`; } else if (rt.waypoints && rt.waypoints.length === 1) { originDest = rt.waypoints[0].name; }
+            let originDest = '-'; if (rt.waypoints && rt.waypoints.length >= 2) { originDest = `${rt.waypoints[0].name} <i class="fas fa-arrow-right text-blue-400 mx-1 sm:mx-2 text-[8px] sm:text-xs"></i> ${rt.waypoints[rt.waypoints.length-1].name}`; } else if (rt.waypoints && rt.waypoints.length === 1) { originDest = rt.waypoints[0].name; }
             document.getElementById('detRtOriginDest').innerHTML = originDest; document.getElementById('detRtDist').textContent = rt.totalDist; document.getElementById('detRtEET').textContent = rt.totalEET;
             
             let totalFuel = 0;
@@ -1541,7 +1557,11 @@
             document.getElementById('routeDetailModal').classList.remove('hidden');
         }
 
-        function closeRouteDetailModal() { document.getElementById('routeDetailModal').classList.add('hidden'); }
+        // Fungsi close yang benar
+        function closeRouteDetailModal() { 
+            document.getElementById('routeDetailModal').classList.add('hidden'); 
+        }
+
         function duplicateRoute(id) { const rt = routesData.find(r => r.id === id); if(!rt) return; const clone = JSON.parse(JSON.stringify(rt)); clone.id = 'rt_' + Date.now(); clone.name += ' - COPY'; routesData.push(clone); saveRoutes(); renderRouteList(); closeRouteDetailModal(); }
         function invertRoute(id) { const rt = routesData.find(r => r.id === id); if(!rt) return; rt.waypoints.reverse(); const parts = rt.name.split('-'); if (parts.length === 2) rt.name = parts[1] + '-' + parts[0]; else rt.name = rt.name + ' (INVERTED)'; recalcRouteTotals(rt); saveRoutes(); renderRouteList(); openRouteDetailModal(rt.id); }
         function recalcRouteTotals(rt) { let totalDist = 0; let totalDecHours = 0; for(let i=1; i<rt.waypoints.length; i++) { const dist = calcDistanceNM(rt.waypoints[i-1].lat, rt.waypoints[i-1].lon, rt.waypoints[i].lat, rt.waypoints[i].lon); totalDist += dist; if(rt.speed > 0) totalDecHours += (dist / rt.speed); } rt.totalDist = Math.round(totalDist); rt.totalEET = formatTimeHM(totalDecHours); }
@@ -1578,6 +1598,20 @@
         }
         function addWpToRoute(wpId) { const wp = waypointsData.find(w => w.id === wpId); if (wp) { currentRouteWps.push({...wp}); renderOFPTable(); closeRouteWpSelector(); } }
         function removeWpFromRoute(index) { currentRouteWps.splice(index, 1); renderOFPTable(); }
+        
+        // Pindahkan posisi WP di OFP
+        function moveWpUp(index) {
+            if (index > 0) {
+                const temp = currentRouteWps[index - 1]; currentRouteWps[index - 1] = currentRouteWps[index]; currentRouteWps[index] = temp;
+                renderOFPTable();
+            }
+        }
+        function moveWpDown(index) {
+            if (index < currentRouteWps.length - 1) {
+                const temp = currentRouteWps[index + 1]; currentRouteWps[index + 1] = currentRouteWps[index]; currentRouteWps[index] = temp;
+                renderOFPTable();
+            }
+        }
 
         function renderOFPTable() {
             const tbody = document.getElementById('ofpTableBody'); tbody.innerHTML = '';
@@ -1594,12 +1628,28 @@
                 const getColValueHTML = (type) => {
                     if (i === 0 && type !== 'eta') return '-'; if (i === 0 && type === 'eta') return document.getElementById('rtEtd').value || '00:00'; 
                     switch(type) {
-                        case 'distance': return `${formatDecimal(dist)} <span class="text-[10px] text-slate-500">NM</span>`; case 'heading': case 'bearing': return `${Math.round(brng).toString().padStart(3, '0')}°`;
+                        case 'distance': return `${formatDecimal(dist)} <span class="text-[8px] sm:text-[10px] text-slate-500">NM</span>`; case 'heading': case 'bearing': return `${Math.round(brng).toString().padStart(3, '0')}°`;
                         case 'eet': return formatTimeHM(decHrs); case 'eta': return addDecimalHoursToHHMM(etdVal, etaHrs); case 'fuel': return formatDecimal(fuelBurn); default: return '-';
                     }
                 };
+                
+                const upClass = i === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-400 cursor-pointer';
+                const downClass = i === currentRouteWps.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-400 cursor-pointer';
+                
                 const tr = document.createElement('tr'); tr.className = 'hover:bg-slate-800/30 transition group';
-                tr.innerHTML = `<td class="px-4 py-2 text-center text-xs text-slate-500">${i+1}</td><td class="px-4 py-2 font-bold text-blue-300">${wp.name}<div class="text-[10px] text-slate-400 font-normal">Elev: ${wp.elev}ft</div></td><td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col1Type)}</td><td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col2Type)}</td><td class="px-4 py-2 font-mono text-sm">${getColValueHTML(col3Type)}</td><td class="px-4 py-2 text-center"><button type="button" onclick="removeWpFromRoute(${i})" class="text-red-500/50 hover:text-red-400 transition p-1"><i class="fas fa-times"></i></button></td>`;
+                tr.innerHTML = `
+                    <td class="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs text-slate-500">${i+1}</td>
+                    <td class="px-2 sm:px-4 py-2 sm:py-3 font-bold text-blue-300">${wp.name}<div class="text-[8px] sm:text-[10px] text-slate-400 font-normal">Elev: ${wp.elev}ft</div></td>
+                    <td class="px-2 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-sm">${getColValueHTML(col1Type)}</td>
+                    <td class="px-2 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-sm">${getColValueHTML(col2Type)}</td>
+                    <td class="px-2 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-sm">${getColValueHTML(col3Type)}</td>
+                    <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
+                        <div class="flex justify-center gap-1 sm:gap-2">
+                            <button type="button" onclick="moveWpUp(${i})" class="${upClass} transition p-1"><i class="fas fa-arrow-up"></i></button>
+                            <button type="button" onclick="moveWpDown(${i})" class="${downClass} transition p-1"><i class="fas fa-arrow-down"></i></button>
+                            <button type="button" onclick="removeWpFromRoute(${i})" class="text-red-500/50 hover:text-red-400 transition p-1 ml-1"><i class="fas fa-times"></i></button>
+                        </div>
+                    </td>`;
                 tbody.appendChild(tr);
             });
             if (currentRouteWps.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500 italic">No waypoints added yet. Click [+] to build your route.</td></tr>'; }
@@ -1713,7 +1763,6 @@
             `;
 
             document.getElementById('printArea').innerHTML = printHtml;
-            // Timeout singkat memastikan DOM sempat merender PDF layer
             setTimeout(() => { window.print(); }, 100);
         }
 
@@ -1767,18 +1816,32 @@
 
         function drawFlightRouteLine() {
             if (activeRouteLayerGroup) activeRouteLayerGroup.clearLayers();
-            const latlngs = flightRouteData.waypoints.map(wp => [wp.lat, wp.lon]); L.polyline(latlngs, { color: '#3b82f6', weight: 4, opacity: 0.8, dashArray: '10, 10' }).addTo(activeRouteLayerGroup);
+            const latlngs = flightRouteData.waypoints.map(wp => [wp.lat, wp.lon]); L.polyline(latlngs, { color: '#d946ef', weight: 4, opacity: 0.9 }).addTo(activeRouteLayerGroup);
         }
 
         function createFlightMarker() {
-            const isHeli = flightAircraftData && flightAircraftData.model === 'Helicopter'; const iconClass = isHeli ? 'fa-helicopter text-pink-400' : 'fa-plane text-cyan-400';
-            const html = `<div style="font-size: 28px; text-shadow: 0 0 10px black; transform: rotate(-45deg);"><i class="fas ${iconClass}"></i></div>`;
-            const icon = L.divIcon({ className: '', html: html, iconSize: [28, 28], iconAnchor: [14, 14] }); flightMarker = L.marker([flightCurrentLat, flightCurrentLon], { icon: icon, zIndexOffset: 1000 }).addTo(map);
+            const isHeli = flightAircraftData && flightAircraftData.model === 'Helicopter';
+            const planeSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#3b82f6" d="M21,15.42v-1.75l-8-5V3.5c0-0.83-0.67-1.5-1.5-1.5S10,2.67,10,3.5v5.17l-8,5v1.75l8-2.5V18l-2.25,1.75V21.5L11.5,20.5L15.25,21.5v-1.75L13,18v-5.08L21,15.42z"/></svg>`;
+            const heliSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#3b82f6" d="M12,2C11.45,2 11,2.45 11,3V8.25L4.5,10.25V11.75L11,10.5V15L9,16.5V18L12,17L15,18V16.5L13,15V10.5L19.5,11.75V10.25L13,8.25V3C13,2.45 12.55,2 12,2ZM12,6C14.21,6 16,4.21 16,2C16,1.9 15.9,1.8 15.8,1.7C14.8,2.5 13.5,3 12,3C10.5,3 9.2,2.5 8.2,1.7C8.1,1.8 8,1.9 8,2C8,4.21 9.79,6 12,6Z"/></svg>`;
+
+            const svgIcon = isHeli ? heliSVG : planeSVG;
+            const html = `<div class="flight-icon-inner" style="filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.8)); display: flex; justify-content: center; align-items: center; transition: transform 0.1s linear;">${svgIcon}</div>`;
+            const icon = L.divIcon({ className: '', html: html, iconSize: [20, 20], iconAnchor: [10, 10] }); 
+            flightMarker = L.marker([flightCurrentLat, flightCurrentLon], { icon: icon, zIndexOffset: 1000 }).addTo(map);
         }
 
         function updateTrackUp(heading) {
-            const mapContainer = document.getElementById('realMap'); mapContainer.style.transformOrigin = 'center center'; mapContainer.style.transform = `scale(1.4) rotate(${-heading}deg)`;
+            const mapContainer = document.getElementById('realMap'); mapContainer.style.transformOrigin = 'center center'; mapContainer.style.transform = `rotate(${-heading}deg)`;
             map.panTo([flightCurrentLat, flightCurrentLon], { animate: true, duration: 0.1, easeLinearity: 1 });
+
+            // Counter-rotate flight marker agar selalu menghadap ke atas layar
+            if (flightMarker) {
+                const iconElement = flightMarker.getElement();
+                if (iconElement) {
+                    const innerDiv = iconElement.querySelector('.flight-icon-inner');
+                    if (innerDiv) innerDiv.style.transform = `rotate(${heading}deg)`;
+                }
+            }
         }
 
         function updateHUD(hdg, spd, distToWp, eetaDest) {
