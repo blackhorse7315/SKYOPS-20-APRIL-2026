@@ -1587,6 +1587,12 @@
             const rt = routesData.find(r => r.id === routeId); if (!rt || rt.waypoints.length < 2) return alert("Rute tidak valid untuk disimulasikan.");
             flightRouteData = rt; flightAircraftData = aircraftsData.find(a => a.id === rt.aircraftId); flightMode = 'sim';
             closeRouteDetailModal(); switchTab('map'); clearActiveMapRoute();
+            
+            // Set filter & redraw peta
+            activeMapRouteId = routeId; 
+            if(document.getElementById('toggleAllWps')) document.getElementById('toggleAllWps').checked = false; 
+            updateMapWaypoints();
+
             document.getElementById('btnAutoDetectMap').classList.add('hidden'); document.getElementById('flightHUDOverlay').classList.remove('hidden'); document.getElementById('flightModeLabel').innerHTML = '<i class="fas fa-play-circle mr-1"></i> SIMULATION'; document.getElementById('simSpeedControl').classList.remove('hidden');
             flightCurrentLat = rt.waypoints[0].lat; flightCurrentLon = rt.waypoints[0].lon; flightTargetWpIndex = 1;
             drawFlightRouteLine(); createFlightMarker(); flightInterval = setInterval(simulationLoop, 100);
@@ -1597,6 +1603,12 @@
             if (!navigator.geolocation) return alert("Geolocation tidak didukung oleh browser Anda.");
             flightRouteData = rt; flightAircraftData = aircraftsData.find(a => a.id === rt.aircraftId); flightMode = 'nav';
             closeRouteDetailModal(); switchTab('map'); clearActiveMapRoute();
+            
+            // Set filter & redraw peta
+            activeMapRouteId = routeId; 
+            if(document.getElementById('toggleAllWps')) document.getElementById('toggleAllWps').checked = false; 
+            updateMapWaypoints();
+
             document.getElementById('btnAutoDetectMap').classList.add('hidden'); document.getElementById('flightHUDOverlay').classList.remove('hidden'); document.getElementById('flightModeLabel').innerHTML = '<i class="fas fa-location-arrow mr-1 text-emerald-400"></i> NAVIGATION'; document.getElementById('simSpeedControl').classList.add('hidden');
             drawFlightRouteLine(); createFlightMarker(); flightCurrentLat = rt.waypoints[0].lat; flightCurrentLon = rt.waypoints[0].lon; flightTargetWpIndex = 1;
             flightWatchId = navigator.geolocation.watchPosition( navigationLoop, (err) => { console.warn("GPS Error", err); }, { enableHighAccuracy: true, maximumAge: 0 } );
@@ -1607,6 +1619,11 @@
             flightMode = 'none'; flightInterval = null; flightWatchId = null;
             document.getElementById('flightHUDOverlay').classList.add('hidden'); document.getElementById('btnAutoDetectMap').classList.remove('hidden');
             if (activeRouteLayerGroup) activeRouteLayerGroup.clearLayers(); if (flightMarker) { map.removeLayer(flightMarker); flightMarker = null; }
+            
+            // Bersihkan filter map agar semua waypoint kembali normal
+            activeMapRouteId = null; 
+            updateMapWaypoints();
+            
             const mapContainer = document.getElementById('realMap'); mapContainer.style.transform = `scale(1) rotate(0deg)`;
         }
 
