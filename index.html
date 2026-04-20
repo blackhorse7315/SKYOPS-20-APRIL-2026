@@ -1063,7 +1063,13 @@
         async function syncWithGoogleSheet() {
             if (GOOGLE_SCRIPT_URL === '') { alert('URL Google Script belum diatur.'); return; }
             alert('Mensinkronkan seluruh data dari Google Sheet...');
-            await initApp(); 
+            
+            // Tarik ulang semua data secara background tanpa pindah halaman
+            await loadUsers();
+            await loadWaypoints(); 
+            await loadAircrafts();
+            await loadRoutes(); 
+            
             alert('Data tersinkronisasi!');
         }
 
