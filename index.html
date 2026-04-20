@@ -899,7 +899,7 @@
     <!-- ========================================== -->
     <script>
         // --- KONFIGURASI GOOGLE SHEETS ---
-        const GOOGLE_SCRIPT_URL = ''; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2wyGnv27jwnX8ji0MpyFmyeF4ZxPIUlzOK9hsGEdi0OUyJhkhbFbZ3ILHIrfhJz3GCQ/exec'; 
         
         // --- GLOBAL STATE ---
         let usersData = [];
@@ -1006,9 +1006,9 @@
         async function initApp() {
             showView('loginScreen');
             await loadUsers();
-            loadWaypoints(); 
-            loadAircrafts();
-            loadRoutes(); 
+            await loadWaypoints(); 
+            await loadAircrafts();
+            await loadRoutes(); 
             document.getElementById('editAdminUser').value = localStorage.getItem('adminUser');
             document.getElementById('editAdminPass').value = localStorage.getItem('adminPass');
         }
@@ -1017,8 +1017,8 @@
         async function loadUsers() {
             if (GOOGLE_SCRIPT_URL !== '') {
                 try {
-                    const response = await fetch(GOOGLE_SCRIPT_URL); usersData = await response.json();
-                } catch (error) { console.error("Error G-Sheet", error); loadLocalUsers(); }
+                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=users'); usersData = await response.json();
+                } catch (error) { console.error("Error G-Sheet Users", error); loadLocalUsers(); }
             } else { loadLocalUsers(); }
             renderUserTable();
         }
@@ -1030,11 +1030,17 @@
                 usersData = [{ id: Date.now().toString(), name: 'Demo Pilot', role: 'user', username: 'pilot', password: '123', expired: nextMonth.toISOString().split('T')[0] }]; saveToLocal();
             }
         }
-        function saveToLocal() { localStorage.setItem('skyops_users', JSON.stringify(usersData)); }
+
+        function saveToLocal() { 
+            localStorage.setItem('skyops_users', JSON.stringify(usersData)); 
+            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=users', { method: 'POST', body: JSON.stringify(usersData) }).catch(e => console.warn(e));
+        }
+
         async function syncWithGoogleSheet() {
             if (GOOGLE_SCRIPT_URL === '') { alert('URL Google Script belum diatur.'); return; }
-            alert('Fitur sinkronisasi POST ke Google Sheet memerlukan penyesuaian endpoint script. Saat ini sinkronisasi mengambil data terbaru.');
-            await loadUsers(); alert('Data tersinkronisasi!');
+            alert('Mensinkronkan seluruh data dari Google Sheet...');
+            await initApp(); 
+            alert('Data tersinkronisasi!');
         }
 
         function handleLogin(e) {
@@ -1223,13 +1229,26 @@
         // ==========================================
         // --- WAYPOINT DATABASE LOGIC            ---
         // ==========================================
-        function loadWaypoints() {
+        async function loadWaypoints() {
+            if (GOOGLE_SCRIPT_URL !== '') {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=waypoints'); waypointsData = await response.json();
+                } catch (error) { console.error("Error G-Sheet Waypoints", error); loadLocalWaypoints(); }
+            } else { loadLocalWaypoints(); }
+            renderWaypoints();
+        }
+
+        function loadLocalWaypoints() {
             const localWP = localStorage.getItem('skyops_waypoints');
             if (localWP) { waypointsData = JSON.parse(localWP); } else {
                 waypointsData = [ { id: '170001', name: 'WIMM', type: 'airport', lat: 3.637222, lon: 98.878889, elev: 23 }, { id: '170002', name: 'MDN', type: 'vfr', lat: 3.5638, lon: 98.6695, elev: 110 }, { id: '170003', name: 'MEDAN HELI', type: 'heliport', lat: 3.5952, lon: 98.6722, elev: 85 } ]; saveWaypoints();
-            } renderWaypoints();
+            } 
         }
-        function saveWaypoints() { localStorage.setItem('skyops_waypoints', JSON.stringify(waypointsData)); }
+
+        function saveWaypoints() { 
+            localStorage.setItem('skyops_waypoints', JSON.stringify(waypointsData)); 
+            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=waypoints', { method: 'POST', body: JSON.stringify(waypointsData) }).catch(e => console.warn(e));
+        }
 
         function renderWaypoints() {
             const tbody = document.getElementById('waypointTableBody'); const search = document.getElementById('searchInputWaypoint') ? document.getElementById('searchInputWaypoint').value.toLowerCase() : ''; tbody.innerHTML = '';
@@ -1343,13 +1362,26 @@
         // ==========================================
         // --- AIRCRAFT PROFILE LOGIC             ---
         // ==========================================
-        function loadAircrafts() {
+        async function loadAircrafts() {
+            if (GOOGLE_SCRIPT_URL !== '') {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=aircrafts'); aircraftsData = await response.json();
+                } catch (error) { console.error("Error G-Sheet Aircrafts", error); loadLocalAircrafts(); }
+            } else { loadLocalAircrafts(); }
+            renderAircrafts();
+        }
+
+        function loadLocalAircrafts() {
             const localAC = localStorage.getItem('skyops_aircrafts');
             if (localAC) { aircraftsData = JSON.parse(localAC); } else {
                 aircraftsData = [ { id: 'ac_1', reg: 'PK-TWA', type: 'Gulfstream IV SP', model: 'Fixed Wing', speed: 450, fuel: 3500, fuelUnit: 'lbs' }, { id: 'ac_2', reg: 'PK-HLY', type: 'Bell 412 EP', model: 'Helicopter', speed: 140, fuel: 250, fuelUnit: 'liter' } ]; saveAircrafts();
-            } renderAircrafts();
+            } 
         }
-        function saveAircrafts() { localStorage.setItem('skyops_aircrafts', JSON.stringify(aircraftsData)); }
+
+        function saveAircrafts() { 
+            localStorage.setItem('skyops_aircrafts', JSON.stringify(aircraftsData)); 
+            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=aircrafts', { method: 'POST', body: JSON.stringify(aircraftsData) }).catch(e => console.warn(e));
+        }
 
         function renderAircrafts() {
             const grid = document.getElementById('aircraftGrid'); grid.innerHTML = '';
@@ -1393,12 +1425,24 @@
         // ==========================================
         // --- ROUTE & OFP LOGIC                  ---
         // ==========================================
-        function loadRoutes() {
-            const localRt = localStorage.getItem('skyops_routes');
-            if (localRt) { routesData = JSON.parse(localRt); } else { routesData = []; }
+        async function loadRoutes() {
+            if (GOOGLE_SCRIPT_URL !== '') {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=routes'); routesData = await response.json();
+                } catch (error) { console.error("Error G-Sheet Routes", error); loadLocalRoutes(); }
+            } else { loadLocalRoutes(); }
             renderRouteList();
         }
-        function saveRoutes() { localStorage.setItem('skyops_routes', JSON.stringify(routesData)); }
+
+        function loadLocalRoutes() {
+            const localRt = localStorage.getItem('skyops_routes');
+            if (localRt) { routesData = JSON.parse(localRt); } else { routesData = []; }
+        }
+
+        function saveRoutes() { 
+            localStorage.setItem('skyops_routes', JSON.stringify(routesData)); 
+            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=routes', { method: 'POST', body: JSON.stringify(routesData) }).catch(e => console.warn(e));
+        }
 
         function renderRouteList() {
             const tbody = document.getElementById('routeTableBody'); tbody.innerHTML = '';
