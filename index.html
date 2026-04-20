@@ -292,7 +292,11 @@
                     <p class="text-sm font-medium text-white" id="displayUserName">Pilot</p>
                     <p class="text-xs text-slate-400">Active Session</p>
                 </div>
-                <button onclick="logout()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 transition flex items-center justify-center text-slate-300">
+                <!-- User Sync Button -->
+                <button onclick="syncWithGoogleSheet()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/50 transition flex items-center justify-center text-slate-300" title="Sync Data dari Cloud">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button onclick="logout()" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 transition flex items-center justify-center text-slate-300" title="Logout">
                     <i class="fas fa-power-off"></i>
                 </button>
             </div>
@@ -906,7 +910,7 @@
     <!-- ========================================== -->
     <script>
         // --- KONFIGURASI GOOGLE SHEETS ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJRgliq3Mijlbpdi1hpAwyxBE9bU3U43aRVGWoV5IMJjkP3-m37hEilI29QccyEOI6dQ/exec'; 
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzs6J4A0TjRs_q36i7BUCJgZplJaaFH3-Ws77qULblSW1j9Qmleon7EOq-08mpntAlcfQ/exec'; 
         
         // --- GLOBAL STATE ---
         let usersData = [];
@@ -939,6 +943,36 @@
         if(!localStorage.getItem('adminUser')) {
             localStorage.setItem('adminUser', 'admin');
             localStorage.setItem('adminPass', 'ramdan28');
+        }
+
+        // ==========================================
+        // --- GOOGLE SHEETS API HELPERS          ---
+        // ==========================================
+        // Fungsi terpusat ini memastikan data selalu ditarik baru (tanpa cache)
+        async function fetchFromSheet(sheetName) {
+            if (!GOOGLE_SCRIPT_URL) return null;
+            try {
+                // &t=Date.now() memaksa browser mengabaikan cache dan menarik data terbaru
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?sheet=${sheetName}&t=${Date.now()}`);
+                if (!res.ok) throw new Error("Gagal merespon dari server.");
+                const text = await res.text();
+                return JSON.parse(text);
+            } catch (err) {
+                console.error(`Error Fetching ${sheetName}:`, err);
+                return null;
+            }
+        }
+
+        async function postToSheet(sheetName, data) {
+            if (!GOOGLE_SCRIPT_URL) return;
+            try {
+                await fetch(`${GOOGLE_SCRIPT_URL}?sheet=${sheetName}`, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            } catch (err) {
+                console.error(`Error Posting ${sheetName}:`, err);
+            }
         }
 
         // ==========================================
@@ -1007,24 +1041,17 @@
                 splash.classList.remove('fade-in'); splash.classList.add('fade-out');
                 setTimeout(() => { initApp(); }, 1000);
             }, 3000);
-
-            // --- PWA SETUP ---
             setupPWA();
         };
 
         function setupPWA() {
             const manifestData = {
-                "name": "SkyOps Navigation Pro",
-                "short_name": "SkyOps",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#0f172a",
-                "theme_color": "#0f172a",
+                "name": "SkyOps Navigation Pro", "short_name": "SkyOps", "start_url": ".", "display": "standalone",
+                "background_color": "#0f172a", "theme_color": "#0f172a",
                 "icons": [ { "src": "https://lh3.googleusercontent.com/d/1HzKe-3FS_hP-MjbOHc-mkyierhu5kVp-", "sizes": "192x192 512x512", "type": "image/png", "purpose": "any" } ]
             };
             const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
             document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
-
             if ('serviceWorker' in navigator) {
                 const swCode = `self.addEventListener('install', (e) => { self.skipWaiting(); }); self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); }); self.addEventListener('fetch', (e) => { });`;
                 const swBlob = new Blob([swCode], {type: 'application/javascript'});
@@ -1048,29 +1075,27 @@
 
         // --- DATA MANAGEMENT & AUTH ---
         async function loadUsers() {
-            if (GOOGLE_SCRIPT_URL !== '') {
-                try {
-                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=users'); usersData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Users", error); usersData = []; }
-            } else { usersData = []; }
+            const data = await fetchFromSheet('users');
+            if (data !== null) { usersData = data; }
             renderUserTable();
         }
 
-        function saveUsers() { 
-            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=users', { method: 'POST', body: JSON.stringify(usersData) }).catch(e => console.warn(e));
-        }
+        function saveUsers() { postToSheet('users', usersData); }
 
         async function syncWithGoogleSheet() {
             if (GOOGLE_SCRIPT_URL === '') { alert('URL Google Script belum diatur.'); return; }
-            alert('Mensinkronkan seluruh data dari Google Sheet...');
             
-            // Tarik ulang semua data secara background tanpa pindah halaman
+            // Putar icon sync saat loading
+            const icons = document.querySelectorAll('.fa-sync-alt');
+            icons.forEach(i => i.classList.add('fa-spin'));
+            
             await loadUsers();
             await loadWaypoints(); 
             await loadAircrafts();
             await loadRoutes(); 
             
-            alert('Data tersinkronisasi!');
+            icons.forEach(i => i.classList.remove('fa-spin'));
+            alert('Semua data berhasil ditarik dan diperbarui dari Google Sheets!');
         }
 
         function handleLogin(e) {
@@ -1260,17 +1285,12 @@
         // --- WAYPOINT DATABASE LOGIC            ---
         // ==========================================
         async function loadWaypoints() {
-            if (GOOGLE_SCRIPT_URL !== '') {
-                try {
-                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=waypoints'); waypointsData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Waypoints", error); waypointsData = []; }
-            } else { waypointsData = []; }
+            const data = await fetchFromSheet('waypoints');
+            if (data !== null) { waypointsData = data; }
             renderWaypoints();
         }
 
-        function saveWaypoints() { 
-            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=waypoints', { method: 'POST', body: JSON.stringify(waypointsData) }).catch(e => console.warn(e));
-        }
+        function saveWaypoints() { postToSheet('waypoints', waypointsData); }
 
         function renderWaypoints() {
             const tbody = document.getElementById('waypointTableBody'); const search = document.getElementById('searchInputWaypoint') ? document.getElementById('searchInputWaypoint').value.toLowerCase() : ''; tbody.innerHTML = '';
@@ -1385,17 +1405,12 @@
         // --- AIRCRAFT PROFILE LOGIC             ---
         // ==========================================
         async function loadAircrafts() {
-            if (GOOGLE_SCRIPT_URL !== '') {
-                try {
-                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=aircrafts'); aircraftsData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Aircrafts", error); aircraftsData = []; }
-            } else { aircraftsData = []; }
+            const data = await fetchFromSheet('aircrafts');
+            if (data !== null) { aircraftsData = data; }
             renderAircrafts();
         }
 
-        function saveAircrafts() { 
-            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=aircrafts', { method: 'POST', body: JSON.stringify(aircraftsData) }).catch(e => console.warn(e));
-        }
+        function saveAircrafts() { postToSheet('aircrafts', aircraftsData); }
 
         function renderAircrafts() {
             const grid = document.getElementById('aircraftGrid'); grid.innerHTML = '';
@@ -1440,17 +1455,12 @@
         // --- ROUTE & OFP LOGIC                  ---
         // ==========================================
         async function loadRoutes() {
-            if (GOOGLE_SCRIPT_URL !== '') {
-                try {
-                    const response = await fetch(GOOGLE_SCRIPT_URL + '?sheet=routes'); routesData = await response.json();
-                } catch (error) { console.error("Error G-Sheet Routes", error); routesData = []; }
-            } else { routesData = []; }
+            const data = await fetchFromSheet('routes');
+            if (data !== null) { routesData = data; }
             renderRouteList();
         }
 
-        function saveRoutes() { 
-            if (GOOGLE_SCRIPT_URL !== '') fetch(GOOGLE_SCRIPT_URL + '?sheet=routes', { method: 'POST', body: JSON.stringify(routesData) }).catch(e => console.warn(e));
-        }
+        function saveRoutes() { postToSheet('routes', routesData); }
 
         function renderRouteList() {
             const tbody = document.getElementById('routeTableBody'); tbody.innerHTML = '';
